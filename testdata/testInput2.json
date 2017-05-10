@@ -1,0 +1,90 @@
+{
+  "uuid": "62c53650-68d6-4ed9-9932-e76c53bebd35",
+  "content": {
+    "uuid": "62c53650-68d6-4ed9-9932-e76c53bebd35",
+    "title": "test title",
+    "body": "test body",
+    "identifiers": [
+      {
+        "authority": "http://api.ft.com/system/FTCOM-METHODE",
+        "identifierValue": "62c53650-68d6-4ed9-9932-e76c53bebd35"
+      }
+    ],
+    "publishedDate": "",
+    "lastModified": "",
+    "firstPublishedDate": "",
+    "mediaType": "",
+    "marked_deleted": false,
+    "byline": "John Doe in London",
+    "standfirst": "standfirst",
+    "description": "description",
+    "mainImage": "",
+    "publishReference": "tid_riega1hr5w",
+    "type": "Article"
+  },
+  "metadata": [
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/bec5a464-bdf8-4f5a-95f0-8e2ea253c589",
+        "prefLabel": "Martin Testerman",
+        "predicate": "http://www.ft.com/ontology/annotation/about",
+        "types": [
+          "http://www.ft.com/ontology/person/Person",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "NGI4YWNhOTktOTc0Ny00MTdiLTkzNzMtZTUwMDM4MGIyODdh-UE4="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/1d216512-3d7c-4757-bb25-824f3a21170b",
+        "prefLabel": "Special",
+        "predicate": "http://www.ft.com/ontology/classification/isPrimarilyClassifiedBy",
+        "types": [
+          "http://www.ft.com/ontology/SpecialReport",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "apiUrl": "http://api.ft.com/things/1d216512-3d7c-4757-bb25-824f3a21170b",
+        "tmeIDs": [
+          "M2FmYTU2ZmMtMTAwNC00ZjM5LWI5ZTQtNzJiZWQ1ZjFmYjg4-U3BlY2lhbFJlcG9ydHM="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "uuid": "b17756fe-0f62-4cf1-9deb-ca7a2ff80172",
+  "content": {
+    "uuid": "b17756fe-0f62-4cf1-9deb-ca7a2ff80172",
+    "title": "test title",
+    "body": "test body",
+    "identifiers": [
+      {
+        "authority": "http://api.ft.com/system/FTCOM-METHODE",
+        "identifierValue": "b17756fe-0f62-4cf1-9deb-ca7a2ff80172"
+      }
+    ],
+    "publishedDate": "",
+    "lastModified": "",
+    "firstPublishedDate": "",
+    "mediaType": "",
+    "marked_deleted": false,
+    "byline": "John Doe in London",
+    "standfirst": "standfirst",
+    "description": "description",
+    "mainImage": "",
+    "publishReference": "tid_riega1hr5w",
+    "type": "Article"
+  },
+  "metadata": [
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/173f9769-2085-48e7-9927-3a71366f2ea3",
+        "prefLabel": "Pomegranate",
+        "types": [
+          "http://www.ft.com/ontology/organisation/Organisation",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "predicate": "http://www.ft.com/ontology/annotation/about"
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 1
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9932743203464962
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    }
+  ]
+}

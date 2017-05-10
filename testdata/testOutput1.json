@@ -1,0 +1,123 @@
+{
+  "uid": "f3f777f8-2b3a-11e7-9b32-1fc36bdf8f7d",
+  "last_metadata_publish": null,
+  "index_date": null,
+  "mark_deleted": false,
+  "story_id": null,
+  "lead_headline": "test title",
+  "byline": "John Doe in London",
+  "body": "test body",
+  "url": "https://www.ft.com/content/f3f777f8-2b3a-11e7-9b32-1fc36bdf8f7d",
+  "initial_publish": null,
+  "last_publish": null,
+  "content_type": "article",
+  "provider_name": null,
+  "length_millis": 0,
+  "short_description": null,
+  "thumbnail_url": null,
+  "section_link": null,
+  "secondary_image_id": null,
+  "contributor_rights": null,
+  "source_code": null,
+  "storymodel_id": null,
+  "model_api_url": null,
+  "model_master_source": null,
+  "model_master_id": null,
+  "model_excerpt": null,
+  "model_resource_uri": null,
+  "cmr_primarysection": "Lex",
+  "cmr_primarytheme": "South Korea",
+  "cmr_mediatype": null,
+  "cmr_metadataupdatetime": null,
+  "cmr_primarysection_id": "MTE1-U2VjdGlvbnM=",
+  "cmr_primarytheme_id": "TnN0ZWluX0dMX0tS-R0w=",
+  "cmr_mediatype_id": null,
+  "cmr_brands": [
+    "Artscast",
+    "Ask the FT",
+    "Ask the Expert"
+  ],
+  "cmr_brands_ids": [
+    "QnJhbmRzXzEz-QnJhbmRz",
+    "QnJhbmRzXzE2-QnJhbmRz",
+    "QnJhbmRzXzE1-QnJhbmRz"
+  ],
+  "cmr_specialreports": [
+    "50 Leading Business Pioneers",
+    "Africa: Farming",
+    "Brazil"
+  ],
+  "cmr_specialreports_ids": [
+    "ODI4MzFkMmMtYTg2NC00OTZhLTliOTktZDRlMDdhMWFlMzRh-U3BlY2lhbFJlcG9ydHM=",
+    "MzU0ZDJjYzUtZjViZC00MmE3LTg4MzItMGFmMWYxZWEzOTQz-U3BlY2lhbFJlcG9ydHM=",
+    "NmVhYWIwYmMtNjc2Yi00YzYzLTgwYTEtOWI0YWIwMTUwY2Fm-U3BlY2lhbFJlcG9ydHM="
+  ],
+  "cmr_sections": [
+    "Lex"
+  ],
+  "cmr_sections_ids": [
+    "MTE1-U2VjdGlvbnM="
+  ],
+  "cmr_subjects": [
+    "Foreign Trade"
+  ],
+  "cmr_subjects_ids": [
+    "ODQ=-U3ViamVjdHM="
+  ],
+  "cmr_topics": [
+    "Annuities"
+  ],
+  "cmr_topics_ids": [
+    "ZGE5NjI5N2UtMTI1ZC00Mzc0LTlhYzktMWViZjUwMGJhM2Ux-VG9waWNz"
+  ],
+  "cmr_people": null,
+  "cmr_people_ids": null,
+  "cmr_regions": [
+    "South Korea",
+    "North Korea",
+    "United States of America"
+  ],
+  "cmr_regions_ids": [
+    "TnN0ZWluX0dMX0tS-R0w=",
+    "TnN0ZWluX0dMX0tQ-R0w=",
+    "TnN0ZWluX0dMX1VT-R0w="
+  ],
+  "cmr_icb": null,
+  "cmr_icb_ids": null,
+  "cmr_iptc": null,
+  "cmr_iptc_ids": null,
+  "cmr_authors_ids": null,
+  "cmr_authors": null,
+  "cmr_companynames": null,
+  "cmr_companynames_ids": null,
+  "cmr_orgnames": null,
+  "cmr_orgnames_ids": null,
+  "bestStory": false,
+  "internalContentType": "article",
+  "category": "article",
+  "lookupFailure": false,
+  "format": "Articles",
+  "cmr_genre": [
+    "Feature"
+  ],
+  "cmr_genre_id": [
+    "NGQ2MWQ0NDMtMDc5Mi00NWExLTlkMGQtNWZhZjk0NGExOWU2-R2VucmVz"
+  ],
+  "region": null,
+  "topics": null,
+  "displayCodes": null,
+  "displayCodeNames": null,
+  "naicsNames": null,
+  "editorsTags": null,
+  "countryCodes": null,
+  "countryNames": null,
+  "subjects": null,
+  "companyNamesAuto": null,
+  "organisationNamesAuto": null,
+  "companyNamesEditorial": null,
+  "companyTickerCodeAuto": null,
+  "companyTickerCodeEditorial": null,
+  "articleTypes": null,
+  "articleBrands": null,
+  "publishReference": "tid_riega1hr5w"
+}

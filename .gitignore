@@ -1,0 +1,5 @@
+*.iml
+*.exe
+.idea
+content-rw-elasticsearch
+vendor/*/

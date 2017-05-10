@@ -1,0 +1,337 @@
+{
+  "uuid": "f3f777f8-2b3a-11e7-9b32-1fc36bdf8f7d",
+  "content": {
+    "uuid": "f3f777f8-2b3a-11e7-9b32-1fc36bdf8f7d",
+    "title": "test title",
+    "body": "test body",
+    "identifiers": [
+      {
+        "authority": "http://api.ft.com/system/FTCOM-METHODE",
+        "identifierValue": "f3f777f8-2b3a-11e7-9b32-1fc36bdf8f7d"
+      }
+    ],
+    "publishedDate": "",
+    "lastModified": "",
+    "firstPublishedDate": "",
+    "mediaType": "",
+    "marked_deleted": false,
+    "byline": "John Doe in London",
+    "standfirst": "standfirst",
+    "description": "description",
+    "mainImage": "",
+    "publishReference": "tid_riega1hr5w",
+    "type": "Article"
+  },
+  "metadata": [
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/bb923fea-82df-3d33-8fe1-e52292721258",
+        "prefLabel": "Foreign Trade",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/Subject"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/bb923fea-82df-3d33-8fe1-e52292721258",
+        "tmeIDs": [
+          "ODQ=-U3ViamVjdHM="
+        ],
+        "uuids": [
+          "bb923fea-82df-3d33-8fe1-e52292721258"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/96b361e3-8cc6-383f-b74c-63e163554d73",
+        "prefLabel": "South Korea",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/Location"
+        ],
+        "predicate": "http://www.ft.com/ontology/annotation/about",
+        "apiUrl": "http://api.ft.com/things/96b361e3-8cc6-383f-b74c-63e163554d73",
+        "tmeIDs": [
+          "TnN0ZWluX0dMX0tS-R0w="
+        ],
+        "uuids": [
+          "96b361e3-8cc6-383f-b74c-63e163554d73"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/e463f9c3-6f88-3a4d-99b0-23cf86e53e54",
+        "prefLabel": "Artscast",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/product/Brand"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/brands/e463f9c3-6f88-3a4d-99b0-23cf86e53e54",
+        "tmeIDs": [
+          "QnJhbmRzXzEz-QnJhbmRz"
+        ],
+        "uuids": [
+          "e463f9c3-6f88-3a4d-99b0-23cf86e53e54"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/90a73db5-65f1-3e52-bf63-f4485d4086da",
+        "prefLabel": "Lex",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/Section"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/90a73db5-65f1-3e52-bf63-f4485d4086da",
+        "tmeIDs": [
+          "MTE1-U2VjdGlvbnM="
+        ],
+        "uuids": [
+          "90a73db5-65f1-3e52-bf63-f4485d4086da"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/d67cef02-e3ee-3260-8ac1-9c67d7a1263c",
+        "prefLabel": "North Korea",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/Location"
+        ],
+        "predicate": "http://www.ft.com/ontology/annotation/majorMentions",
+        "apiUrl": "http://api.ft.com/things/d67cef02-e3ee-3260-8ac1-9c67d7a1263c",
+        "tmeIDs": [
+          "TnN0ZWluX0dMX0tQ-R0w="
+        ],
+        "uuids": [
+          "d67cef02-e3ee-3260-8ac1-9c67d7a1263c"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/a5dcd3e2-3645-3f79-a4f5-90c3a4679326",
+        "prefLabel": "Feature",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/Genre"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/a5dcd3e2-3645-3f79-a4f5-90c3a4679326",
+        "tmeIDs": [
+          "NGQ2MWQ0NDMtMDc5Mi00NWExLTlkMGQtNWZhZjk0NGExOWU2-R2VucmVz"
+        ],
+        "uuids": [
+          "a5dcd3e2-3645-3f79-a4f5-90c3a4679326"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/3e6fa571-873d-3eb3-8c3f-22f4a2d4bae4",
+        "prefLabel": "50 Leading Business Pioneers",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/SpecialReport"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/3e6fa571-873d-3eb3-8c3f-22f4a2d4bae4",
+        "tmeIDs": [
+          "ODI4MzFkMmMtYTg2NC00OTZhLTliOTktZDRlMDdhMWFlMzRh-U3BlY2lhbFJlcG9ydHM="
+        ],
+        "uuids": [
+          "3e6fa571-873d-3eb3-8c3f-22f4a2d4bae4"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/96b361e3-8cc6-383f-b74c-63e163554d73",
+        "prefLabel": "South Korea",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/Location"
+        ],
+        "predicate": "http://www.ft.com/ontology/annotation/majorMentions",
+        "apiUrl": "http://api.ft.com/things/96b361e3-8cc6-383f-b74c-63e163554d73",
+        "tmeIDs": [
+          "TnN0ZWluX0dMX0tS-R0w="
+        ],
+        "uuids": [
+          "96b361e3-8cc6-383f-b74c-63e163554d73"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/fc517ca3-a707-3b52-aed5-1e892fa852f3",
+        "prefLabel": "Africa: Farming",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/SpecialReport"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/fc517ca3-a707-3b52-aed5-1e892fa852f3",
+        "tmeIDs": [
+          "MzU0ZDJjYzUtZjViZC00MmE3LTg4MzItMGFmMWYxZWEzOTQz-U3BlY2lhbFJlcG9ydHM="
+        ],
+        "uuids": [
+          "fc517ca3-a707-3b52-aed5-1e892fa852f3"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/c3e41edf-33c1-3c71-8f58-4f4ace2b355e",
+        "prefLabel": "United States of America",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/Location"
+        ],
+        "predicate": "http://www.ft.com/ontology/annotation/majorMentions",
+        "apiUrl": "http://api.ft.com/things/c3e41edf-33c1-3c71-8f58-4f4ace2b355e",
+        "tmeIDs": [
+          "TnN0ZWluX0dMX1VT-R0w="
+        ],
+        "uuids": [
+          "c3e41edf-33c1-3c71-8f58-4f4ace2b355e"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/1e5ea867-e3b4-3c70-8821-039218f3c43a",
+        "prefLabel": "Ask the FT",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/product/Brand"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/brands/1e5ea867-e3b4-3c70-8821-039218f3c43a",
+        "tmeIDs": [
+          "QnJhbmRzXzE2-QnJhbmRz"
+        ],
+        "uuids": [
+          "1e5ea867-e3b4-3c70-8821-039218f3c43a"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/90a73db5-65f1-3e52-bf63-f4485d4086da",
+        "prefLabel": "Lex",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/Section"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isPrimarilyClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/90a73db5-65f1-3e52-bf63-f4485d4086da",
+        "tmeIDs": [
+          "MTE1-U2VjdGlvbnM="
+        ],
+        "uuids": [
+          "90a73db5-65f1-3e52-bf63-f4485d4086da"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/794b805c-4978-3a3f-8c53-1f4237020175",
+        "prefLabel": "Ask the Expert",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/product/Brand"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/brands/794b805c-4978-3a3f-8c53-1f4237020175",
+        "tmeIDs": [
+          "QnJhbmRzXzE1-QnJhbmRz"
+        ],
+        "uuids": [
+          "794b805c-4978-3a3f-8c53-1f4237020175"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/f6a375ff-6fee-38e0-8909-aed39304a5e0",
+        "prefLabel": "Brazil",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/classification/Classification",
+          "http://www.ft.com/ontology/SpecialReport"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "apiUrl": "http://api.ft.com/things/f6a375ff-6fee-38e0-8909-aed39304a5e0",
+        "tmeIDs": [
+          "NmVhYWIwYmMtNjc2Yi00YzYzLTgwYTEtOWI0YWIwMTUwY2Fm-U3BlY2lhbFJlcG9ydHM="
+        ],
+        "uuids": [
+          "f6a375ff-6fee-38e0-8909-aed39304a5e0"
+        ],
+        "platformVersion": "v1"
+      }
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/0a46789d-ee19-34f0-a728-04662e7b603c",
+        "prefLabel": "Annuities",
+        "types": [
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept",
+          "http://www.ft.com/ontology/Topic"
+        ],
+        "predicate": "http://www.ft.com/ontology/annotation/majorMentions",
+        "apiUrl": "http://api.ft.com/things/0a46789d-ee19-34f0-a728-04662e7b603c",
+        "tmeIDs": [
+          "ZGE5NjI5N2UtMTI1ZC00Mzc0LTlhYzktMWViZjUwMGJhM2Ux-VG9waWNz"
+        ],
+        "uuids": [
+          "0a46789d-ee19-34f0-a728-04662e7b603c"
+        ],
+        "platformVersion": "v1"
+      }
+    }
+  ]
+}

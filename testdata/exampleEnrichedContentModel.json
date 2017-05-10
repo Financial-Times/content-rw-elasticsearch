@@ -1,0 +1,393 @@
+{
+  "uuid": "aae9611e-f66c-4fe4-a6c6-2e2bdea69060",
+  "content": {
+    "uuid": "aae9611e-f66c-4fe4-a6c6-2e2bdea69060",
+    "marked_deleted": false,
+    "title": "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+    "byline": "John Doe in London",
+    "identifiers": [{
+      "authority": "http://api.ft.com/system/FTCOM-METHODE",
+      "identifierValue": "aae9611e-f66c-4fe4-a6c6-2e2bdea69060"
+    }
+    ],
+    "publishedDate": "2017-02-01T00:37:02.000Z",
+    "firstPublishedDate": "2017-02-01T00:37:02.000Z",
+    "standfirst": "Mauris scelerisque, nunc vel consectetur sagittis",
+    "body": "<body><content data-embedded=\"true\" id=\"aae9611e-f66c-4fe4-a6c6-2e2bdea69060\" type=\"http://www.ft.com/ontology/content/ImageSet\"></content>\n<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris scelerisque, nunc vel consectetur sagittis, purus ex ultrices metus, in consectetur nisl lacus congue nulla. Integer fermentum molestie dui at accumsan.</p>\n<p>Nam <content id=\"396d9102-9845-4ce2-8783-49b73f8f1302\" type=\"http://www.ft.com/ontology/content/Article\">scelerisque luctus</content> tristique. Aliquam orci massa, hendrerit non pulvinar a, tristique vitae enim. Pellentesque laoreet condimentum nulla sed tempor. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Quisque euismod euismod porta. Praesent id sapien et magna porta malesuada. Proin sit amet justo vel augue sollicitudin volutpat sodales id turpis.</p>\n<p>Sed posuere vestibulum metus non cursus. Fusce ac blandit erat. Fusce turpis turpis, vehicula et condimentum quis, dapibus eget odio. Vivamus lobortis vulputate sapien quis ultrices. </p>\n<p>Morbi laoreet, sem at bibendum rutrum, ligula erat rhoncus est, eget hendrerit leo diam sit amet mauris. Curabitur cursus dictum mi id eleifend. Pellentesque sed massa sit amet massa ornare accumsan. Nulla eget lobortis velit. </p>\n<p>Cras vel libero ut arcu hendrerit accumsan. “Vivamus ligula lectus”, vestibulum at nisi id, imperdiet “ornare libero”.</p>\n<pull-quote>\n    <pull-quote-text><p>Maecenas ac ipsum in elit aliquam consectetur. Proin felis metus, efficitur et nulla eu, interdum malesuada diam.</p></pull-quote-text><pull-quote-image><content data-embedded=\"true\" id=\"77c8a5b5-c9e3-4df2-ad5f-3ef35fe1d9d4\" type=\"http://www.ft.com/ontology/content/ImageSet\"></content></pull-quote-image><pull-quote-source>Pellentesque habitant, morbi tristique</pull-quote-source>\n</pull-quote>\n<p>Donec id faucibus erat. Suspendisse tempor laoreet lorem, sit amet vehicula massa facilisis at. Nulla quis feugiat massa. Praesent viverra non lectus ut ullamcorper. Phasellus <content id=\"c71efed9-fe5a-488d-9f47-20c15d177153\" type=\"http://www.ft.com/ontology/content/Article\">porttitor neque</content> at volutpat pulvinar.</p>\n<p>“Curabitur fermentum, dolor vel interdum varius, tellus justo dapibus velit, interdum sollicitudin dolor nibh varius velit.”</p>\n</body>",
+    "description": null,
+    "mainImage": "f622bfc6-4931-11e4-0318-978e959e1c97",
+    "publishReference": "tid_f7k7nexpop",
+    "lastModified": "2017-02-01T03:57:55.505Z",
+    "type": "Article"
+  },
+  "metadata": [
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/173f9769-2085-48e7-9927-3a71366f2ea3",
+        "prefLabel": "Pomegranate",
+        "types": [
+          "http://www.ft.com/ontology/company/Company",
+          "http://www.ft.com/ontology/organisation/Organisation",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "predicate": "http://www.ft.com/ontology/classification/isClassifiedBy",
+        "tmeIDs": [
+          "MDVkNTgwMzMtMDQ1Ni00ZWU3LTk0MDgtMGZlZjIwMmEwYmY3-T04="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 1
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9932743203464962
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/2b917a0b-e3fd-4ff4-92bd-6f3c543ac5ce",
+        "prefLabel": "ACME Corp",
+        "types": [
+          "http://www.ft.com/ontology/company/Company",
+          "http://www.ft.com/ontology/organisation/Organisation",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "YTM1NmIyNjQtYWI5NC00NDUzLTgxNTUtNDQ2MzhkMTRhNGYw-T04="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/bec5a464-bdf8-4f5a-95f0-8e2ea253c589",
+        "prefLabel": "John Doe",
+        "predicate": "http://www.ft.com/ontology/annotation/hasAuthor",
+        "types": [
+          "http://www.ft.com/ontology/person/Person",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "NzZlY2VlNTItOTk3ZC00M2EwLTljMzItNDlmMDQxNzlkZDI0-QXV0aG9ycw=="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/bec5a464-bdf8-4f5a-95f0-8e2ea253c589",
+        "prefLabel": "Joe Smith",
+        "predicate": "http://www.ft.com/ontology/annotation/hasAuthor",
+        "types": [
+          "http://www.ft.com/ontology/person/Person",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "NmFmNDU4NWQtZDBkYS00YjEyLWEwMmYtOWE0YTYwYTA2ZDRj-UE4=",
+          "YzcxMTcyNGYtMzQyZC00ZmU2LTk0ZGYtYWI2Y2YxMDMwMTQy-QXV0aG9ycw=="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/bec5a464-bdf8-4f5a-95f0-8e2ea253c589",
+        "prefLabel": "Martin Testerman",
+        "types": [
+          "http://www.ft.com/ontology/person/Person",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "NGI4YWNhOTktOTc0Ny00MTdiLTkzNzMtZTUwMDM4MGIyODdh-UE4="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/c25e3931-c198-4f01-a782-7f75ad606686",
+        "prefLabel": "Megabrand",
+        "types": [
+          "http://www.ft.com/ontology/product/Brand",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "Zjk5ZTk0MjktMDljNS00OGM1LWIwMTgtNmNhYjkzYTJjMDAz-QnJhbmRz"
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/15238d67-5fe8-4725-aef6-759a7f6ea320",
+        "prefLabel": "Current Issues",
+        "types": [
+          "http://www.ft.com/ontology/Subject",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "YWU2Zjg3ODMtNjNhNS00ZjUwLTg3MDktZTVkZjU1NDJjOWNj-U3ViamVjdHM="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/6c5674ed-3760-41ca-919d-11494d3eca65",
+        "prefLabel": "Misc",
+        "predicate": "http://www.ft.com/ontology/classification/isPrimarilyClassifiedBy",
+        "types": [
+          "http://www.ft.com/ontology/Section",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "MTU1NGNjNmUtZjk4MS00ZmRhLThlYmEtMDJjYjI2ZmQ3MGY5-U2VjdGlvbnM="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/fe6e3306-e3de-48e5-89c2-d56c2a6fe3ce",
+        "prefLabel": "Life",
+        "predicate": "http://www.ft.com/ontology/annotation/about",
+        "types": [
+          "http://www.ft.com/ontology/Topic",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "MWI3OGNhMzctZGMzYi00OTE3LWFhMGMtNGIwZTg4ZGJmZjc5-VG9waWNz"
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/420cd579-6532-4d1c-862b-86aea04007c6",
+        "prefLabel": "Europe",
+        "types": [
+          "http://www.ft.com/ontology/Location",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "MjA1NWUzN2YtZmIzMC00ZTU2LWEwNTMtYTQ4NDQ2NDFlMzI3-R0w="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/cbfc4137-8763-4b92-9b01-17d4813172dc",
+        "prefLabel": "News",
+        "types": [
+          "http://www.ft.com/ontology/Genre",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "NDRiMWQwZGItZGEzNC00NWJmLTliNmEtZGY5ZDMzZGY2ZGVl-R2VucmVz"
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    },
+    {
+      "thing": {
+        "id": "http://api.ft.com/things/1d216512-3d7c-4757-bb25-824f3a21170b",
+        "prefLabel": "Special",
+        "types": [
+          "http://www.ft.com/ontology/SpecialReport",
+          "http://www.ft.com/ontology/core/Thing",
+          "http://www.ft.com/ontology/concept/Concept"
+        ],
+        "tmeIDs": [
+          "M2FmYTU2ZmMtMTAwNC00ZjM5LWI5ZTQtNzJiZWQ1ZjFmYjg4-U3BlY2lhbFJlcG9ydHM="
+        ]
+      },
+      "provenances": [
+        {
+          "scores": [
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-RELEVANCE-SYSTEM",
+              "value": 0.375
+            },
+            {
+              "scoringSystem": "http://api.ft.com/scoringsystem/FT-CONFIDENCE-SYSTEM",
+              "value": 0.9996836123273414
+            }
+          ],
+          "atTime": "2016-01-20T19:43:47.314Z",
+          "agentRole": "http://api.ft.com/things/286b1285-737b-4fac-87dc-30a37575df80"
+        }
+      ]
+    }
+  ]
+}
