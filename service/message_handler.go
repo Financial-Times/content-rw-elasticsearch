@@ -33,17 +33,18 @@ const (
 var allowedTypes = []string{"Article", "Video", "MediaResource", ""}
 
 type MessageHandler struct {
-	esService         es.ServiceI
-	messageConsumer   consumer.MessageConsumer
-	ConceptGetter     concept.ConceptGetter
-	connectToESClient func(config es.AccessConfig, c *http.Client) (es.ClientI, error)
-	baseApiUrl        string
-	wg                sync.WaitGroup
-	mu                sync.Mutex
+	esService                 es.ServiceI
+	messageConsumer           consumer.MessageConsumer
+	ConceptGetter             concept.ConceptGetter
+	connectToESClient         func(config es.AccessConfig, c *http.Client) (es.ClientI, error)
+	baseApiUrl                string
+	wg                        sync.WaitGroup
+	mu                        sync.Mutex
+	elasticsearchBulkRequests bool
 }
 
-func NewMessageHandler(service es.ServiceI, conceptGetter concept.ConceptGetter, client *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, connectToClient func(config es.AccessConfig, c *http.Client) (es.ClientI, error)) *MessageHandler {
-	indexer := &MessageHandler{esService: service, ConceptGetter: conceptGetter, connectToESClient: connectToClient, wg: *wg}
+func NewMessageHandler(service es.ServiceI, conceptGetter concept.ConceptGetter, client *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, connectToClient func(config es.AccessConfig, c *http.Client) (es.ClientI, error), elasticsearchBulkRequests bool) *MessageHandler {
+	indexer := &MessageHandler{esService: service, ConceptGetter: conceptGetter, connectToESClient: connectToClient, wg: *wg, elasticsearchBulkRequests: elasticsearchBulkRequests}
 	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, client)
 	return indexer
 }
@@ -160,11 +161,14 @@ func (handler *MessageHandler) handleMessage(msg consumer.Message) {
 
 	payload := handler.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
 
-	_, err = handler.esService.WriteData(ContentTypeMap[contentType].Collection, uuid, payload)
+	if handler.elasticsearchBulkRequests == true {
+		_, err = handler.esService.WriteDataInBulk(ContentTypeMap[contentType].Collection, uuid, payload)
+	} else {
+		_, err = handler.esService.WriteData(ContentTypeMap[contentType].Collection, uuid, payload)
+	}
 	if err != nil {
 		logger.WithTransactionID(tid).WithUUID(uuid).WithError(err).Error("Failed to index content")
 		return
 	}
 	logger.WithMonitoringEvent("ContentWriteElasticsearch", tid, contentType).WithUUID(uuid).Info("Successfully saved")
-
 }

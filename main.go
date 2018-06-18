@@ -102,6 +102,12 @@ func main() {
 		Desc:   "Whether the consumer uses concurrent processing for the messages",
 		EnvVar: "KAFKA_CONCURRENT_PROCESSING",
 	})
+	elasticsearchBulkRequests := app.Bool(cli.BoolOpt{
+		Name:   "elasticsearch-bulk-requests",
+		Value:  false,
+		Desc:   "Determines whether the message handlers send requests to Elasticsearch in bulk",
+		EnvVar: "ELASTICSEARCH_BULK_REQUESTS",
+	})
 	publicConcordancesEndpoint := app.String(cli.StringOpt{
 		Name:   "public-concordances-endpoint",
 		Value:  "http://public-concordances-api:8080",
@@ -149,7 +155,7 @@ func main() {
 		svc := es.NewService(*indexName)
 		var wg sync.WaitGroup
 		concordanceApiService := concept.NewConcordanceApiService(*publicConcordancesEndpoint, httpClient)
-		handler := service.NewMessageHandler(svc, concordanceApiService, httpClient, queueConfig, &wg, es.NewClient)
+		handler := service.NewMessageHandler(svc, concordanceApiService, httpClient, queueConfig, &wg, es.NewClient, *elasticsearchBulkRequests)
 
 		handler.Start(*baseApiUrl, accessConfig, httpClient)
 

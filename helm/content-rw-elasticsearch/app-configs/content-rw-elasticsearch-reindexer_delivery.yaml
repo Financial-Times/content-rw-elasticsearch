@@ -4,5 +4,6 @@ service:
   name: content-rw-elasticsearch-reindexer
 env:
   KAFKA_TOPIC: ForcedCombinedPostPublicationEvents
-  KAFKA_CONCURRENT_PROCESSING: true
+  KAFKA_CONCURRENT_PROCESSING: false
+  ELASTICSEARCH_BULK_REQUESTS: true
   PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080

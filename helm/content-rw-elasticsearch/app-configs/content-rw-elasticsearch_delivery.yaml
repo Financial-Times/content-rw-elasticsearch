@@ -5,4 +5,5 @@ service:
 env:
   KAFKA_TOPIC: CombinedPostPublicationEvents
   KAFKA_CONCURRENT_PROCESSING: false
+  ELASTICSEARCH_BULK_REQUESTS: true
   PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080

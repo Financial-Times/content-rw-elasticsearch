@@ -44,11 +44,13 @@ spec:
           value: {{ .Values.env.KAFKA_TOPIC }}
         - name: KAFKA_CONCURRENT_PROCESSING 
           value: "{{ .Values.env.KAFKA_CONCURRENT_PROCESSING }}"
-        - name: KAFKA_PROXY_ADDR 
-          valueFrom: 
-            configMapKeyRef: 
-              name: global-config 
+        - name: KAFKA_PROXY_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
               key: kafka.proxy.url.with.protocol
+        - name: ELASTICSEARCH_BULK_REQUESTS
+          value: "{{ .Values.env.ELASTICSEARCH_BULK_REQUESTS }}"
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:

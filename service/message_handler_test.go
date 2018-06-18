@@ -27,6 +27,11 @@ func (*esServiceMock) GetSchemaHealth() (string, error) {
 	panic("implement me")
 }
 
+func (service *esServiceMock) WriteDataInBulk(conceptType string, uuid string, payload interface{}) (*elastic.BulkResponse, error) {
+	args := service.Called(conceptType, uuid, payload)
+	return args.Get(0).(*elastic.BulkResponse), args.Error(1)
+}
+
 func (service *esServiceMock) WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error) {
 	args := service.Called(conceptType, uuid, payload)
 	return args.Get(0).(*elastic.IndexResult), args.Error(1)
@@ -58,6 +63,11 @@ func (client elasticClientMock) IndexGet() *elastic.IndicesGetService {
 func (client elasticClientMock) ClusterHealth() *elastic.ClusterHealthService {
 	args := client.Called()
 	return args.Get(0).(*elastic.ClusterHealthService)
+}
+
+func (client elasticClientMock) Bulk() *elastic.BulkService {
+	args := client.Called()
+	return args.Get(0).(*elastic.BulkService)
 }
 
 func (client elasticClientMock) Index() *elastic.IndexService {
@@ -112,7 +122,7 @@ func TestStartClient(t *testing.T) {
 	concordanceApiMock := new(concordanceApiMock)
 
 	var wg sync.WaitGroup
-	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient)
+	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient, false)
 
 	handler.Start("http://api.ft.com/", accessConfig, http.DefaultClient)
 	defer handler.Stop()
@@ -152,7 +162,7 @@ func TestStartClientError(t *testing.T) {
 	concordanceApiMock := new(concordanceApiMock)
 
 	var wg sync.WaitGroup
-	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient)
+	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient, false)
 
 	handler.Start("http://api.ft.com/", accessConfig, http.DefaultClient)
 	defer handler.Stop()

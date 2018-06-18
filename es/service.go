@@ -26,6 +26,7 @@ type Service struct {
 type ServiceI interface {
 	HealthServiceI
 	SetClient(client ClientI)
+	WriteDataInBulk(conceptType string, uuid string, payload interface{}) (*elastic.BulkResponse, error)
 	WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error)
 	DeleteData(conceptType string, uuid string) (*elastic.DeleteResult, error)
 }
@@ -95,6 +96,17 @@ func (service *Service) SetClient(client ClientI) {
 	service.Lock()
 	defer service.Unlock()
 	service.ElasticClient = client
+}
+
+func (service *Service) WriteDataInBulk(conceptType string, uuid string, payload interface{}) (*elastic.BulkResponse, error) {
+	req := elastic.NewBulkIndexRequest().Index(service.IndexName).
+		Type(conceptType).
+		Id(uuid).
+		Doc(payload)
+
+	return service.ElasticClient.Bulk().
+		Add(req).
+		Do()
 }
 
 func (service *Service) WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error) {

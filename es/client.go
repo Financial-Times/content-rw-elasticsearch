@@ -4,12 +4,13 @@ import (
 	"net/http"
 
 	"github.com/Financial-Times/go-logger"
-	awsauth "github.com/smartystreets/go-aws-auth"
+	"github.com/smartystreets/go-aws-auth"
 	"gopkg.in/olivere/elastic.v2"
 )
 
 type ClientI interface {
 	ClusterHealth() *elastic.ClusterHealthService
+	Bulk() *elastic.BulkService
 	Index() *elastic.IndexService
 	Get() *elastic.GetService
 	Delete() *elastic.DeleteService
@@ -41,7 +42,6 @@ func NewClient(config AccessConfig, c *http.Client) (ClientI, error) {
 		HTTPClient: c,
 	}
 	signingClient := &http.Client{Transport: http.RoundTripper(signingTransport)}
-
 	return elastic.NewClient(
 		elastic.SetURL(config.Endpoint),
 		elastic.SetScheme("https"),
