@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/content"
-	"github.com/Financial-Times/content-rw-elasticsearch/es"
-	"github.com/Financial-Times/content-rw-elasticsearch/service/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/content"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/service/concept"
 	"github.com/Financial-Times/go-logger"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	logger2 "github.com/Financial-Times/go-logger/v2"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/dchest/uniuri"
 	"github.com/stretchr/stew/slice"
 )
@@ -41,13 +42,19 @@ type MessageHandler struct {
 	ConceptGetter     concept.ConceptGetter
 	connectToESClient func(config es.AccessConfig, c *http.Client) (es.ClientI, error)
 	baseApiUrl        string
-	wg                sync.WaitGroup
-	mu                sync.Mutex
+	wg                *sync.WaitGroup
+	log               *logger2.UPPLogger
 }
 
-func NewMessageHandler(service es.ServiceI, conceptGetter concept.ConceptGetter, client *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, connectToClient func(config es.AccessConfig, c *http.Client) (es.ClientI, error)) *MessageHandler {
-	indexer := &MessageHandler{esService: service, ConceptGetter: conceptGetter, connectToESClient: connectToClient, wg: *wg}
-	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, client)
+func NewMessageHandler(service es.ServiceI, conceptGetter concept.ConceptGetter, client *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, connectToClient func(config es.AccessConfig, c *http.Client) (es.ClientI, error), log *logger2.UPPLogger) *MessageHandler {
+	indexer := &MessageHandler{
+		esService:         service,
+		ConceptGetter:     conceptGetter,
+		connectToESClient: connectToClient,
+		wg:                wg,
+		log:               log,
+	}
+	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, client, log)
 	return indexer
 }
 
@@ -67,31 +74,21 @@ func (handler *MessageHandler) Start(baseApiUrl string, accessConfig es.AccessCo
 			time.Sleep(time.Minute)
 		}
 	}()
-
+	handler.wg.Add(1)
 	go func() {
 		defer handler.wg.Done()
 		for ec := range channel {
-			handler.mu.Lock()
-			handler.wg.Add(1)
-			handler.mu.Unlock()
 			handler.esService.SetClient(ec)
-			handler.startMessageConsumer()
+			//this is a blocking method
+			handler.messageConsumer.Start()
 		}
 	}()
 }
 
 func (handler *MessageHandler) Stop() {
-	handler.mu.Lock()
 	if handler.messageConsumer != nil {
 		handler.messageConsumer.Stop()
 	}
-	handler.mu.Unlock()
-
-}
-
-func (handler *MessageHandler) startMessageConsumer() {
-	//this is a blocking method
-	handler.messageConsumer.Start()
 }
 
 func (handler *MessageHandler) handleMessage(msg consumer.Message) {

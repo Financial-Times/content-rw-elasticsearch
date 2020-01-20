@@ -38,6 +38,8 @@ spec:
             configMapKeyRef: 
               name: global-config 
               key: aws.content.elasticsearch.endpoint
+        - name: LOG_LEVEL
+          value: INFO
         - name: KAFKA_CONSUMER_GROUP 
           value: "k8s-{{ .Values.service.name }}" 
         - name: KAFKA_TOPIC 
@@ -48,7 +50,7 @@ spec:
           valueFrom: 
             configMapKeyRef: 
               name: global-config 
-              key: kafka.proxy.url.with.protocol
+              key: kafka-msk.proxy.url.with.protocol
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:

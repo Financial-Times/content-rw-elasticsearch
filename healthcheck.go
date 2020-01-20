@@ -5,31 +5,34 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/service/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/service/concept"
 	health "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	logger2 "github.com/Financial-Times/go-logger/v2"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/Financial-Times/service-status-go/gtg"
 )
 
 type healthService struct {
 	esHealthService  es.HealthServiceI
-	concordanceApi   *concept.ConcordanceApiService
+	concordanceAPI   *concept.ConcordanceApiService
 	consumerInstance consumer.MessageConsumer
 	httpClient       *http.Client
 	checks           []health.Check
 	appSystemCode    string
+	log              *logger2.UPPLogger
 }
 
-func newHealthService(config *consumer.QueueConfig, esHealthService es.HealthServiceI, client *http.Client, concordanceApi *concept.ConcordanceApiService, appSystemCode string) *healthService {
-	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client)
+func newHealthService(config *consumer.QueueConfig, esHealthService es.HealthServiceI, client *http.Client, concordanceAPI *concept.ConcordanceApiService, appSystemCode string, log *logger2.UPPLogger) *healthService {
+	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client, log)
 	service := &healthService{
 		esHealthService:  esHealthService,
-		concordanceApi:   concordanceApi,
+		concordanceAPI:   concordanceAPI,
 		consumerInstance: consumerInstance,
 		httpClient:       client,
 		appSystemCode:    appSystemCode,
+		log:              log,
 	}
 	service.checks = []health.Check{
 		service.clusterIsHealthyCheck(),
@@ -46,7 +49,7 @@ func (service *healthService) clusterIsHealthyCheck() health.Check {
 		ID:               service.appSystemCode,
 		BusinessImpact:   "Full or partial degradation in serving requests from Elasticsearch",
 		Name:             "Check Elasticsearch cluster health",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         1,
 		TechnicalSummary: "Elasticsearch cluster is not healthy. Details on /__health-details",
 		Checker:          service.healthChecker,
@@ -69,7 +72,7 @@ func (service *healthService) connectivityHealthyCheck() health.Check {
 		ID:               service.appSystemCode,
 		BusinessImpact:   "Could not connect to Elasticsearch",
 		Name:             "Check connectivity to the Elasticsearch cluster",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         1,
 		TechnicalSummary: "Connection to Elasticsearch cluster could not be created. Please check your AWS credentials.",
 		Checker:          service.connectivityChecker,
@@ -90,7 +93,7 @@ func (service *healthService) schemaHealthyCheck() health.Check {
 		ID:               service.appSystemCode,
 		BusinessImpact:   "Search results may be inconsistent",
 		Name:             "Check Elasticsearch mapping",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         1,
 		TechnicalSummary: "Elasticsearch mapping does not match expected mapping. Please check index against the reference https://github.com/Financial-Times/content-rw-elasticsearch/blob/master/runtime/referenceSchema.json",
 		Checker:          service.schemaChecker,
@@ -113,7 +116,7 @@ func (service *healthService) checkKafkaProxyConnectivity() health.Check {
 		ID:               service.appSystemCode,
 		BusinessImpact:   "CombinedPostPublication messages can't be read from the queue. Indexing for search won't work.",
 		Name:             "Check kafka-proxy connectivity.",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         1,
 		TechnicalSummary: "Messages couldn't be read from the queue. Check if kafka-proxy is reachable.",
 		Checker:          service.consumerInstance.ConnectivityCheck,
@@ -125,10 +128,10 @@ func (service *healthService) checkConcordanceAPI() health.Check {
 		ID:               service.appSystemCode,
 		BusinessImpact:   "Annotation-related Elasticsearch fields won't be populated",
 		Name:             "Public Concordance API Health check",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         2,
 		TechnicalSummary: "Public Concordance API is not working correctly",
-		Checker:          service.concordanceApi.HealthCheck,
+		Checker:          service.concordanceAPI.HealthCheck,
 	}
 }
 

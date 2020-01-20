@@ -1,5 +1,5 @@
 # Values used for the deployed application.
-replicaCount: 2
+replicaCount: 1
 service:
   name: content-rw-elasticsearch
 env:

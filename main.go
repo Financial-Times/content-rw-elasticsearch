@@ -9,14 +9,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/es"
-	"github.com/Financial-Times/content-rw-elasticsearch/service"
-	"github.com/Financial-Times/content-rw-elasticsearch/service/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/service"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/service/concept"
 	health "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	logger2 "github.com/Financial-Times/go-logger/v2"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	status "github.com/Financial-Times/service-status-go/httphandlers"
-	"github.com/jawher/mow.cli"
+	cli "github.com/jawher/mow.cli"
 )
 
 const (
@@ -24,10 +25,6 @@ const (
 	healthPath          = "/__health"
 	healthDetailsPath   = "/__health-details"
 )
-
-func init() {
-	logger.InitDefaultLogger(appNameDefaultValue)
-}
 
 func main() {
 	app := cli.App("content-rw-elasticsearch", "Service for loading contents into elasticsearch")
@@ -71,6 +68,12 @@ func main() {
 		Value:  "ft",
 		Desc:   "The name of the elaticsearch index",
 		EnvVar: "ELASTICSEARCH_SAPI_INDEX",
+	})
+	logLevel := app.String(cli.StringOpt{
+		Name:   "logLevel",
+		Value:  "INFO",
+		Desc:   "Logging level (DEBUG, INFO, WARN, ERROR)",
+		EnvVar: "LOG_LEVEL",
 	})
 	kafkaProxyAddress := app.String(cli.StringOpt{
 		Name:   "kafka-proxy-address",
@@ -126,7 +129,7 @@ func main() {
 	logger.Info("[Startup] Application is starting")
 
 	app.Action = func() {
-
+		logger.InitLogger(*appSystemCode, *logLevel)
 		accessConfig := es.AccessConfig{
 			AccessKey: *accessKey,
 			SecretKey: *secretKey,
@@ -149,11 +152,13 @@ func main() {
 		svc := es.NewService(*indexName)
 		var wg sync.WaitGroup
 		concordanceApiService := concept.NewConcordanceApiService(*publicConcordancesEndpoint, httpClient)
-		handler := service.NewMessageHandler(svc, concordanceApiService, httpClient, queueConfig, &wg, es.NewClient)
+		logConf := logger2.KeyNamesConfig{KeyTime: "@time"}
+		l := logger2.NewUPPLogger(*appName, *logLevel, logConf)
+		handler := service.NewMessageHandler(svc, concordanceApiService, httpClient, queueConfig, &wg, es.NewClient, l)
 
 		handler.Start(*baseApiUrl, accessConfig, httpClient)
 
-		healthService := newHealthService(&queueConfig, svc, httpClient, concordanceApiService, *appSystemCode)
+		healthService := newHealthService(&queueConfig, svc, httpClient, concordanceApiService, *appSystemCode, l)
 		serveAdminEndpoints(healthService, *appSystemCode, *appName, *port)
 
 		handler.Stop()
@@ -191,13 +196,13 @@ func serveAdminEndpoints(healthService *healthService, appSystemCode string, app
 	logger.Info("[Shutdown] Application is shutting down")
 
 	if err := server.Close(); err != nil {
-		logger.WithError(err).Error("Unable to stop http server")
+		logger.WithError(err).Error("Unable to stop HTTP server")
 	}
 	wg.Wait()
 }
 
 func waitForSignal() {
-	ch := make(chan os.Signal)
+	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	<-ch
 }

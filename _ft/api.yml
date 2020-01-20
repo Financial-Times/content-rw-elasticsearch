@@ -34,7 +34,7 @@ paths:
           examples:
             application/json:
               schemaVersion: 1
-              systemCode: dewey-system-code
+              systemCode: content-rw-elasticsearch
               name: app-name
               description: A descriptive description
               checks:
@@ -44,7 +44,7 @@ paths:
                   severity: 1
                   businessImpact: A business impact this failure might have
                   technicalSummary: A technical description of what's gone wrong
-                  panicGuide: https://dewey.ft.com/dewey-system-code.html
+                  panicGuide: https://runbooks.in.ft.com/content-rw-elasticsearch
                   checkOutput: Technical output from the check
                   lastUpdated: 2017-08-03T10:44:32.324709638+01:00
               ok: true

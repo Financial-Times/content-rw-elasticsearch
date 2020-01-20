@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/content"
-	"github.com/Financial-Times/content-rw-elasticsearch/service/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/content"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/service/concept"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

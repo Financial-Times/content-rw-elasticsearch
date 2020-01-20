@@ -9,16 +9,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/es"
-	"github.com/Financial-Times/content-rw-elasticsearch/service/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/service/concept"
 	logTest "github.com/Financial-Times/go-logger/test"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	logger2 "github.com/Financial-Times/go-logger/v2"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/olivere/elastic.v2"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/content"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/content"
 )
 
 type esServiceMock struct {
@@ -114,7 +115,9 @@ func TestStartClient(t *testing.T) {
 	concordanceApiMock := new(concordanceApiMock)
 
 	var wg sync.WaitGroup
-	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient)
+	logConf := logger2.KeyNamesConfig{KeyTime: "@time"}
+	l := logger2.NewUPPLogger("Test", "PANIC", logConf)
+	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient, l)
 
 	handler.Start("http://api.ft.com/", accessConfig, http.DefaultClient)
 	defer handler.Stop()
@@ -154,7 +157,9 @@ func TestStartClientError(t *testing.T) {
 	concordanceApiMock := new(concordanceApiMock)
 
 	var wg sync.WaitGroup
-	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient)
+	logConf := logger2.KeyNamesConfig{KeyTime: "@time"}
+	l := logger2.NewUPPLogger("Test", "PANIC", logConf)
+	handler := NewMessageHandler(es.NewService("index"), concordanceApiMock, http.DefaultClient, queueConfig, &wg, NewClient, l)
 
 	handler.Start("http://api.ft.com/", accessConfig, http.DefaultClient)
 	defer handler.Stop()
