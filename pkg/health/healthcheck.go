@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	PathHealth        = "/__health"
-	PathHealthDetails = "/__health-details"
+	pathHealth        = "/__health"
+	pathHealthDetails = "/__health-details"
 )
 
 type Service struct {
@@ -57,8 +57,8 @@ func (s *Service) AttachHTTPEndpoints(serveMux *http.ServeMux, appName string, a
 		Description: appDescription,
 		Checks:      s.Checks,
 	}
-	serveMux.HandleFunc(PathHealth, fthealth.Handler(hc))
-	serveMux.HandleFunc(PathHealthDetails, s.healthDetails)
+	serveMux.HandleFunc(pathHealth, fthealth.Handler(hc))
+	serveMux.HandleFunc(pathHealthDetails, s.healthDetails)
 	serveMux.HandleFunc(status.GTGPath, status.NewGoodToGoHandler(s.gtgCheck))
 	serveMux.HandleFunc(status.BuildInfoPath, status.BuildInfoHandler)
 

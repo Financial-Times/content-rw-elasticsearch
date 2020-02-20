@@ -1,11 +1,13 @@
 package http
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/Financial-Times/go-logger/v2"
 )
@@ -25,7 +27,10 @@ func StartServer(log *logger.UPPLogger, serveMux *http.ServeMux, port string) {
 	waitForSignal()
 	log.Info("[Shutdown] Application is shutting down")
 
-	if err := server.Close(); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
 		log.WithError(err).Error("Unable to stop http server")
 	}
 	wg.Wait()

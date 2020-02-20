@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strings"
@@ -37,7 +36,7 @@ func (c ContentTypeMap) Get(key string) schema.ContentType {
 
 type AppConfig struct {
 	Predicates     Map
-	Concepts       Map
+	ConceptTypes   Map
 	Origins        Map
 	Authorities    Map
 	ContentTypeMap ContentTypeMap
@@ -48,11 +47,11 @@ func ParseConfig(configFilePath string) (AppConfig, error) {
 	v.SetConfigType("yaml")
 	v.SetConfigFile(joinPath(ProjectRoot, configFilePath))
 	if err := v.ReadInConfig(); err != nil {
-		log.Fatal(err)
+		return AppConfig{}, err
 	}
 	origins := v.Sub("content").GetStringMapString("origin")
 	predicates := v.GetStringMapString("predicates")
-	concepts := v.GetStringMapString("concepts")
+	concepts := v.GetStringMapString("conceptTypes")
 	authorities := v.GetStringMapString("authorities")
 	var contentTypeMap ContentTypeMap
 	err := v.UnmarshalKey("esContentTypeMap", &contentTypeMap)
@@ -61,7 +60,7 @@ func ParseConfig(configFilePath string) (AppConfig, error) {
 	}
 	return AppConfig{
 		Predicates:     predicates,
-		Concepts:       concepts,
+		ConceptTypes:   concepts,
 		Origins:        origins,
 		Authorities:    authorities,
 		ContentTypeMap: contentTypeMap,

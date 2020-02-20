@@ -1,4 +1,4 @@
-concepts:
+conceptTypes:
   organisation: "http://www.ft.com/ontology/organisation/Organisation"
   person: "http://www.ft.com/ontology/person/Person"
   company: "http://www.ft.com/ontology/company/Company"

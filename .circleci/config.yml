@@ -1,60 +1,71 @@
-version: 2
+version: 2.1
+
+orbs:
+  golang-ci: financial-times/golang-ci@1.0.0
+
 jobs:
   build:
     working_directory: /go/src/github.com/Financial-Times/content-rw-elasticsearch
     docker:
-    - image: golang:1
-      environment:
-        CIRCLE_TEST_REPORTS: /tmp/test-results
-        CIRCLE_COVERAGE_REPORT: /tmp/coverage-results
+      - image: golang:1
+        environment:
+          CIRCLE_TEST_REPORTS: /tmp/test-results
+          CIRCLE_COVERAGE_REPORT: /tmp/coverage-results
     steps:
-    - checkout
-    - run:
-        name: External dependencies
-        command: |
-          GO111MODULE=off go get -u github.com/mattn/goveralls
-          GO111MODULE=off go get -u github.com/jstemmer/go-junit-report
-          curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.18.0
-          wget https://raw.githubusercontent.com/Financial-Times/upp-coding-standard/v1.0.0/golangci-config/.golangci.yml
-    - run:
-        name: Make result folders
-        command: |
-          mkdir -p ${CIRCLE_TEST_REPORTS}
-          mkdir -p ${CIRCLE_COVERAGE_REPORT}
-    - run:
-        name: Go build
-        command: go build -mod=readonly -v ./cmd/content-rw-elasticsearch
-    - run:
-        name: Run Linters
-        command: golangci-lint run --config=.golangci.yml --new-from-rev=master
-    - run:
-        name: Run tests
-        command: go test -race -cover -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out ./... | go-junit-report > ${CIRCLE_TEST_REPORTS}/junit.xml
-    - run:
-        name: Upload coverage
-        command: goveralls -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out -service=circle-ci -repotoken=${COVERALLS_TOKEN}
-    - store_test_results:
-        path: /tmp/test-results
+      - checkout
+      - run:
+          name: External dependencies
+          command: |
+            GO111MODULE=off go get -u github.com/mattn/goveralls
+            GO111MODULE=off go get -u github.com/jstemmer/go-junit-report
+            curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.18.0
+            wget https://raw.githubusercontent.com/Financial-Times/upp-coding-standard/v1.0.0/golangci-config/.golangci.yml
+      - run:
+          name: Make result folders
+          command: |
+            mkdir -p ${CIRCLE_TEST_REPORTS}
+            mkdir -p ${CIRCLE_COVERAGE_REPORT}
+      - run:
+          name: Go build
+          command: go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+      - run:
+          name: Run Linters
+          command: golangci-lint run --config=.golangci.yml --new-from-rev=master
+      - run:
+          name: Run tests
+          command: go test -race -mod=readonly -cover -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out ./... | go-junit-report > ${CIRCLE_TEST_REPORTS}/junit.xml
+      - run:
+          name: Upload coverage
+          command: goveralls -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out -service=circle-ci -repotoken=${COVERALLS_TOKEN}
+      - store_test_results:
+          path: /tmp/test-results
   dockerfile:
     working_directory: /content-rw-elasticsearch
     docker:
-    - image: docker:18.03
+      - image: docker:18.03
     steps:
-    - checkout
-    - setup_docker_engine
-    - run:
-        name: Build Dockerfile
-        command: docker build .
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Dockerfile
+          command: docker build .
   dredd:
     working_directory: /go/src/github.com/Financial-Times/content-rw-elasticsearch
     docker:
-      - image: bankrs/golang-dredd:go1.13.7-dredd11.2.19
+      - image: golang:1
         environment:
           GOPATH: /go
           ELASTICSEARCH_SAPI_ENDPOINT: http://localhost:9000
       - image: peteclarkft/ersatz:stable
     steps:
       - checkout
+      - run:
+          name: Download dredd
+          command: |
+            curl -sL https://deb.nodesource.com/setup_11.x | bash -
+            DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=11.\*
+            npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@11.2.19
+            rm -rf /var/lib/apt/lists/*
       - run:
           name: Load ersatz-fixtures.yml to ersatz image
           command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
@@ -65,7 +76,7 @@ jobs:
           name: Dredd API Testing
           command: dredd
 workflows:
-  version: 2
+  version: 2.1
   test-and-build-docker:
     jobs:
       - build
@@ -73,3 +84,8 @@ workflows:
       - dockerfile:
           requires:
             - build
+  scanning:
+    jobs:
+      - golang-ci/scan:
+          name: scan-dependencies
+          context: org-global
