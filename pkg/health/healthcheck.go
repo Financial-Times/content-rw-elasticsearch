@@ -3,8 +3,9 @@ package health
 import (
 	"encoding/json"
 	"fmt"
-	status "github.com/Financial-Times/service-status-go/httphandlers"
 	"net/http"
+
+	status "github.com/Financial-Times/service-status-go/httphandlers"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
@@ -29,11 +30,11 @@ type Service struct {
 	log              *logger.UPPLogger
 }
 
-func NewHealthService(config *consumer.QueueConfig, esHealthService es.HealthStatus, client *http.Client, concordanceApi *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
+func NewHealthService(config *consumer.QueueConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
 	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client)
 	service := &Service{
 		ESHealthService:  esHealthService,
-		ConcordanceAPI:   concordanceApi,
+		ConcordanceAPI:   concordanceAPI,
 		ConsumerInstance: consumerInstance,
 		HTTPClient:       client,
 		AppSystemCode:    appSystemCode,

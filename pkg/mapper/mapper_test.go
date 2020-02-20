@@ -2,12 +2,13 @@ package mapper
 
 import (
 	"encoding/json"
+	"testing"
+	"time"
+
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
 	tst "github.com/Financial-Times/content-rw-elasticsearch/test"
 	"github.com/Financial-Times/go-logger/v2"
-	"testing"
-	"time"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
 	"github.com/stretchr/testify/assert"
@@ -15,11 +16,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type concordanceApiMock struct {
+type concordanceAPIMock struct {
 	mock.Mock
 }
 
-func (m *concordanceApiMock) GetConcepts(tid string, ids []string) (map[string]concept.Model, error) {
+func (m *concordanceAPIMock) GetConcepts(tid string, ids []string) (map[string]concept.Model, error) {
 	args := m.Called(tid, ids)
 	return args.Get(0).(map[string]concept.Model), args.Error(1)
 }
@@ -45,8 +46,8 @@ func TestConvertToESContentModel(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	concordanceApiMock := new(concordanceApiMock)
-	mapperHandler := NewMapperHandler(concordanceApiMock, "http://api.ft.com", appConfig, log)
+	concordanceAPIMock := new(concordanceAPIMock)
+	mapperHandler := NewMapperHandler(concordanceAPIMock, "http://api.ft.com", appConfig, log)
 
 	for _, test := range tests {
 		if test.inputFileConcordanceModel != "" {
@@ -56,7 +57,7 @@ func TestConvertToESContentModel(t *testing.T) {
 			err = json.Unmarshal(inputConcordanceJSON, &concResp)
 			require.NoError(t, err, "Unexpected error")
 
-			concordanceApiMock.On("GetConcepts", test.tid, mock.AnythingOfType("[]string")).Return(concept.TransformToConceptModel(concResp), nil)
+			concordanceAPIMock.On("GetConcepts", test.tid, mock.AnythingOfType("[]string")).Return(concept.TransformToConceptModel(concResp), nil)
 		}
 		ecModel := schema.EnrichedContent{}
 		inputJSON := tst.ReadTestResource(test.inputFileEnrichedModel)
@@ -88,7 +89,7 @@ func TestConvertToESContentModel(t *testing.T) {
 
 		expect.Equal(expectedESModel, esModel, "ES model not matching with the one from %v", test.outputFile)
 
-		mock.AssertExpectationsForObjects(t, concordanceApiMock)
+		mock.AssertExpectationsForObjects(t, concordanceAPIMock)
 	}
 }
 

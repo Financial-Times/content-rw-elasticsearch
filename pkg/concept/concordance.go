@@ -47,16 +47,16 @@ type Client interface {
 }
 
 type ConcordanceAPIService struct {
-	ConcordanceApiBaseURL string
+	ConcordanceAPIBaseURL string
 	Client                Client
 }
 
-func NewConcordanceAPIService(concordanceApiBaseURL string, c Client) *ConcordanceAPIService {
-	return &ConcordanceAPIService{ConcordanceApiBaseURL: concordanceApiBaseURL, Client: c}
+func NewConcordanceAPIService(concordanceAPIBaseURL string, c Client) *ConcordanceAPIService {
+	return &ConcordanceAPIService{ConcordanceAPIBaseURL: concordanceAPIBaseURL, Client: c}
 }
 
 func (c *ConcordanceAPIService) GetConcepts(tid string, ids []string) (map[string]Model, error) {
-	req, err := http.NewRequest(http.MethodGet, c.ConcordanceApiBaseURL+concordancesEndpoint, nil)
+	req, err := http.NewRequest(http.MethodGet, c.ConcordanceAPIBaseURL+concordancesEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func TransformToConceptModel(concordancesResp ConcordancesResponse) map[string]M
 }
 
 func (c *ConcordanceAPIService) HealthCheck() (string, error) {
-	req, err := http.NewRequest(http.MethodGet, c.ConcordanceApiBaseURL+"/__gtg", nil)
+	req, err := http.NewRequest(http.MethodGet, c.ConcordanceAPIBaseURL+"/__gtg", nil)
 	if err != nil {
 		return "", err
 	}

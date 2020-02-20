@@ -2,12 +2,13 @@ package config
 
 import (
 	"fmt"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
+	"github.com/spf13/viper"
 )
 
 const (

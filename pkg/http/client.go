@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func NewHTTPClient() *http.Client{
+func NewHTTPClient() *http.Client {
 	return &http.Client{
 		Transport: &http.Transport{
 			Proxy: http.ProxyFromEnvironment,

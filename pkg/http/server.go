@@ -1,12 +1,13 @@
 package http
 
 import (
-	"github.com/Financial-Times/go-logger/v2"
 	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/Financial-Times/go-logger/v2"
 )
 
 func StartServer(log *logger.UPPLogger, serveMux *http.ServeMux, port string) {
@@ -35,4 +36,3 @@ func waitForSignal() {
 	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 	<-ch
 }
-

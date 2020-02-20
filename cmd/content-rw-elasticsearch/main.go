@@ -8,13 +8,15 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/message"
-	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/jawher/mow.cli"
+
 	nethttp "net/http"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/Financial-Times/go-logger/v2"
+	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"github.com/jawher/mow.cli"
 )
 
 func main() {

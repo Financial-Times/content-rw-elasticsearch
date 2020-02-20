@@ -14,6 +14,8 @@ jobs:
         command: |
           GO111MODULE=off go get -u github.com/mattn/goveralls
           GO111MODULE=off go get -u github.com/jstemmer/go-junit-report
+          curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.18.0
+          wget https://raw.githubusercontent.com/Financial-Times/upp-coding-standard/v1.0.0/golangci-config/.golangci.yml
     - run:
         name: Make result folders
         command: |
@@ -22,6 +24,9 @@ jobs:
     - run:
         name: Go build
         command: go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+    - run:
+        name: Run Linters
+        command: golangci-lint run --config=.golangci.yml --new-from-rev=master
     - run:
         name: Run tests
         command: go test -race -cover -coverprofile=${CIRCLE_COVERAGE_REPORT}/coverage.out ./... | go-junit-report > ${CIRCLE_TEST_REPORTS}/junit.xml

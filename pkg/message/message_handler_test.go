@@ -1,12 +1,6 @@
 package message
 
 import (
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
-	tst "github.com/Financial-Times/content-rw-elasticsearch/test"
-	"github.com/Financial-Times/go-logger/v2"
-	"github.com/stretchr/testify/assert"
 	"log"
 	"net/http"
 	"net/url"
@@ -14,6 +8,13 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
+	tst "github.com/Financial-Times/content-rw-elasticsearch/test"
+	"github.com/Financial-Times/go-logger/v2"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
@@ -53,37 +54,37 @@ type elasticClientMock struct {
 	mock.Mock
 }
 
-func (c elasticClientMock) IndexGet() *elastic.IndicesGetService {
+func (c *elasticClientMock) IndexGet() *elastic.IndicesGetService {
 	args := c.Called()
 	return args.Get(0).(*elastic.IndicesGetService)
 }
 
-func (c elasticClientMock) ClusterHealth() *elastic.ClusterHealthService {
+func (c *elasticClientMock) ClusterHealth() *elastic.ClusterHealthService {
 	args := c.Called()
 	return args.Get(0).(*elastic.ClusterHealthService)
 }
 
-func (c elasticClientMock) Index() *elastic.IndexService {
+func (c *elasticClientMock) Index() *elastic.IndexService {
 	args := c.Called()
 	return args.Get(0).(*elastic.IndexService)
 }
 
-func (c elasticClientMock) Get() *elastic.GetService {
+func (c *elasticClientMock) Get() *elastic.GetService {
 	args := c.Called()
 	return args.Get(0).(*elastic.GetService)
 }
 
-func (c elasticClientMock) Delete() *elastic.DeleteService {
+func (c *elasticClientMock) Delete() *elastic.DeleteService {
 	args := c.Called()
 	return args.Get(0).(*elastic.DeleteService)
 }
 
-func (c elasticClientMock) PerformRequest(method, path string, params url.Values, body interface{}, ignoreErrors ...int) (*elastic.Response, error) {
+func (c *elasticClientMock) PerformRequest(method, path string, params url.Values, body interface{}, ignoreErrors ...int) (*elastic.Response, error) {
 	args := c.Called()
 	return args.Get(0).(*elastic.Response), args.Error(1)
 }
 
-type concordanceApiMock struct {
+type concordanceAPIMock struct {
 	mock.Mock
 }
 
@@ -95,7 +96,7 @@ var errorESClient = func(config es.AccessConfig, c *http.Client) (es.Client, err
 	return nil, elastic.ErrNoClient
 }
 
-func (m *concordanceApiMock) GetConcepts(tid string, ids []string) (map[string]concept.Model, error) {
+func (m *concordanceAPIMock) GetConcepts(tid string, ids []string) (map[string]concept.Model, error) {
 	args := m.Called(tid, ids)
 	return args.Get(0).(map[string]concept.Model), args.Error(1)
 }
@@ -117,12 +118,12 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 		ConcurrentProcessing: false,
 	}
 
-	concordanceAPI := new(concordanceApiMock)
+	concordanceAPI := new(concordanceAPIMock)
 	esService := new(esServiceMock)
 	for _, m := range mocks {
 		switch m.(type) {
-		case *concordanceApiMock:
-			concordanceAPI = m.(*concordanceApiMock)
+		case *concordanceAPIMock:
+			concordanceAPI = m.(*concordanceAPIMock)
 		case *esServiceMock:
 			esService = m.(*esServiceMock)
 		}
@@ -138,9 +139,9 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 	return accessConfig, handler
 }
 
-func mockMapperHandler(concordanceApiMock *concordanceApiMock, log *logger.UPPLogger) *mapper.Handler {
+func mockMapperHandler(concordanceAPIMock *concordanceAPIMock, log *logger.UPPLogger) *mapper.Handler {
 	appConfig := initAppConfig()
-	mapperHandler := mapper.NewMapperHandler(concordanceApiMock, "http://api.ft.com", appConfig, log)
+	mapperHandler := mapper.NewMapperHandler(concordanceAPIMock, "http://api.ft.com", appConfig, log)
 	return mapperHandler
 }
 
@@ -190,10 +191,10 @@ func TestHandleWriteMessage(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: string(inputJSON)})
 
 	expect.Equal(1, len(serviceMock.Calls))
@@ -206,7 +207,7 @@ func TestHandleWriteMessage(t *testing.T) {
 	expect.NotEmpty(model.Body)
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageFromBodyXML(t *testing.T) {
@@ -216,10 +217,10 @@ func TestHandleWriteMessageFromBodyXML(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: string(inputJSON)})
 
 	expect.Equal(1, len(serviceMock.Calls))
@@ -232,7 +233,7 @@ func TestHandleWriteMessageFromBodyXML(t *testing.T) {
 	expect.NotEmpty(model.Body)
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageBlog(t *testing.T) {
@@ -240,14 +241,14 @@ func TestHandleWriteMessageBlog(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTBlogs", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: input})
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageBlogWithHeader(t *testing.T) {
@@ -255,14 +256,14 @@ func TestHandleWriteMessageBlogWithHeader(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTBlogs", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Origin-System-Id": "wordpress", "Content-Type": "application/json"}})
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageVideo(t *testing.T) {
@@ -270,14 +271,14 @@ func TestHandleWriteMessageVideo(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTVideos", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Content-Type": "application/json"}})
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageAudio(t *testing.T) {
@@ -285,14 +286,14 @@ func TestHandleWriteMessageAudio(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTAudios", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Content-Type": "vnd.ft-upp-audio+json"}})
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageArticleByHeaderType(t *testing.T) {
@@ -300,14 +301,14 @@ func TestHandleWriteMessageArticleByHeaderType(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Content-Type": "application/vnd.ft-upp-article"}})
 
 	serviceMock.AssertExpectations(t)
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageUnknownType(t *testing.T) {
@@ -355,15 +356,15 @@ func TestHandleWriteMessageError(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, elastic.ErrTimeout)
-	concordanceApiMock := new(concordanceApiMock)
-	concordanceApiMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceApiMock)
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
 	handler.handleMessage(consumer.Message{Body: string(inputJSON)})
 
 	serviceMock.AssertExpectations(t)
 
-	concordanceApiMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func TestHandleDeleteMessage(t *testing.T) {

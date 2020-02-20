@@ -3,10 +3,11 @@ package mapper
 import (
 	"encoding/base64"
 	"errors"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
 	"strings"
 	"time"
+
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
 
 	"fmt"
 
@@ -33,17 +34,17 @@ const (
 
 type Handler struct {
 	ConceptReader concept.Reader
-	BaseApiURL    string
+	BaseAPIURL    string
 	Config        config.AppConfig
 	log           *logger.UPPLogger
 }
 
-var noAnnotationErr = errors.New("no annotation to be processed")
+var errNoAnnotation = errors.New("no annotation to be processed")
 
-func NewMapperHandler(reader concept.Reader, baseApiURL string, appConfig config.AppConfig, logger *logger.UPPLogger) *Handler {
+func NewMapperHandler(reader concept.Reader, baseAPIURL string, appConfig config.AppConfig, logger *logger.UPPLogger) *Handler {
 	return &Handler{
 		ConceptReader: reader,
-		BaseApiURL:    baseApiURL,
+		BaseAPIURL:    baseAPIURL,
 		Config:        appConfig,
 		log:           logger,
 	}
@@ -52,14 +53,14 @@ func NewMapperHandler(reader concept.Reader, baseApiURL string, appConfig config
 func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentType string, tid string) schema.IndexModel {
 	model := schema.IndexModel{}
 
-	if strings.HasPrefix(h.BaseApiURL, "http://") {
-		h.BaseApiURL = strings.Replace(h.BaseApiURL, "http", "https", 1)
+	if strings.HasPrefix(h.BaseAPIURL, "http://") {
+		h.BaseAPIURL = strings.Replace(h.BaseAPIURL, "http", "https", 1)
 	}
 	h.populateContentRelatedFields(&model, enrichedContent, contentType, tid)
 
 	annotations, concepts, err := h.prepareAnnotationsWithConcepts(&enrichedContent, tid)
 	if err != nil {
-		if err == noAnnotationErr {
+		if err == errNoAnnotation {
 			h.log.WithTransactionID(tid).Warn(err.Error())
 		} else {
 			h.log.WithError(err).WithTransactionID(tid).Error(err)
@@ -157,7 +158,7 @@ func (h *Handler) prepareAnnotationsWithConcepts(enrichedContent *schema.Enriche
 	}
 
 	if len(ids) == 0 {
-		return nil, nil, noAnnotationErr
+		return nil, nil, errNoAnnotation
 	}
 
 	concepts, err := h.ConceptReader.GetConcepts(tid, ids)
@@ -251,7 +252,7 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 	model.URL = new(string)
 	*model.URL = webURLPrefix + enrichedContent.Content.UUID
 	model.ModelAPIURL = new(string)
-	*model.ModelAPIURL = fmt.Sprintf("%v%v%v", h.BaseApiURL, apiURLPrefix, enrichedContent.Content.UUID)
+	*model.ModelAPIURL = fmt.Sprintf("%v%v%v", h.BaseAPIURL, apiURLPrefix, enrichedContent.Content.UUID)
 	model.PublishReference = tid
 }
 

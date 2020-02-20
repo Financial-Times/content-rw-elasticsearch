@@ -2,13 +2,14 @@ package message
 
 import (
 	"encoding/json"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
 	"github.com/Financial-Times/go-logger/v2"
@@ -37,19 +38,19 @@ type Handler struct {
 	messageConsumer consumer.MessageConsumer
 	Mapper          *mapper.Handler
 	esClient        ESClient
-	wg              sync.WaitGroup
+	wg              *sync.WaitGroup
 	mu              sync.Mutex
 	log             *logger.UPPLogger
 }
 
 func NewMessageHandler(service es.Service, mapper *mapper.Handler, client *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, esClient ESClient, logger *logger.UPPLogger) *Handler {
-	indexer := &Handler{esService: service, Mapper: mapper, esClient: esClient, wg: *wg, log: logger}
+	indexer := &Handler{esService: service, Mapper: mapper, esClient: esClient, wg: wg, log: logger}
 	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, client)
 	return indexer
 }
 
-func (h *Handler) Start(baseApiURL string, accessConfig es.AccessConfig, httpClient *http.Client) {
-	h.Mapper.BaseApiURL = baseApiURL
+func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig, httpClient *http.Client) {
+	h.Mapper.BaseAPIURL = baseAPIURL
 	channel := make(chan es.Client)
 	go func() {
 		defer close(channel)

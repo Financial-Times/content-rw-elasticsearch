@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
 	"io/ioutil"
 	"reflect"
 	"sync"
+
+	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
 
 	"gopkg.in/olivere/elastic.v2"
 )
