@@ -4,6 +4,8 @@ services:
     build: .
     image: content-rw-elasticsearch:local
     container_name: content-rw-elasticsearch
+    environment:
+      ELASTICSEARCH_SAPI_ENDPOINT: "http://es:9200"
     ports:
       - "8080:8080"
     networks:

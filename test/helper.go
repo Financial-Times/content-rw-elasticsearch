@@ -4,12 +4,37 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
+	"path"
+	"strings"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
 )
 
+func getResourceFilePath(resourceFilePath string) string {
+	return joinPath(getProjectRoot(), resourceFilePath)
+}
+
+func getProjectRoot() string {
+	currentDir, _ := os.Getwd()
+	for !strings.HasSuffix(currentDir, config.AppName) {
+		currentDir = path.Dir(currentDir)
+		if currentDir == "/" {
+			break
+		}
+	}
+	return currentDir
+}
+
+func joinPath(source, target string) string {
+	if path.IsAbs(target) {
+		return target
+	}
+	return path.Join(source, target)
+}
+
 func ReadTestResource(testDataFileName string) []byte {
-	filePath := config.GetResourceFilePath("test/data/" + testDataFileName)
+	filePath := getResourceFilePath("test/data/" + testDataFileName)
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		e := fmt.Errorf("cannot read test resource '%s': %s", testDataFileName, err)

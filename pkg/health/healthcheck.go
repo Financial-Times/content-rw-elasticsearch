@@ -18,6 +18,7 @@ import (
 const (
 	pathHealth        = "/__health"
 	pathHealthDetails = "/__health-details"
+	panicGuide        = "https://runbooks.in.ft.com/content-rw-elasticsearch"
 )
 
 type Service struct {
@@ -70,7 +71,7 @@ func (s *Service) clusterIsHealthyCheck() fthealth.Check {
 		ID:               s.AppSystemCode,
 		BusinessImpact:   "Full or partial degradation in serving requests from Elasticsearch",
 		Name:             "Check Elasticsearch cluster health",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       panicGuide,
 		Severity:         1,
 		TechnicalSummary: "Elasticsearch cluster is not healthy. Details on /__health-details",
 		Checker:          s.healthChecker,
@@ -82,7 +83,7 @@ func (s *Service) healthChecker() (string, error) {
 	if err != nil {
 		return "Cluster is not healthy: ", err
 	} else if output.Status != "green" {
-		return "Cluster is not healthy", fmt.Errorf("Cluster is %v", output.Status)
+		return "Cluster is not healthy", fmt.Errorf("cluster is %v", output.Status)
 	} else {
 		return "Cluster is healthy", nil
 	}
@@ -93,7 +94,7 @@ func (s *Service) connectivityHealthyCheck() fthealth.Check {
 		ID:               s.AppSystemCode,
 		BusinessImpact:   "Could not connect to Elasticsearch",
 		Name:             "Check connectivity to the Elasticsearch cluster",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       panicGuide,
 		Severity:         1,
 		TechnicalSummary: "Connection to Elasticsearch cluster could not be created. Please check your AWS credentials.",
 		Checker:          s.connectivityChecker,
@@ -114,7 +115,7 @@ func (s *Service) schemaHealthyCheck() fthealth.Check {
 		ID:               s.AppSystemCode,
 		BusinessImpact:   "Search results may be inconsistent",
 		Name:             "Check Elasticsearch mapping",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         1,
 		TechnicalSummary: "Elasticsearch mapping does not match expected mapping. Please check index against the reference https://github.com/Financial-Times/content-rw-elasticsearch/blob/master/configs/referenceSchema.json",
 		Checker:          s.schemaChecker,
@@ -126,7 +127,7 @@ func (s *Service) schemaChecker() (string, error) {
 	if err != nil {
 		return "Could not get schema: ", err
 	} else if output != "ok" {
-		return "Schema is not healthy", fmt.Errorf("Schema is %v", output)
+		return "Schema is not healthy", fmt.Errorf("schema is %v", output)
 	} else {
 		return "Schema is healthy", nil
 	}
@@ -137,7 +138,7 @@ func (s *Service) checkKafkaProxyConnectivity() fthealth.Check {
 		ID:               s.AppSystemCode,
 		BusinessImpact:   "CombinedPostPublication messages can't be read from the queue. Indexing for search won't work.",
 		Name:             "Check kafka-proxy connectivity.",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       panicGuide,
 		Severity:         1,
 		TechnicalSummary: "Messages couldn't be read from the queue. Check if kafka-proxy is reachable.",
 		Checker:          s.ConsumerInstance.ConnectivityCheck,
@@ -149,7 +150,7 @@ func (s *Service) checkConcordanceAPI() fthealth.Check {
 		ID:               s.AppSystemCode,
 		BusinessImpact:   "Annotation-related Elasticsearch fields won't be populated",
 		Name:             "Public Concordance API Health check",
-		PanicGuide:       "https://dewey.in.ft.com/view/system/content-rw-elasticsearch#general",
+		PanicGuide:       panicGuide,
 		Severity:         2,
 		TechnicalSummary: "Public Concordance API is not working correctly",
 		Checker:          s.ConcordanceAPI.HealthCheck,

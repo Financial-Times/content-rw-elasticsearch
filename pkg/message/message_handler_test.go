@@ -146,7 +146,7 @@ func mockMapperHandler(concordanceAPIMock *concordanceAPIMock, log *logger.UPPLo
 }
 
 func initAppConfig() config.AppConfig {
-	appConfig, err := config.ParseConfig("configs/config.yml")
+	appConfig, err := config.ParseConfig("app.yml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -158,7 +158,7 @@ func TestStartClient(t *testing.T) {
 
 	accessConfig, handler := mockMessageHandler(defaultESClient)
 
-	handler.Start("http://api.ft.com/", accessConfig, http.DefaultClient)
+	handler.Start("http://api.ft.com/", accessConfig)
 	defer handler.Stop()
 
 	time.Sleep(100 * time.Millisecond)
@@ -174,7 +174,7 @@ func TestStartClientError(t *testing.T) {
 
 	accessConfig, handler := mockMessageHandler(errorESClient)
 
-	handler.Start("http://api.ft.com/", accessConfig, http.DefaultClient)
+	handler.Start("http://api.ft.com/", accessConfig)
 	defer handler.Stop()
 
 	time.Sleep(100 * time.Millisecond)

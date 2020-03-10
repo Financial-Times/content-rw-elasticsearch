@@ -1,12 +1,15 @@
 package config
 
 import (
+	"bytes"
 	"fmt"
-	"os"
-	"path"
+	"io/ioutil"
 	"strings"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
+	// This blank import is required in order to read the embedded config files
+	_ "github.com/Financial-Times/content-rw-elasticsearch/statik"
+	"github.com/rakyll/statik/fs"
 	"github.com/spf13/viper"
 )
 
@@ -20,8 +23,6 @@ const (
 	BlogType    = "blog"
 	AudioType   = "audio"
 )
-
-var ProjectRoot = getProjectRoot()
 
 type ContentTypeMap map[string]schema.ContentType
 type Map map[string]string
@@ -42,22 +43,28 @@ type AppConfig struct {
 	ContentTypeMap ContentTypeMap
 }
 
-func ParseConfig(configFilePath string) (AppConfig, error) {
-	v := viper.New()
-	v.SetConfigType("yaml")
-	v.SetConfigFile(joinPath(ProjectRoot, configFilePath))
-	if err := v.ReadInConfig(); err != nil {
+func ParseConfig(configFileName string) (AppConfig, error) {
+	contents, err := ReadEmbeddedResource(configFileName)
+	if err != nil {
 		return AppConfig{}, err
 	}
+
+	v := viper.New()
+	v.SetConfigType("yaml")
+	if err = v.ReadConfig(bytes.NewBuffer(contents)); err != nil {
+		return AppConfig{}, err
+	}
+
 	origins := v.Sub("content").GetStringMapString("origin")
 	predicates := v.GetStringMapString("predicates")
 	concepts := v.GetStringMapString("conceptTypes")
 	authorities := v.GetStringMapString("authorities")
 	var contentTypeMap ContentTypeMap
-	err := v.UnmarshalKey("esContentTypeMap", &contentTypeMap)
+	err = v.UnmarshalKey("esContentTypeMap", &contentTypeMap)
 	if err != nil {
 		return AppConfig{}, fmt.Errorf("unable to unmarshal %w", err)
 	}
+
 	return AppConfig{
 		Predicates:     predicates,
 		ConceptTypes:   concepts,
@@ -67,21 +74,21 @@ func ParseConfig(configFilePath string) (AppConfig, error) {
 	}, nil
 }
 
-func GetResourceFilePath(resourceFilePath string) string {
-	return joinPath(ProjectRoot, resourceFilePath)
-}
-
-func getProjectRoot() string {
-	currentDir, _ := os.Getwd()
-	for !strings.HasSuffix(currentDir, "content-rw-elasticsearch") {
-		currentDir = path.Dir(currentDir)
+func ReadEmbeddedResource(fileName string) ([]byte, error) {
+	statikFS, err := fs.New()
+	if err != nil {
+		return nil, err
 	}
-	return currentDir
-}
-
-func joinPath(source, target string) string {
-	if path.IsAbs(target) {
-		return target
+	// Access individual files by their paths.
+	f, err := statikFS.Open("/" + fileName)
+	if err != nil {
+		return nil, err
 	}
-	return path.Join(source, target)
+	defer f.Close()
+
+	contents, err := ioutil.ReadAll(f)
+	if err != nil {
+		return nil, err
+	}
+	return contents, err
 }

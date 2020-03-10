@@ -4,15 +4,19 @@ PROJECT_NAME=content-rw-elasticsearch
 all: clean test build-readonly
 
 build:
+	@echo ">>> Embedding static resources in binary..."
+	go generate ./cmd/${PROJECT_NAME}
 	@echo ">>> Building Application..."
 	go build -v ./cmd/${PROJECT_NAME}
 
 build-readonly:
-	@echo ">>> Building Application..."
+	@echo ">>> Embedding static resources in binary..."
+	go generate ./cmd/${PROJECT_NAME}
+	@echo ">>> Building Application with -mod=readonly..."
 	go build -mod=readonly -v ./cmd/${PROJECT_NAME}
 
 test:
-	@echo ">>> Running Unit Tests..."
+	@echo ">>> Running Tests..."
 	go test -race -v ./...
 
 cover-test:

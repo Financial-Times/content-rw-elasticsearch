@@ -1,6 +1,13 @@
+//go:generate statik -src=../../configs -dest ../../
+
 package main
 
 import (
+	nethttp "net/http"
+	"os"
+	"sync"
+	"time"
+
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
@@ -8,12 +15,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/pkg/message"
-
-	nethttp "net/http"
-	"os"
-	"sync"
-	"time"
-
+	_ "github.com/Financial-Times/content-rw-elasticsearch/statik"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/jawher/mow.cli"
@@ -40,7 +42,6 @@ func main() {
 		Desc:   "Port to listen on",
 		EnvVar: "APP_PORT",
 	})
-
 	logLevel := app.String(cli.StringOpt{
 		Name:   "logLevel",
 		Value:  config.AppDefaultLogLevel,
@@ -49,7 +50,7 @@ func main() {
 	})
 	accessKey := app.String(cli.StringOpt{
 		Name:   "aws-access-key",
-		Desc:   "AWS ACCES KEY",
+		Desc:   "AWS ACCESS KEY",
 		EnvVar: "AWS_ACCESS_KEY_ID",
 	})
 	secretKey := app.String(cli.StringOpt{
@@ -132,7 +133,7 @@ func main() {
 
 		httpClient := http.NewHTTPClient()
 
-		appConfig, err := config.ParseConfig("configs/config.yml")
+		appConfig, err := config.ParseConfig("app.yml")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -160,11 +161,13 @@ func main() {
 			log,
 		)
 
-		handler.Start(*baseAPIUrl, accessConfig, httpClient)
+		handler.Start(*baseAPIUrl, accessConfig)
 
 		healthService := health.NewHealthService(&queueConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
-
-		serveAdminEndpoints(log, healthService, *appName, *port)
+		//
+		serveMux := nethttp.NewServeMux()
+		serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
+		http.StartServer(log, serveMux, *port)
 
 		handler.Stop()
 		wg.Wait()
@@ -175,10 +178,4 @@ func main() {
 		return
 	}
 	log.Info("[Shutdown] Shutdown complete")
-}
-
-func serveAdminEndpoints(log *logger.UPPLogger, healthService *health.Service, appName string, port string) {
-	serveMux := nethttp.NewServeMux()
-	serveMux = healthService.AttachHTTPEndpoints(serveMux, appName, config.AppDescription)
-	http.StartServer(log, serveMux, port)
 }

@@ -37,25 +37,26 @@ type Handler struct {
 	esService       es.Service
 	messageConsumer consumer.MessageConsumer
 	Mapper          *mapper.Handler
+	httpClient      *http.Client
 	esClient        ESClient
 	wg              *sync.WaitGroup
 	mu              sync.Mutex
 	log             *logger.UPPLogger
 }
 
-func NewMessageHandler(service es.Service, mapper *mapper.Handler, client *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, esClient ESClient, logger *logger.UPPLogger) *Handler {
-	indexer := &Handler{esService: service, Mapper: mapper, esClient: esClient, wg: wg, log: logger}
-	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, client)
+func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, esClient ESClient, logger *logger.UPPLogger) *Handler {
+	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, esClient: esClient, wg: wg, log: logger}
+	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, httpClient)
 	return indexer
 }
 
-func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig, httpClient *http.Client) {
+func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 	h.Mapper.BaseAPIURL = baseAPIURL
 	channel := make(chan es.Client)
 	go func() {
 		defer close(channel)
 		for {
-			ec, err := h.esClient(accessConfig, httpClient)
+			ec, err := h.esClient(accessConfig, h.httpClient)
 			if err == nil {
 				h.log.Info("Connected to Elasticsearch")
 				channel <- ec

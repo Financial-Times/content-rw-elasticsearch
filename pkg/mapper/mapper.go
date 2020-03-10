@@ -63,7 +63,7 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 		if err == errNoAnnotation {
 			h.log.WithTransactionID(tid).Warn(err.Error())
 		} else {
-			h.log.WithError(err).WithTransactionID(tid).Error(err)
+			h.log.WithTransactionID(tid).WithError(err).Error(err)
 		}
 		return model
 	}
@@ -226,7 +226,7 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 		}
 
 		if err != nil {
-			h.log.WithError(err).Warnf("Couldn't generate image uuid for the image set with uuid %s: image field won't be populated.", enrichedContent.Content.MainImage)
+			h.log.WithTransactionID(tid).WithError(err).Warnf("Couldn't generate image uuid for the image set with uuid %s: image field won't be populated.", enrichedContent.Content.MainImage)
 		} else {
 			*model.ThumbnailURL = strings.Replace(imageServiceURL, imagePlaceholder, imageID.String(), -1)
 		}
@@ -267,15 +267,11 @@ func (h *Handler) handleSectionMapping(annotation schema.Thing, model *schema.In
 	// handle sections
 	predicates := h.Config.Predicates
 	switch annotation.Predicate {
-	case predicates.Get("about"):
-		fallthrough
-	case predicates.Get("majorMentions"):
-		fallthrough
-	case predicates.Get("implicitlyAbout"):
-		fallthrough
-	case predicates.Get("isClassifiedBy"):
-		fallthrough
-	case predicates.Get("implicitlyClassifiedBy"):
+	case predicates.Get("about"),
+		predicates.Get("majorMentions"),
+		predicates.Get("implicitlyAbout"),
+		predicates.Get("isClassifiedBy"),
+		predicates.Get("implicitlyClassifiedBy"):
 		model.CmrSections = appendIfNotExists(model.CmrSections, annotation.PrefLabel)
 		model.CmrSectionsIds = prepareElasticField(model.CmrSectionsIds, annIDs)
 	case predicates.Get("isPrimaryClassifiedBy"):

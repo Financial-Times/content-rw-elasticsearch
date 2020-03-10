@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"reflect"
 	"sync"
 
@@ -53,13 +52,13 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 	if referenceIndex == nil {
 		referenceIndex = new(elasticIndex)
 
-		schemaFilePath := config.GetResourceFilePath("configs/referenceSchema.json")
-		referenceJSON, err := ioutil.ReadFile(schemaFilePath)
+		referenceJSON, err := config.ReadEmbeddedResource("referenceSchema.json")
 		if err != nil {
 			return "", err
 		}
 
-		err = json.Unmarshal([]byte(fmt.Sprintf(`{"ft": %s}`, referenceJSON)), &referenceIndex.index)
+		fullReferenceJSON := []byte(fmt.Sprintf(`{"ft": %s}`, string(referenceJSON)))
+		err = json.Unmarshal(fullReferenceJSON, &referenceIndex.index)
 		if err != nil {
 			return "", err
 		}
