@@ -142,7 +142,6 @@ func TestConcordanceApiService_GetConceptsErrorOnNewRequest(t *testing.T) {
 	concepts, err := concordanceAPIService.GetConcepts("tid_test", []string{sampleID})
 
 	expect.Error(err)
-	expect.Equal("parse ://concordances: missing protocol scheme", err.Error())
 	expect.Nil(concepts)
 }
 
@@ -241,7 +240,6 @@ func TestConcordanceApiService_CheckHealthErrorOnNewRequest(t *testing.T) {
 	check, err := concordanceAPIService.HealthCheck()
 	expect.Error(err)
 	expect.Empty(check)
-	expect.Equal("parse ://__gtg: missing protocol scheme", err.Error())
 }
 
 func TestConcordanceApiService_CheckHealthErrorOnRequestDo(t *testing.T) {

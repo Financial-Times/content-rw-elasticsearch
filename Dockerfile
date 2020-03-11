@@ -16,6 +16,8 @@ RUN VERSION="version=$(git describe --tag --always 2> /dev/null)" \
   && REVISION="revision=$(git rev-parse HEAD)" \
   && BUILDER="builder=$(go version)" \
   && LDFLAGS="-X '"${BUILDINFO_PACKAGE}$VERSION"' -X '"${BUILDINFO_PACKAGE}$DATETIME"' -X '"${BUILDINFO_PACKAGE}$REPOSITORY"' -X '"${BUILDINFO_PACKAGE}$REVISION"' -X '"${BUILDINFO_PACKAGE}$BUILDER"'" \
+  && STATIK_VERSION="$(go list -m all | grep statik | cut -d ' ' -f2)" \
+  && go get github.com/rakyll/statik@${STATIK_VERSION} \
   && go generate ./cmd/${PROJECT} \
   && CGO_ENABLED=0 go build -mod=readonly -a -o /artifacts/${PROJECT}/${PROJECT} -ldflags="${LDFLAGS}" ./cmd/${PROJECT} \
   && echo "Build flags: ${LDFLAGS}"

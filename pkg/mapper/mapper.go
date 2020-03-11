@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 
 	"fmt"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/html"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/html"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/uuid-utils-go"
 )

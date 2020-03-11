@@ -7,8 +7,8 @@ import (
 
 	status "github.com/Financial-Times/service-status-go/httphandlers"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"

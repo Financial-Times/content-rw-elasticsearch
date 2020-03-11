@@ -9,15 +9,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
-	tst "github.com/Financial-Times/content-rw-elasticsearch/test"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
+	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/olivere/elastic.v2"
@@ -165,9 +165,7 @@ func TestStartClient(t *testing.T) {
 
 	expect.NotNil(handler.esService, "Elastic Service should be initialized")
 	expect.Equal("index", handler.esService.(*es.ElasticsearchService).IndexName, "Wrong index")
-	handler.esService.(*es.ElasticsearchService).Lock()
-	expect.NotNil(handler.esService.(*es.ElasticsearchService).ElasticClient, "Elastic client should be initialized")
-	handler.esService.(*es.ElasticsearchService).Unlock()
+	expect.NotNil(handler.esService.(*es.ElasticsearchService).GetClient(), "Elastic client should be initialized")
 }
 func TestStartClientError(t *testing.T) {
 	expect := assert.New(t)

@@ -18,7 +18,7 @@ func StartServer(log *logger.UPPLogger, serveMux *http.ServeMux, port string) {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
-		if err := server.ListenAndServe(); err != nil {
+		if err := server.ListenAndServe(); err != http.ErrServerClosed {
 			log.WithError(err).Error("HTTP server is closing")
 		}
 		wg.Done()

@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 )
 
 func getResourceFilePath(resourceFilePath string) string {
@@ -34,7 +34,7 @@ func joinPath(source, target string) string {
 }
 
 func ReadTestResource(testDataFileName string) []byte {
-	filePath := getResourceFilePath("test/data/" + testDataFileName)
+	filePath := getResourceFilePath("test/testdata/" + testDataFileName)
 	content, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		e := fmt.Errorf("cannot read test resource '%s': %s", testDataFileName, err)

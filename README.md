@@ -8,6 +8,16 @@ Indexes V2 content in Elasticsearch for use by SAPI V1
 
 ## Project Local Execution
 
+Before executing any of the proposed ways run
+```
+make install
+```
+to install external tools needed and then
+```
+make all
+```
+to run tests and a clean build of the project.
+
 ### Docker Compose
 `docker-compose` is used to provide application external components:
 * Elasticsearch
@@ -37,6 +47,10 @@ docker-compose up -d app
 **Step 1.** Build project and run tests
 ```
 make all
+```
+or just build project
+```
+make build-readonly
 ```
 **Step 2.** Run the binary (using the `--help` flag to see the available optional arguments):
 ```

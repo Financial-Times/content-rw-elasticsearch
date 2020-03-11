@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 
 	"gopkg.in/olivere/elastic.v2"
 )
@@ -19,7 +19,7 @@ type elasticIndex struct {
 }
 
 type ElasticsearchService struct {
-	sync.RWMutex
+	mu            sync.RWMutex
 	ElasticClient Client
 	IndexName     string
 }
@@ -95,9 +95,14 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 	return "ok", nil
 }
 
+func (s *ElasticsearchService) GetClient() Client {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.ElasticClient
+}
 func (s *ElasticsearchService) SetClient(client Client) {
-	s.Lock()
-	defer s.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.ElasticClient = client
 }
 

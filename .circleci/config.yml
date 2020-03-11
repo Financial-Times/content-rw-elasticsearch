@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  golang-ci: financial-times/golang-ci@1.0.0
+  snyk: snyk/snyk@0.0.8
 
 jobs:
   build:
@@ -18,8 +18,11 @@ jobs:
           command: |
             GO111MODULE=off go get -u github.com/mattn/goveralls
             GO111MODULE=off go get -u github.com/jstemmer/go-junit-report
+            GO111MODULE=off go get -u github.com/myitcv/gobin
             curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.18.0
             wget https://raw.githubusercontent.com/Financial-Times/upp-coding-standard/v1.0.0/golangci-config/.golangci.yml
+            STATIK_VERSION=$(go list -m all | grep statik | cut -d ' ' -f2)
+            gobin github.com/rakyll/statik@${STATIK_VERSION}
       - run:
           name: Make result folders
           command: |
@@ -27,7 +30,9 @@ jobs:
             mkdir -p ${CIRCLE_COVERAGE_REPORT}
       - run:
           name: Go build
-          command: go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+          command: |
+            go generate ./cmd/content-rw-elasticsearch
+            go build -mod=readonly -v ./cmd/content-rw-elasticsearch
       - run:
           name: Run Linters
           command: golangci-lint run --config=.golangci.yml --new-from-rev=master
@@ -66,15 +71,31 @@ jobs:
             DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=11.\*
             npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@11.2.19
             rm -rf /var/lib/apt/lists/*
+            GO111MODULE=off go get -u github.com/myitcv/gobin
+            STATIK_VERSION=$(go list -m all | grep statik | cut -d ' ' -f2)
+            gobin github.com/rakyll/statik@${STATIK_VERSION}
       - run:
           name: Load ersatz-fixtures.yml to ersatz image
           command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
       - run:
           name: Go Build
-          command: go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+          command: |
+            go generate ./cmd/content-rw-elasticsearch
+            go build -mod=readonly -v ./cmd/content-rw-elasticsearch
       - run:
           name: Dredd API Testing
           command: dredd
+  snykscan:
+    working_directory: /go/src/github.com/Financial-Times/content-rw-elasticsearch
+    docker:
+      - image: circleci/golang:1
+    steps:
+      - checkout
+      - snyk/scan:
+          monitor-on-build: false
+          severity-threshold: medium
+          fail-on-issues: true
+
 workflows:
   version: 2.1
   test-and-build-docker:
@@ -86,6 +107,8 @@ workflows:
             - build
   scanning:
     jobs:
-      - golang-ci/scan:
-          name: scan-dependencies
-          context: org-global
+      - build
+      - snykscan:
+          context: cm-team-snyk
+          requires:
+            - build

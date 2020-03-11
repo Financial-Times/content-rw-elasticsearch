@@ -7,11 +7,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/schema"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/dchest/uniuri"
@@ -40,7 +40,6 @@ type Handler struct {
 	httpClient      *http.Client
 	esClient        ESClient
 	wg              *sync.WaitGroup
-	mu              sync.Mutex
 	log             *logger.UPPLogger
 }
 
@@ -67,30 +66,21 @@ func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 		}
 	}()
 
+	h.wg.Add(1)
 	go func() {
 		defer h.wg.Done()
 		for ec := range channel {
-			h.mu.Lock()
-			h.wg.Add(1)
-			h.mu.Unlock()
 			h.esService.SetClient(ec)
-			h.startMessageConsumer()
+			// this is a blocking method
+			h.messageConsumer.Start()
 		}
 	}()
 }
 
 func (h *Handler) Stop() {
-	h.mu.Lock()
 	if h.messageConsumer != nil {
 		h.messageConsumer.Stop()
 	}
-	h.mu.Unlock()
-
-}
-
-func (h *Handler) startMessageConsumer() {
-	// this is a blocking method
-	h.messageConsumer.Start()
 }
 
 func (h *Handler) handleMessage(msg consumer.Message) {

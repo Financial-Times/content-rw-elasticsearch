@@ -1,6 +1,6 @@
-module github.com/Financial-Times/content-rw-elasticsearch
+module github.com/Financial-Times/content-rw-elasticsearch/v2
 
-go 1.13
+go 1.14
 
 require (
 	github.com/Financial-Times/go-fthealth v0.0.0-20180807113633-3d8eb430d5b5
@@ -15,7 +15,7 @@ require (
 	github.com/hashicorp/go-version v1.0.0 // indirect
 	github.com/jawher/mow.cli v1.0.4
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
-	github.com/rakyll/statik v0.1.6
+	github.com/rakyll/statik v0.1.7
 	github.com/smartystreets/go-aws-auth v0.0.0-20170504205021-8ef1316913ee
 	github.com/smartystreets/gunit v1.1.3 // indirect
 	github.com/spf13/viper v1.6.2
