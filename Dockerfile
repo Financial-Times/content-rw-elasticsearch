@@ -9,6 +9,13 @@ ENV BUILDINFO_PACKAGE="${ORG_PATH}/service-status-go/buildinfo."
 COPY . ${SRC_FOLDER}
 WORKDIR ${SRC_FOLDER}
 
+# Install statik cli tool in GOPATH in order to successfully execute the go generate command
+RUN GO111MODULE=off go get -u github.com/myitcv/gobin \
+  # Get statik version from go.mod of the project
+  && STATIK_VERSION="$(go list -mod=readonly -m all | grep statik | cut -d ' ' -f2)" \
+  && gobin github.com/rakyll/statik@${STATIK_VERSION} \
+  && go generate ./cmd/${PROJECT}
+
 # Build app
 RUN VERSION="version=$(git describe --tag --always 2> /dev/null)" \
   && DATETIME="dateTime=$(date -u +%Y%m%d%H%M%S)" \
@@ -16,9 +23,6 @@ RUN VERSION="version=$(git describe --tag --always 2> /dev/null)" \
   && REVISION="revision=$(git rev-parse HEAD)" \
   && BUILDER="builder=$(go version)" \
   && LDFLAGS="-X '"${BUILDINFO_PACKAGE}$VERSION"' -X '"${BUILDINFO_PACKAGE}$DATETIME"' -X '"${BUILDINFO_PACKAGE}$REPOSITORY"' -X '"${BUILDINFO_PACKAGE}$REVISION"' -X '"${BUILDINFO_PACKAGE}$BUILDER"'" \
-  && STATIK_VERSION="$(go list -m all | grep statik | cut -d ' ' -f2)" \
-  && go get github.com/rakyll/statik@${STATIK_VERSION} \
-  && go generate ./cmd/${PROJECT} \
   && CGO_ENABLED=0 go build -mod=readonly -a -o /artifacts/${PROJECT}/${PROJECT} -ldflags="${LDFLAGS}" ./cmd/${PROJECT} \
   && echo "Build flags: ${LDFLAGS}"
 

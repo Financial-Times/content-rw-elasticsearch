@@ -2,7 +2,7 @@ PROJECT_NAME=content-rw-elasticsearch
 STATIK_VERSION=$(shell go list -m all | grep statik | cut -d ' ' -f2)
 .PHONY: all test clean
 
-all: clean test build-readonly
+all: clean build-readonly test
 
 install:
 	go get github.com/rakyll/statik@${STATIK_VERSION}

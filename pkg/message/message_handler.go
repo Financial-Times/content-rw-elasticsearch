@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
@@ -39,12 +38,11 @@ type Handler struct {
 	Mapper          *mapper.Handler
 	httpClient      *http.Client
 	esClient        ESClient
-	wg              *sync.WaitGroup
 	log             *logger.UPPLogger
 }
 
-func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, queueConfig consumer.QueueConfig, wg *sync.WaitGroup, esClient ESClient, logger *logger.UPPLogger) *Handler {
-	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, esClient: esClient, wg: wg, log: logger}
+func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, queueConfig consumer.QueueConfig, esClient ESClient, logger *logger.UPPLogger) *Handler {
+	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, esClient: esClient, log: logger}
 	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, httpClient)
 	return indexer
 }
@@ -66,9 +64,7 @@ func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 		}
 	}()
 
-	h.wg.Add(1)
 	go func() {
-		defer h.wg.Done()
 		for ec := range channel {
 			h.esService.SetClient(ec)
 			// this is a blocking method

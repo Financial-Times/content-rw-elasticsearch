@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -129,12 +128,11 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 		}
 	}
 
-	var wg sync.WaitGroup
 	mapperHandler := mockMapperHandler(concordanceAPI, uppLogger)
 
-	handler := NewMessageHandler(esService, mapperHandler, http.DefaultClient, queueConfig, &wg, esClient, uppLogger)
+	handler := NewMessageHandler(esService, mapperHandler, http.DefaultClient, queueConfig, esClient, uppLogger)
 	if mocks == nil {
-		handler = NewMessageHandler(es.NewService("index"), mapperHandler, http.DefaultClient, queueConfig, &wg, esClient, uppLogger)
+		handler = NewMessageHandler(es.NewService("index"), mapperHandler, http.DefaultClient, queueConfig, esClient, uppLogger)
 	}
 	return accessConfig, handler
 }

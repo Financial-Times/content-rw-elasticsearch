@@ -5,7 +5,6 @@ package main
 import (
 	nethttp "net/http"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
@@ -15,7 +14,6 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
-	_ "github.com/Financial-Times/content-rw-elasticsearch/v2/statik"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/jawher/mow.cli"
@@ -139,9 +137,7 @@ func main() {
 		}
 
 		esService := es.NewService(*indexName)
-
-		var wg sync.WaitGroup
-
+		
 		concordanceAPIService := concept.NewConcordanceAPIService(*publicConcordancesEndpoint, httpClient)
 
 		mapperHandler := mapper.NewMapperHandler(
@@ -156,7 +152,6 @@ func main() {
 			mapperHandler,
 			httpClient,
 			queueConfig,
-			&wg,
 			es.NewClient,
 			log,
 		)
@@ -170,7 +165,6 @@ func main() {
 		http.StartServer(log, serveMux, *port)
 
 		handler.Stop()
-		wg.Wait()
 	}
 	err := app.Run(os.Args)
 	if err != nil {
