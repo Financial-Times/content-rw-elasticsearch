@@ -3,7 +3,7 @@
 package main
 
 import (
-	nethttp "net/http"
+	"net/http"
 	"os"
 	"time"
 
@@ -11,7 +11,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/health"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/http"
+	pkghttp "github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
@@ -129,7 +129,7 @@ func main() {
 			Endpoint:  *esEndpoint,
 		}
 
-		httpClient := http.NewHTTPClient()
+		httpClient := pkghttp.NewHTTPClient()
 
 		appConfig, err := config.ParseConfig("app.yml")
 		if err != nil {
@@ -137,7 +137,7 @@ func main() {
 		}
 
 		esService := es.NewService(*indexName)
-		
+
 		concordanceAPIService := concept.NewConcordanceAPIService(*publicConcordancesEndpoint, httpClient)
 
 		mapperHandler := mapper.NewMapperHandler(
@@ -160,9 +160,9 @@ func main() {
 
 		healthService := health.NewHealthService(&queueConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
 		//
-		serveMux := nethttp.NewServeMux()
+		serveMux := http.NewServeMux()
 		serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
-		http.StartServer(log, serveMux, *port)
+		pkghttp.StartServer(log, serveMux, *port)
 
 		handler.Stop()
 	}

@@ -7,6 +7,7 @@ require (
 	github.com/Financial-Times/go-logger/v2 v2.0.1
 	github.com/Financial-Times/message-queue-gonsumer v0.0.0-20180518165041-cd41937c7566
 	github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d
+	github.com/Financial-Times/transactionid-utils-go v0.2.0
 	github.com/Financial-Times/uuid-utils-go v0.0.0-20170516110427-e22658edd0f1
 	github.com/dchest/uniuri v0.0.0-20160212164326-8902c56451e9
 	github.com/fortytw2/leaktest v1.3.0 // indirect

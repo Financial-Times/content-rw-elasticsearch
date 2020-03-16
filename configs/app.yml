@@ -19,19 +19,32 @@ predicates:
   hasAuthor: "http://www.ft.com/ontology/annotation/hasAuthor"
   hasContributor: "http://www.ft.com/ontology/hasContributor"
 
-content:
-  origin:
-    methode: "methode-web-pub"
-    wordpress: "wordpress"
-    video: "next-video-editor"
-    pac: "http://cmdb.ft.com/systems/pac"
+contentMetadata:
+  methode:
+    origin: "methode-web-pub"
+    authority: "http://api.ft.com/system/FTCOM-METHODE"
+    contentType: "article"
+  wordpress:
+    origin: "wordpress"
+    authority: "http://api.ft.com/system/FT-LABS-WP"
+    contentType: "blog"
+  video:
+    origin: "next-video-editor"
+    authority: "http://api.ft.com/system/NEXT-VIDEO-EDITOR"
+    contentType: "video"
+  cct:
+    origin: "http://cmdb.ft.com/systems/cct"
+    authority: "http://api.ft.com/system/cct"
+    contentType: "article"
+  spark:
+    origin: "http://cmdb.ft.com/systems/spark"
+    authority: "http://api.ft.com/system/spark"
+    contentType: "article"
+  pac:
+    origin: "http://cmdb.ft.com/systems/pac"
+    contentType: "article"
 
-authorities:
-  article: "http://api.ft.com/system/FTCOM-METHODE"
-  blog: "http://api.ft.com/system/FT-LABS-WP"
-  video: "http://api.ft.com/system/NEXT-VIDEO-EDITOR"
-
-esContentTypeMap:
+esContentTypeMetadata:
   article:
     collection: "FTCom"
     format: "Articles"

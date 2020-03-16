@@ -24,23 +24,33 @@ const (
 	AudioType   = "audio"
 )
 
-type ContentTypeMap map[string]schema.ContentType
+type ESContentTypeMetadataMap map[string]schema.ContentType
 type Map map[string]string
+type ContentMetadataMap map[string]ContentMetadata
+
+type ContentMetadata struct {
+	Origin      string
+	Authority   string
+	ContentType string
+}
 
 func (c Map) Get(key string) string {
 	return c[strings.ToLower(key)]
 }
 
-func (c ContentTypeMap) Get(key string) schema.ContentType {
+func (c ESContentTypeMetadataMap) Get(key string) schema.ContentType {
+	return c[strings.ToLower(key)]
+}
+
+func (c ContentMetadataMap) Get(key string) ContentMetadata {
 	return c[strings.ToLower(key)]
 }
 
 type AppConfig struct {
-	Predicates     Map
-	ConceptTypes   Map
-	Origins        Map
-	Authorities    Map
-	ContentTypeMap ContentTypeMap
+	Predicates               Map
+	ConceptTypes             Map
+	ContentMetadataMap       ContentMetadataMap
+	ESContentTypeMetadataMap ESContentTypeMetadataMap
 }
 
 func ParseConfig(configFileName string) (AppConfig, error) {
@@ -55,22 +65,25 @@ func ParseConfig(configFileName string) (AppConfig, error) {
 		return AppConfig{}, err
 	}
 
-	origins := v.Sub("content").GetStringMapString("origin")
+	var contentMetadataMap ContentMetadataMap
+	err = v.UnmarshalKey("contentMetadata", &contentMetadataMap)
+	if err != nil {
+		return AppConfig{}, fmt.Errorf("unable to unmarshal %w", err)
+	}
+
 	predicates := v.GetStringMapString("predicates")
 	concepts := v.GetStringMapString("conceptTypes")
-	authorities := v.GetStringMapString("authorities")
-	var contentTypeMap ContentTypeMap
-	err = v.UnmarshalKey("esContentTypeMap", &contentTypeMap)
+	var contentTypeMetadataMap ESContentTypeMetadataMap
+	err = v.UnmarshalKey("esContentTypeMetadata", &contentTypeMetadataMap)
 	if err != nil {
 		return AppConfig{}, fmt.Errorf("unable to unmarshal %w", err)
 	}
 
 	return AppConfig{
-		Predicates:     predicates,
-		ConceptTypes:   concepts,
-		Origins:        origins,
-		Authorities:    authorities,
-		ContentTypeMap: contentTypeMap,
+		Predicates:               predicates,
+		ConceptTypes:             concepts,
+		ContentMetadataMap:       contentMetadataMap,
+		ESContentTypeMetadataMap: contentTypeMetadataMap,
 	}, nil
 }
 

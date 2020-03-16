@@ -32,7 +32,7 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (*http.Response, error
 	return a.HTTPClient.Do(awsauth.Sign4(req, a.Credentials))
 }
 
-func NewClient(config AccessConfig, c *http.Client) (Client, error) {
+func NewClient(config AccessConfig, c *http.Client, log *logger.UPPLogger) (Client, error) {
 	signingTransport := AWSSigningTransport{
 		Credentials: awsauth.Credentials{
 			AccessKeyID:     config.AccessKey,
@@ -47,6 +47,7 @@ func NewClient(config AccessConfig, c *http.Client) (Client, error) {
 		elastic.SetScheme("https"),
 		elastic.SetHttpClient(signingClient),
 		elastic.SetSniff(false), // needs to be disabled due to EAS behavior. Healthcheck still operates as normal.
-		elastic.SetErrorLog(logger.NewUnstructuredLogger()),
+		// elastic.SetErrorLog(logger.NewUnstructuredLogger()),
+		elastic.SetErrorLog(log),
 	)
 }

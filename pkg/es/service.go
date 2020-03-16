@@ -107,6 +107,8 @@ func (s *ElasticsearchService) SetClient(client Client) {
 }
 
 func (s *ElasticsearchService) WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return s.ElasticClient.Index().
 		Index(s.IndexName).
 		Type(conceptType).
@@ -116,6 +118,8 @@ func (s *ElasticsearchService) WriteData(conceptType string, uuid string, payloa
 }
 
 func (s *ElasticsearchService) DeleteData(conceptType string, uuid string) (*elastic.DeleteResult, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	return s.ElasticClient.Delete().
 		Index(s.IndexName).
 		Type(conceptType).

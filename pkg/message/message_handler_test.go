@@ -87,11 +87,11 @@ type concordanceAPIMock struct {
 	mock.Mock
 }
 
-var defaultESClient = func(config es.AccessConfig, c *http.Client) (es.Client, error) {
+var defaultESClient = func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error) {
 	return &elasticClientMock{}, nil
 }
 
-var errorESClient = func(config es.AccessConfig, c *http.Client) (es.Client, error) {
+var errorESClient = func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error) {
 	return nil, elastic.ErrNoClient
 }
 
@@ -327,8 +327,14 @@ func TestHandleWriteMessageNoUUIDForMetadataPublish(t *testing.T) {
 
 	serviceMock := &esServiceMock{}
 
-	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Body: string(inputJSON), Headers: map[string]string{originHeader: handler.Mapper.Config.Origins.Get("methode")}})
+	_, h := mockMessageHandler(defaultESClient, serviceMock)
+	methodeOrigin := h.Mapper.Config.ContentMetadataMap.Get("methode").Origin
+	h.handleMessage(consumer.Message{
+		Body: string(inputJSON),
+		Headers: map[string]string{
+			originHeader: methodeOrigin,
+		},
+	})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, "b17756fe-0f62-4cf1-9deb-ca7a2ff80172", mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, "b17756fe-0f62-4cf1-9deb-ca7a2ff80172")

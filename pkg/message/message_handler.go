@@ -7,15 +7,12 @@ import (
 	"time"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
-
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/dchest/uniuri"
-
-	"github.com/stretchr/stew/slice"
+	transactionid "github.com/Financial-Times/transactionid-utils-go"
 )
 
 const (
@@ -27,10 +24,7 @@ const (
 	articleContentTypeHeader = "ft-upp-article"
 )
 
-// Empty type added for older content. Placeholders - which are subject of exclusion - have type Content.
-var allowedTypes = []string{"Article", "Video", "MediaResource", "Audio", ""}
-
-type ESClient func(config es.AccessConfig, c *http.Client) (es.Client, error)
+type ESClient func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error)
 
 type Handler struct {
 	esService       es.Service
@@ -49,26 +43,20 @@ func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *h
 
 func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 	h.Mapper.BaseAPIURL = baseAPIURL
-	channel := make(chan es.Client)
 	go func() {
-		defer close(channel)
 		for {
-			ec, err := h.esClient(accessConfig, h.httpClient)
-			if err == nil {
-				h.log.Info("Connected to Elasticsearch")
-				channel <- ec
-				return
+			ec, err := h.esClient(accessConfig, h.httpClient, h.log)
+			if err != nil {
+				h.log.Error("Could not connect to Elasticsearch")
+				time.Sleep(time.Minute)
+				// channel <- ec
+				continue
 			}
-			h.log.Error("Could not connect to Elasticsearch")
-			time.Sleep(time.Minute)
-		}
-	}()
-
-	go func() {
-		for ec := range channel {
 			h.esService.SetClient(ec)
+			h.log.Info("Connected to Elasticsearch")
 			// this is a blocking method
 			h.messageConsumer.Start()
+			return
 		}
 	}()
 }
@@ -81,20 +69,23 @@ func (h *Handler) Stop() {
 
 func (h *Handler) handleMessage(msg consumer.Message) {
 	tid := msg.Headers[transactionIDHeader]
+	log := h.log.WithTransactionID(tid)
+
 	if tid == "" {
-		tid = "tid_" + uniuri.NewLen(10) + "_content-rw-elasticsearch"
-		h.log.WithTransactionID(tid).Info("Generated tid")
+		tid = transactionid.NewTransactionID()
+		log = h.log.WithTransactionID(tid)
+		log.Info("Generated tid")
 	}
 
 	if strings.Contains(tid, syntheticRequestPrefix) {
-		h.log.WithTransactionID(tid).Info("Ignoring synthetic message")
+		log.Info("Ignoring synthetic message")
 		return
 	}
 
 	var combinedPostPublicationEvent schema.EnrichedContent
 	err := json.Unmarshal([]byte(msg.Body), &combinedPostPublicationEvent)
 	if err != nil {
-		h.log.WithTransactionID(tid).WithError(err).Error("Cannot unmarshal message body")
+		log.WithError(err).Error("Cannot unmarshal message body")
 		return
 	}
 
@@ -103,71 +94,82 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 		combinedPostPublicationEvent.Content.BodyXML = ""
 	}
 
-	if !slice.ContainsString(allowedTypes, combinedPostPublicationEvent.Content.Type) {
-		h.log.WithTransactionID(tid).Infof("Ignoring message of type %s", combinedPostPublicationEvent.Content.Type)
+	if !isAllowedType(combinedPostPublicationEvent.Content.Type) {
+		log.Infof("Ignoring message of type %s", combinedPostPublicationEvent.Content.Type)
 		return
 	}
 
 	uuid := combinedPostPublicationEvent.UUID
-	h.log.WithTransactionID(tid).WithUUID(uuid).Info("Processing combined post publication event")
+	log = log.WithUUID(uuid)
+	log.Info("Processing combined post publication event")
 
-	var contentType string
-	typeHeader := msg.Headers[contentTypeHeader]
-	if strings.Contains(typeHeader, audioContentTypeHeader) {
-		contentType = config.AudioType
-	} else if strings.Contains(typeHeader, articleContentTypeHeader) {
-		contentType = config.ArticleType
-	} else {
-		for _, identifier := range combinedPostPublicationEvent.Content.Identifiers {
-			if strings.HasPrefix(identifier.Authority, h.Mapper.Config.Authorities.Get(config.BlogType)) {
-				contentType = config.BlogType
-			} else if strings.HasPrefix(identifier.Authority, h.Mapper.Config.Authorities.Get(config.ArticleType)) {
-				contentType = config.ArticleType
-			} else if strings.HasPrefix(identifier.Authority, h.Mapper.Config.Authorities.Get(config.VideoType)) {
-				contentType = config.VideoType
-			}
-		}
+	contentType := h.readContentType(msg, combinedPostPublicationEvent)
+	pacOrigin := h.Mapper.Config.ContentMetadataMap.Get("pac").Origin
+	if contentType == "" && msg.Headers[originHeader] != pacOrigin {
+		log.Error("Failed to index content. Could not infer type of content")
+		return
 	}
 
-	if contentType == "" {
-		originHeader := msg.Headers[originHeader]
-		origins := h.Mapper.Config.Origins
+	log = log.WithMonitoringEvent("ContentDeleteElasticsearch", tid, contentType)
 
-		if strings.Contains(originHeader, origins.Get("methode")) {
-			contentType = config.ArticleType
-		} else if strings.Contains(originHeader, origins.Get("wordpress")) {
-			contentType = config.BlogType
-		} else if strings.Contains(originHeader, origins.Get("video")) {
-			contentType = config.VideoType
-		} else if originHeader != origins.Get("pac") {
-			h.log.WithTransactionID(tid).WithUUID(uuid).WithError(err).Error("Failed to index content. Could not infer type of content")
-			return
-		}
-	}
-
-	conceptType := h.Mapper.Config.ContentTypeMap.Get(contentType).Collection
+	conceptType := h.Mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
 	if combinedPostPublicationEvent.MarkedDeleted == "true" {
 		_, err = h.esService.DeleteData(conceptType, uuid)
 		if err != nil {
-			h.log.WithTransactionID(tid).WithUUID(uuid).WithError(err).Error("Failed to delete indexed content")
+			log.WithError(err).Error("Failed to delete indexed content")
 			return
 		}
-		h.log.WithMonitoringEvent("ContentDeleteElasticsearch", tid, contentType).WithUUID(uuid).Info("Successfully deleted")
+		log.Info("Successfully deleted")
 		return
 	}
 
 	if combinedPostPublicationEvent.Content.UUID == "" || contentType == "" {
-		h.log.WithTransactionID(tid).WithUUID(combinedPostPublicationEvent.UUID).Info("Ignoring message with no content")
+		log.Info("Ignoring message with no content")
 		return
 	}
 
 	payload := h.Mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
-	h.log.Info(conceptType)
 
 	_, err = h.esService.WriteData(conceptType, uuid, payload)
 	if err != nil {
-		h.log.WithTransactionID(tid).WithUUID(uuid).WithError(err).Error("Failed to index content")
+		log.WithError(err).Error("Failed to index content")
 		return
 	}
-	h.log.WithMonitoringEvent("ContentWriteElasticsearch", tid, contentType).WithUUID(uuid).Info("Successfully saved")
+	log.Info("Successfully saved")
+}
+
+func (h *Handler) readContentType(msg consumer.Message, event schema.EnrichedContent) string {
+	typeHeader := msg.Headers[contentTypeHeader]
+	if strings.Contains(typeHeader, audioContentTypeHeader) {
+		return config.AudioType
+	}
+	if strings.Contains(typeHeader, articleContentTypeHeader) {
+		return config.ArticleType
+	}
+	contentMetadata := h.Mapper.Config.ContentMetadataMap
+	for _, identifier := range event.Content.Identifiers {
+		for _, t := range contentMetadata {
+			if t.Authority != "" && strings.Contains(identifier.Authority, t.Authority) {
+				return t.ContentType
+			}
+		}
+	}
+	originHeader := msg.Headers[originHeader]
+	for _, t := range contentMetadata {
+		if t.Origin != "" && strings.Contains(originHeader, t.Origin) {
+			return t.ContentType
+		}
+	}
+	return ""
+}
+
+func isAllowedType(s string) bool {
+	// Empty type added for older content. Placeholders - which are subject of exclusion - have type Content.
+	var allowedTypes = [...]string{"Article", "Video", "MediaResource", "Audio", ""}
+	for _, value := range allowedTypes {
+		if value == s {
+			return true
+		}
+	}
+	return false
 }

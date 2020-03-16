@@ -173,9 +173,9 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 	model.InternalContentType = new(string)
 	*model.InternalContentType = contentType
 	model.Category = new(string)
-	*model.Category = h.Config.ContentTypeMap.Get(contentType).Category
+	*model.Category = h.Config.ESContentTypeMetadataMap.Get(contentType).Category
 	model.Format = new(string)
-	*model.Format = h.Config.ContentTypeMap.Get(contentType).Format
+	*model.Format = h.Config.ESContentTypeMetadataMap.Get(contentType).Format
 	model.UID = &(enrichedContent.Content.UUID)
 	model.LeadHeadline = new(string)
 	*model.LeadHeadline = html.TransformText(enrichedContent.Content.Title,
