@@ -49,7 +49,6 @@ func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 			if err != nil {
 				h.log.Error("Could not connect to Elasticsearch")
 				time.Sleep(time.Minute)
-				// channel <- ec
 				continue
 			}
 			h.esService.SetClient(ec)

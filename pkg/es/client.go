@@ -47,7 +47,6 @@ func NewClient(config AccessConfig, c *http.Client, log *logger.UPPLogger) (Clie
 		elastic.SetScheme("https"),
 		elastic.SetHttpClient(signingClient),
 		elastic.SetSniff(false), // needs to be disabled due to EAS behavior. Healthcheck still operates as normal.
-		// elastic.SetErrorLog(logger.NewUnstructuredLogger()),
 		elastic.SetErrorLog(log),
 	)
 }
