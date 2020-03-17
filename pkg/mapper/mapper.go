@@ -59,11 +59,12 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 	h.populateContentRelatedFields(&model, enrichedContent, contentType, tid)
 
 	annotations, concepts, err := h.prepareAnnotationsWithConcepts(&enrichedContent, tid)
+	log := h.log.WithTransactionID(tid).WithUUID(enrichedContent.UUID)
 	if err != nil {
 		if err == errNoAnnotation {
-			h.log.WithTransactionID(tid).Warn(err.Error())
+			log.Warn(err.Error())
 		} else {
-			h.log.WithTransactionID(tid).WithError(err).Error(err)
+			log.WithError(err).Error(err)
 		}
 		return model
 	}
@@ -72,14 +73,14 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 		canonicalID := strings.TrimPrefix(annotation.ID, concept.ThingURIPrefix)
 		concepts, found := concepts[annotation.ID]
 		if !found {
-			h.log.WithTransactionID(tid).WithUUID(enrichedContent.UUID).Warnf("No concordance found for %v", canonicalID)
+			log.Warnf("No concordance found for %v", canonicalID)
 			continue
 		}
 		annIDs := []string{canonicalID}
 		if concepts.TmeIDs != nil {
 			annIDs = append(annIDs, concepts.TmeIDs...)
 		} else {
-			h.log.WithTransactionID(tid).WithUUID(enrichedContent.Content.UUID).Warnf("TME id missing for concept with id %s, using only canonical id", canonicalID)
+			log.Warnf("TME id missing for concept with id %s, using only canonical id", canonicalID)
 		}
 
 		h.populateAnnotationRelatedFields(annotation, &model, annIDs, canonicalID)
@@ -225,8 +226,9 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 			imageID, err = uuidutils.NewUUIDDeriverWith(uuidutils.IMAGE_SET).From(imageSetUUID)
 		}
 
+		log := h.log.WithTransactionID(tid).WithUUID(enrichedContent.UUID)
 		if err != nil {
-			h.log.WithTransactionID(tid).WithError(err).Warnf("Couldn't generate image uuid for the image set with uuid %s: image field won't be populated.", enrichedContent.Content.MainImage)
+			log.WithError(err).Warnf("Couldn't generate image uuid for the image set with uuid %s: image field won't be populated.", enrichedContent.Content.MainImage)
 		} else {
 			*model.ThumbnailURL = strings.Replace(imageServiceURL, imagePlaceholder, imageID.String(), -1)
 		}

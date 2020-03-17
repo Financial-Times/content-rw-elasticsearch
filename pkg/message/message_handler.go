@@ -110,8 +110,6 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 		return
 	}
 
-	log = log.WithMonitoringEvent("ContentDeleteElasticsearch", tid, contentType)
-
 	conceptType := h.Mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
 	if combinedPostPublicationEvent.MarkedDeleted == "true" {
 		_, err = h.esService.DeleteData(conceptType, uuid)
@@ -119,7 +117,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 			log.WithError(err).Error("Failed to delete indexed content")
 			return
 		}
-		log.Info("Successfully deleted")
+		log.WithMonitoringEvent("ContentDeleteElasticsearch", tid, contentType).Info("Successfully deleted")
 		return
 	}
 
@@ -135,7 +133,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 		log.WithError(err).Error("Failed to index content")
 		return
 	}
-	log.Info("Successfully saved")
+	log.WithMonitoringEvent("ContentWriteElasticsearch", tid, contentType).Info("Successfully saved")
 }
 
 func (h *Handler) readContentType(msg consumer.Message, event schema.EnrichedContent) string {

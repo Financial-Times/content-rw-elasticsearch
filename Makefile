@@ -5,7 +5,8 @@ STATIK_VERSION=$(shell go list -m all | grep statik | cut -d ' ' -f2)
 all: clean build-readonly test
 
 install:
-	go get github.com/rakyll/statik@${STATIK_VERSION}
+	GO111MODULE="off" go get -u github.com/myitcv/gobin
+	gobin github.com/rakyll/statik@${STATIK_VERSION}
 
 build:
 	@echo ">>> Embedding static resources in binary..."

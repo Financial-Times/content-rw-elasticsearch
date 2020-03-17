@@ -42,7 +42,6 @@ contentMetadata:
     contentType: "article"
   pac:
     origin: "http://cmdb.ft.com/systems/pac"
-    contentType: "article"
 
 esContentTypeMetadata:
   article:
