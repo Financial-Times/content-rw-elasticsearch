@@ -8,16 +8,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/olivere/elastic.v2"
 )
@@ -417,10 +416,40 @@ func TestHandleSyntheticMessage(t *testing.T) {
 func TestHandlePACMessage(t *testing.T) {
 	serviceMock := &esServiceMock{}
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Headers: map[string]string{"Origin-System-Id": "http://cmdb.ft.com/systems/pac"}, Body: "{}"})
+	handler.handleMessage(consumer.Message{Headers: map[string]string{"Origin-System-Id": config.PACOrigin}, Body: "{}"})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
+}
+
+func TestHandlePACMessageWithOldSparkContent(t *testing.T) {
+	input := modifyTestInputAuthority("cct")
+
+	serviceMock := &esServiceMock{}
+	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
+	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
+
+	serviceMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
+}
+
+func TestHandlePACMessageWithSparkContent(t *testing.T) {
+	input := modifyTestInputAuthority("spark")
+
+	serviceMock := &esServiceMock{}
+	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	concordanceAPIMock := new(concordanceAPIMock)
+	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
+
+	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
+	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
+
+	serviceMock.AssertExpectations(t)
+	concordanceAPIMock.AssertExpectations(t)
 }
 
 func modifyTestInputAuthority(replacement string) string {
