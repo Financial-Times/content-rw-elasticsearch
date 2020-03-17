@@ -8,15 +8,15 @@ install:
 	GO111MODULE="off" go get -u github.com/myitcv/gobin
 	gobin github.com/rakyll/statik@${STATIK_VERSION}
 
-build:
+generate:
 	@echo ">>> Embedding static resources in binary..."
 	go generate ./cmd/${PROJECT_NAME}
+
+build: generate
 	@echo ">>> Building Application..."
 	go build -v ./cmd/${PROJECT_NAME}
 
-build-readonly:
-	@echo ">>> Embedding static resources in binary..."
-	go generate ./cmd/${PROJECT_NAME}
+build-readonly: generate
 	@echo ">>> Building Application with -mod=readonly..."
 	go build -mod=readonly -v ./cmd/${PROJECT_NAME}
 

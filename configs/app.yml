@@ -40,8 +40,6 @@ contentMetadata:
     origin: "http://cmdb.ft.com/systems/spark"
     authority: "http://api.ft.com/system/spark"
     contentType: "article"
-  pac:
-    origin: "http://cmdb.ft.com/systems/pac"
 
 esContentTypeMetadata:
   article:

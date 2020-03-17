@@ -22,6 +22,8 @@ const (
 	VideoType   = "video"
 	BlogType    = "blog"
 	AudioType   = "audio"
+
+	PACOrigin = "http://cmdb.ft.com/systems/pac"
 )
 
 type ESContentTypeMetadataMap map[string]schema.ContentType

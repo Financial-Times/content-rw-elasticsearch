@@ -18,6 +18,14 @@ make all
 ```
 to run tests and a clean build of the project.
 
+---
+**NOTE**
+
+Each time you modify any file under the `configs` directory, please run `make generate` in order to regenerate
+the `statik` package which embeds the files in the binary.
+
+---
+
 ### Docker Compose
 `docker-compose` is used to provide application external components:
 * Elasticsearch

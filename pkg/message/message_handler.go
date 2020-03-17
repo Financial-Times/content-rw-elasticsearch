@@ -104,8 +104,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 	log.Info("Processing combined post publication event")
 
 	contentType := h.readContentType(msg, combinedPostPublicationEvent)
-	pacOrigin := h.Mapper.Config.ContentMetadataMap.Get("pac").Origin
-	if contentType == "" && msg.Headers[originHeader] != pacOrigin {
+	if contentType == "" && msg.Headers[originHeader] != config.PACOrigin {
 		log.Error("Failed to index content. Could not infer type of content")
 		return
 	}
