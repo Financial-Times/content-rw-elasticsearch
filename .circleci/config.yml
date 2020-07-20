@@ -20,11 +20,8 @@ jobs:
             git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
             GO111MODULE=off go get -u github.com/mattn/goveralls
             GO111MODULE=off go get -u github.com/jstemmer/go-junit-report
-            GO111MODULE=off go get -u github.com/myitcv/gobin
             curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.18.0
             wget https://raw.githubusercontent.com/Financial-Times/upp-coding-standard/v1.0.0/golangci-config/.golangci.yml
-            STATIK_VERSION=$(go list -mod=readonly -m all | grep statik | cut -d ' ' -f2)
-            gobin github.com/rakyll/statik@${STATIK_VERSION}
       - run:
           name: Make result folders
           command: |
@@ -35,7 +32,6 @@ jobs:
           command: |
             GOPRIVATE="github.com/Financial-Times"
             git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
-            go generate ./cmd/content-rw-elasticsearch
             go build -mod=readonly -v ./cmd/content-rw-elasticsearch
       - run:
           name: Run Linters
@@ -79,9 +75,6 @@ jobs:
             DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=11.\*
             npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@11.2.19
             rm -rf /var/lib/apt/lists/*
-            GO111MODULE=off go get -u github.com/myitcv/gobin
-            STATIK_VERSION=$(go list -mod=readonly -m all | grep statik | cut -d ' ' -f2)
-            gobin github.com/rakyll/statik@${STATIK_VERSION}
       - run:
           name: Load ersatz-fixtures.yml to ersatz image
           command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
@@ -90,7 +83,6 @@ jobs:
           command: |
             GOPRIVATE="github.com/Financial-Times"
             git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
-            go generate ./cmd/content-rw-elasticsearch
             go build -mod=readonly -v ./cmd/content-rw-elasticsearch
       - run:
           name: Dredd API Testing

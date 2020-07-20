@@ -1,18 +1,9 @@
 PROJECT_NAME=content-rw-elasticsearch
-STATIK_VERSION=$(shell go list -m all | grep statik | cut -d ' ' -f2)
 .PHONY: all test clean
 
 all: clean build-readonly test
 
-install:
-	GO111MODULE="off" go get -u github.com/myitcv/gobin
-	gobin github.com/rakyll/statik@${STATIK_VERSION}
-
-generate:
-	@echo ">>> Embedding static resources in binary..."
-	go generate ./cmd/${PROJECT_NAME}
-
-build: generate
+build: 
 	@echo ">>> Building Application..."
 	go build -v ./cmd/${PROJECT_NAME}
 

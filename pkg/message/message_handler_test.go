@@ -151,7 +151,7 @@ func mockMapperHandler(concordanceAPIMock *concordanceAPIMock, log *logger.UPPLo
 }
 
 func initAppConfig() config.AppConfig {
-	appConfig, err := config.ParseConfig("app.yml")
+	appConfig, err := config.ParseConfig("../../../configs/app.yml")
 	if err != nil {
 		log.Fatal(err)
 	}

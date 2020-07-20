@@ -8,26 +8,9 @@ Indexes V2 content in Elasticsearch for use by SAPI V1
 
 ## Project Local Execution
 
-Before executing any of the proposed ways run
-
 ```sh
-make install
+make build
 ```
-
-to install external tools needed and then
-
-```sh
-make all
-```
-
-to run tests and a clean build of the project.
-
----
-
-**NOTE**
-
-Each time you modify any file under the `configs` directory, please run `make generate` in order to regenerate
-the `statik` package which embeds the files in the binary.
 
 ---
 

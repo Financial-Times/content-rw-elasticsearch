@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-
 	"gopkg.in/olivere/elastic.v2"
 )
 
@@ -52,7 +51,7 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 	if referenceIndex == nil {
 		referenceIndex = new(elasticIndex)
 
-		referenceJSON, err := config.ReadEmbeddedResource("referenceSchema.json")
+		referenceJSON, err := config.ReadConfigFile("referenceSchema.json")
 		if err != nil {
 			return "", err
 		}

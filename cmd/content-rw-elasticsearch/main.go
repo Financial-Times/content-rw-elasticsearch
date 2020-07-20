@@ -1,5 +1,3 @@
-//go:generate statik -src=../../configs -dest ../../
-
 package main
 
 import (
