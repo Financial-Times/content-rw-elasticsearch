@@ -1,7 +1,7 @@
 # Values used for the deployed application.
 replicaCount: 0
 service:
-  name: content-rw-elasticsearch-reindexer
+  name: content-rw-elasticsearch-reindexer-legacy
 env:
   KAFKA_TOPIC: ForcedCombinedPostPublicationEvents
   KAFKA_CONCURRENT_PROCESSING: true

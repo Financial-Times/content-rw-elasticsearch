@@ -1,7 +1,7 @@
 # Values used for the deployed application.
 replicaCount: 2
 service:
-  name: content-rw-elasticsearch
+  name: content-rw-elasticsearch-legacy
 env:
   KAFKA_TOPIC: CombinedPostPublicationEvents
   KAFKA_CONCURRENT_PROCESSING: false
