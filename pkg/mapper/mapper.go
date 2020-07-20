@@ -213,10 +213,6 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 		*model.Body = enrichedContent.Content.Description
 	}
 
-	model.Scoop = enrichedContent.Content.Scoop
-	model.CanBeSyndicated = enrichedContent.Content.CanBeSyndicated
-	model.CanBeDistributed = enrichedContent.Content.CanBeDistributed
-
 	model.ShortDescription = new(string)
 	*model.ShortDescription = enrichedContent.Content.Standfirst
 
