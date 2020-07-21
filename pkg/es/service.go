@@ -52,7 +52,7 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 	if referenceIndex == nil {
 		referenceIndex = new(elasticIndex)
 
-		referenceJSON, err := config.ReadEmbeddedResource("referenceSchema.json")
+		referenceJSON, err := config.ReadConfigFile("referenceSchema.json")
 		if err != nil {
 			return "", err
 		}

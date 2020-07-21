@@ -115,7 +115,7 @@ func TestConvertToESContentModel(t *testing.T) {
 	}
 
 	log := logger.NewUPPLogger(config.AppName, config.AppDefaultLogLevel)
-	appConfig, err := config.ParseConfig("app.yml")
+	appConfig, err := config.ParseConfig("../../../configs/app.yml")
 	if err != nil {
 		log.Fatal(err)
 	}

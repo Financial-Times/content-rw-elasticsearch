@@ -151,7 +151,7 @@ func mockMapperHandler(concordanceAPIMock *concordanceAPIMock, log *logger.UPPLo
 }
 
 func initAppConfig() config.AppConfig {
-	appConfig, err := config.ParseConfig("app.yml")
+	appConfig, err := config.ParseConfig("../../../configs/app.yml")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -288,7 +288,7 @@ func TestHandleWriteMessageAudio(t *testing.T) {
 	input := modifyTestInputAuthority("NEXT-VIDEO-EDITOR")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTAudios", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "FTPodcasts", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -305,7 +305,7 @@ func TestHandleWriteMessageAudioWithoutHeader(t *testing.T) {
 	input := strings.Replace(string(inputJSON), "FTCOM-METHODE", "NEXT-VIDEO-EDITOR", 1)
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTAudios", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "FTPodcasts", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
 
 	concordanceAPIMock := new(concordanceAPIMock)
 
