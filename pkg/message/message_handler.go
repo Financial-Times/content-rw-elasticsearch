@@ -2,6 +2,7 @@ package message
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -100,7 +101,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 
 	uuid := combinedPostPublicationEvent.UUID
 	log = log.WithUUID(uuid)
-	log.Info("Processing combined post publication event")
+	log.Info(fmt.Sprintf("Processing combined post publication event with type %s", combinedPostPublicationEvent.Content.Type))
 
 	contentType := h.readContentType(msg, combinedPostPublicationEvent)
 	if contentType == "" && msg.Headers[originHeader] != config.PACOrigin {
@@ -136,7 +137,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 
 func (h *Handler) readContentType(msg consumer.Message, event schema.EnrichedContent) string {
 	typeHeader := msg.Headers[contentTypeHeader]
-	if strings.Contains(typeHeader, audioContentTypeHeader) {
+	if strings.Contains(typeHeader, audioContentTypeHeader) || event.Content.Type == config.ContentTypeAudio {
 		return config.AudioType
 	}
 	if strings.Contains(typeHeader, articleContentTypeHeader) {

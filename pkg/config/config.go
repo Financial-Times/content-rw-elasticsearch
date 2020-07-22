@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
-	// This blank import is required in order to read the embedded config files
-	_ "github.com/Financial-Times/content-rw-elasticsearch/v2/statik"
-	"github.com/rakyll/statik/fs"
 	"github.com/spf13/viper"
 )
 
@@ -24,6 +24,8 @@ const (
 	AudioType   = "audio"
 
 	PACOrigin = "http://cmdb.ft.com/systems/pac"
+
+	ContentTypeAudio = "Audio"
 )
 
 type ESContentTypeMetadataMap map[string]schema.ContentType
@@ -56,7 +58,7 @@ type AppConfig struct {
 }
 
 func ParseConfig(configFileName string) (AppConfig, error) {
-	contents, err := ReadEmbeddedResource(configFileName)
+	contents, err := ReadConfigFile(configFileName)
 	if err != nil {
 		return AppConfig{}, err
 	}
@@ -89,21 +91,16 @@ func ParseConfig(configFileName string) (AppConfig, error) {
 	}, nil
 }
 
-func ReadEmbeddedResource(fileName string) ([]byte, error) {
-	statikFS, err := fs.New()
+func ReadConfigFile(fileName string) ([]byte, error) {
+	path, err := filepath.Abs(fmt.Sprintf("./configs/%s", fileName))
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	// Access individual files by their paths.
-	f, err := statikFS.Open("/" + fileName)
+	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	defer f.Close()
+	defer file.Close()
 
-	contents, err := ioutil.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-	return contents, err
+	return ioutil.ReadAll(file)
 }

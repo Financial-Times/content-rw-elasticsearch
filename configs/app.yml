@@ -55,6 +55,6 @@ esContentTypeMetadata:
     format: "Videos"
     category: "video"
   audio:
-    collection: "FTAudios"
+    collection: "FTPodcasts"
     format: "Audios"
     category: "audio"

@@ -52,17 +52,18 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 	if referenceIndex == nil {
 		referenceIndex = new(elasticIndex)
 
-		referenceJSON, err := config.ReadEmbeddedResource("referenceSchema.json")
+		referenceJSON, err := config.ReadConfigFile("referenceSchema.json")
 		if err != nil {
 			return "", err
 		}
 
-		fullReferenceJSON := []byte(fmt.Sprintf(`{"ft": %s}`, string(referenceJSON)))
+		fullReferenceJSON := []byte(fmt.Sprintf(`{"%s": %s}`, s.IndexName, string(referenceJSON)))
 		err = json.Unmarshal(fullReferenceJSON, &referenceIndex.index)
 		if err != nil {
 			return "", err
 		}
 	}
+
 	if referenceIndex.index[s.IndexName] == nil || referenceIndex.index[s.IndexName].Settings == nil || referenceIndex.index[s.IndexName].Mappings == nil {
 		return "not ok, wrong referenceIndex", nil
 	}

@@ -1,0 +1,58 @@
+{
+  "uuid": "aae9611e-f66c-4fe4-a6c6-2e2bdea69060",
+  "content": {
+    "accessLevel": "subscribed",
+    "alternativeStandfirsts": {
+      "promotionalStandfirst": "promotionalStandfirst"
+    },
+    "alternativeTitles": {
+      "contentPackageTitle": null,
+      "promotionalTitle": "promotionalTitle"
+    },
+    "body": "example body",
+    "byline": "byline",
+    "canBeDistributed": "yes",
+    "canBeSyndicated": "yes",
+    "comments": {
+      "enabled": true
+    },
+    "contentPackage": null,
+    "copyright": null,
+    "description": null,
+    "editorialDesk": "/FT/MarketNews",
+    "externalBinaryUrl": null,
+    "firstPublishedDate": "2017-06-26T04:00:17.000Z",
+    "identifiers": [
+      {
+        "authority": "http://api.ft.com/system/FTCOM-METHODE",
+        "identifierValue": "aae9611e-f66c-4fe4-a6c6-2e2bdea69060"
+      }
+    ],
+    "internalBinaryUrl": null,
+    "lastModified": "2018-04-04T12:58:00.347Z",
+    "mainImage": "5546cbc4-d4f7-47f9-a158-03856a0d3706",
+    "masterSource": null,
+    "mediaType": null,
+    "members": null,
+    "pixelHeight": null,
+    "pixelWidth": null,
+    "publishReference": "tid_123",
+    "publishedDate": "2017-06-26T04:00:17.000Z",
+    "rightsGroup": null,
+    "standfirst": "",
+    "standout": {
+      "editorsChoice": false,
+      "exclusive": false,
+      "scoop": false
+    },
+    "storyPackage": null,
+    "title": "Example audio",
+    "type": "Audio",
+    "uuid": "aae9611e-f66c-4fe4-a6c6-2e2bdea69060",
+    "webUrl": null
+  },
+  "metadata": [],
+  "contentUri": "http://methode-article-mapper.svc.ft.com/content/aae9611e-f66c-4fe4-a6c6-2e2bdea69060",
+  "lastModified": "2020-07-06T12:58:00.347Z",
+  "markedDeleted": "false"
+}
