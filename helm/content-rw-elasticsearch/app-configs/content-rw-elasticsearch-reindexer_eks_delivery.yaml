@@ -1,0 +1,10 @@
+# Values used for the deployed application.
+replicaCount: 0
+service:
+  name: content-rw-elasticsearch-reindexer
+eksCluster: true
+env:
+  KAFKA_TOPIC: ForcedCombinedPostPublicationEvents
+  KAFKA_CONCURRENT_PROCESSING: true
+  PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080
+  INTERNAL_CONTENT_API_URL: http://internal-content-api:8080
