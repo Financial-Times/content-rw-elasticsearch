@@ -55,7 +55,7 @@ No
 
 ## Dependencies
 
-* search-api
+* upp-content-es-cluster
 * kafka-proxy
 * public-concordances-api
 * up-ica
