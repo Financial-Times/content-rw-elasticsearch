@@ -2,7 +2,6 @@
 replicaCount: 0
 service:
   name: content-rw-elasticsearch-reindexer
-eksCluster: true
 env:
   KAFKA_TOPIC: ForcedCombinedPostPublicationEvents
   KAFKA_CONCURRENT_PROCESSING: true

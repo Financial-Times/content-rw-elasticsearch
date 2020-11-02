@@ -2,7 +2,6 @@
 replicaCount: 2
 service:
   name: content-rw-elasticsearch
-eksCluster: true
 env:
   KAFKA_TOPIC: CombinedPostPublicationEvents
   KAFKA_CONCURRENT_PROCESSING: false
