@@ -193,5 +193,5 @@
   ],
   "contentUri": "http://methode-article-mapper.svc.ft.com/content/35ebcdf5-54b2-4834-8309-ba5ae3d5dd15",
   "lastModified": "2018-04-11T12:27:51.148Z",
-  "markedDeleted": "false"
+  "deleted": false
 }
