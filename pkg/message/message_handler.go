@@ -110,7 +110,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 	}
 
 	conceptType := h.Mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
-	if combinedPostPublicationEvent.MarkedDeleted == "true" {
+	if combinedPostPublicationEvent.Deleted {
 		_, err = h.esService.DeleteData(conceptType, uuid)
 		if err != nil {
 			log.WithError(err).Error("Failed to delete indexed content")

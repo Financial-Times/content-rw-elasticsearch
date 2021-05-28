@@ -397,7 +397,7 @@ func TestHandleWriteMessageError(t *testing.T) {
 
 func TestHandleDeleteMessage(t *testing.T) {
 	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
-	input := strings.Replace(string(inputJSON), `"markedDeleted": "false"`, `"markedDeleted": "true"`, 1)
+	input := strings.Replace(string(inputJSON), `"deleted": false`, `"deleted": true`, 1)
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("DeleteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResult{}, nil)
@@ -410,7 +410,7 @@ func TestHandleDeleteMessage(t *testing.T) {
 
 func TestHandleDeleteMessageError(t *testing.T) {
 	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
-	input := strings.Replace(string(inputJSON), `"markedDeleted": "false"`, `"markedDeleted": "true"`, 1)
+	input := strings.Replace(string(inputJSON), `"deleted": false`, `"deleted": true`, 1)
 
 	serviceMock := &esServiceMock{}
 

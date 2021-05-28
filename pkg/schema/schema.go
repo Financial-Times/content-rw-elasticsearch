@@ -92,9 +92,9 @@ type EnrichedContent struct {
 	Content  Content     `json:"content"`
 	Metadata Annotations `json:"metadata"`
 
-	ContentURI    string `json:"contentUri"`
-	LastModified  string `json:"lastModified"`
-	MarkedDeleted string `json:"markedDeleted"`
+	ContentURI   string `json:"contentUri"`
+	LastModified string `json:"lastModified"`
+	Deleted      bool   `json:"deleted"`
 }
 
 type Content struct {
