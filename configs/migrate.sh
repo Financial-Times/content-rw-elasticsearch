@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 index_name="combinedpostpublicationevents"
 file_path=$(dirname "$0")/referenceSchema.json
+# This make sure that the script is apply to the same file that the script was created for
+# due to poor portability
+if [ $(git log --follow -1 --pretty=format:"%h"  -- "$file_path") -ne 9781498 ]; then
+    echo "This script was created to migrate $file_path from revision 9781498"
+    exit -1
+fi
 pushd $(dirname "$0"); git restore "$file_path"; popd
 
 set_total_fields_limit() {
   file_path=$1
   limit=$2
-  #TODO --arg
+  #TODO jq --arg
   #jq < "$file_path"_2 '.settings.index += {mapping:{total_fields:{limit:$limit}}}' > "$file_path"_2
   jq < "$file_path" '.settings.index += {mapping:{total_fields:{limit:12000}}}' > "$file_path"_2
   mv "$file_path"_2 "$file_path"
