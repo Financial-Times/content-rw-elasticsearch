@@ -13,7 +13,7 @@ import (
 	"gopkg.in/olivere/elastic.v2"
 
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/Financial-Times/upp-go-sdk/pkg/api"
 	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
 

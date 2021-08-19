@@ -11,7 +11,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/Financial-Times/service-status-go/gtg"
 )
 
@@ -32,7 +32,7 @@ type Service struct {
 }
 
 func NewHealthService(config *consumer.QueueConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
-	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client)
+	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client, log)
 	service := &Service{
 		ESHealthService:  esHealthService,
 		ConcordanceAPI:   concordanceAPI,

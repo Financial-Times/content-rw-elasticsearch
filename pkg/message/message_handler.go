@@ -12,7 +12,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	transactionid "github.com/Financial-Times/transactionid-utils-go"
 )
 
@@ -38,7 +38,7 @@ type Handler struct {
 
 func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, queueConfig consumer.QueueConfig, esClient ESClient, logger *logger.UPPLogger) *Handler {
 	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, esClient: esClient, log: logger}
-	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, httpClient)
+	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, httpClient, logger)
 	return indexer
 }
 
