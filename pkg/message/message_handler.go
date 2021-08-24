@@ -3,16 +3,15 @@ package message
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Financial-Times/kafka-client-go/kafka"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
-	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	transactionid "github.com/Financial-Times/transactionid-utils-go"
 )
 
@@ -29,45 +28,17 @@ type ESClient func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger
 
 type Handler struct {
 	esService       es.Service
-	messageConsumer consumer.MessageConsumer
 	Mapper          *mapper.Handler
 	httpClient      *http.Client
-	esClient        ESClient
 	log             *logger.UPPLogger
 }
 
-func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, queueConfig consumer.QueueConfig, esClient ESClient, logger *logger.UPPLogger) *Handler {
-	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, esClient: esClient, log: logger}
-	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, httpClient, logger)
+func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, logger *logger.UPPLogger) *Handler {
+	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, log: logger}
 	return indexer
 }
 
-func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
-	h.Mapper.BaseAPIURL = baseAPIURL
-	go func() {
-		for {
-			ec, err := h.esClient(accessConfig, h.httpClient, h.log)
-			if err != nil {
-				h.log.Error("Could not connect to Elasticsearch")
-				time.Sleep(time.Minute)
-				continue
-			}
-			h.esService.SetClient(ec)
-			h.log.Info("Connected to Elasticsearch")
-			// this is a blocking method
-			h.messageConsumer.Start()
-			return
-		}
-	}()
-}
-
-func (h *Handler) Stop() {
-	if h.messageConsumer != nil {
-		h.messageConsumer.Stop()
-	}
-}
-
-func (h *Handler) handleMessage(msg consumer.Message) {
+func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
 	tid := msg.Headers[transactionIDHeader]
 	log := h.log.WithTransactionID(tid)
 
@@ -79,14 +50,14 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 
 	if strings.Contains(tid, syntheticRequestPrefix) {
 		log.Info("Ignoring synthetic message")
-		return
+		return nil
 	}
 
 	var combinedPostPublicationEvent schema.EnrichedContent
 	err := json.Unmarshal([]byte(msg.Body), &combinedPostPublicationEvent)
 	if err != nil {
 		log.WithError(err).Error("Cannot unmarshal message body")
-		return
+		return err
 	}
 
 	if combinedPostPublicationEvent.Content.BodyXML != "" && combinedPostPublicationEvent.Content.Body == "" {
@@ -96,7 +67,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 
 	if !isAllowedType(combinedPostPublicationEvent.Content.Type) {
 		log.Infof("Ignoring message of type %s", combinedPostPublicationEvent.Content.Type)
-		return
+		return nil
 	}
 
 	uuid := combinedPostPublicationEvent.UUID
@@ -106,7 +77,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 	contentType := h.readContentType(msg, combinedPostPublicationEvent)
 	if contentType == "" && msg.Headers[originHeader] != config.PACOrigin {
 		log.Error("Failed to index content. Could not infer type of content")
-		return
+		return nil
 	}
 
 	conceptType := h.Mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
@@ -114,15 +85,15 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 		_, err = h.esService.DeleteData(conceptType, uuid)
 		if err != nil {
 			log.WithError(err).Error("Failed to delete indexed content")
-			return
+			return err
 		}
 		log.WithMonitoringEvent("ContentDeleteElasticsearch", tid, contentType).Info("Successfully deleted")
-		return
+		return nil
 	}
 
 	if combinedPostPublicationEvent.Content.UUID == "" || contentType == "" {
 		log.Info("Ignoring message with no content")
-		return
+		return nil
 	}
 
 	payload := h.Mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
@@ -130,12 +101,14 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 	_, err = h.esService.WriteData(conceptType, uuid, payload)
 	if err != nil {
 		log.WithError(err).Error("Failed to index content")
-		return
+		return err
 	}
 	log.WithMonitoringEvent("ContentWriteElasticsearch", tid, contentType).Info("Successfully saved")
+
+	return nil
 }
 
-func (h *Handler) readContentType(msg consumer.Message, event schema.EnrichedContent) string {
+func (h *Handler) readContentType(msg kafka.FTMessage, event schema.EnrichedContent) string {
 	typeHeader := msg.Headers[contentTypeHeader]
 	if strings.Contains(typeHeader, audioContentTypeHeader) || event.Content.Type == config.ContentTypeAudio {
 		return config.AudioType
