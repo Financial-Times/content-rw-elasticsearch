@@ -1,9 +1,9 @@
 package message
 
 import (
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/kafka"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
-	"github.com/Financial-Times/kafka-client-go/kafka"
 	"log"
 	"net/http"
 	"net/url"

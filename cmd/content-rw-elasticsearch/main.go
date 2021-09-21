@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/Financial-Times/kafka/consumergroup"
+	"github.com/Shopify/sarama"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,7 +16,7 @@ import (
 	"github.com/Financial-Times/upp-go-sdk/pkg/api"
 	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
 
-	"github.com/Financial-Times/kafka-client-go/kafka"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/kafka"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
@@ -197,8 +199,12 @@ func main() {
 			log,
 		)
 
+		consumerConfig := consumergroup.NewConfig()
+		consumerConfig.Offsets.Initial = sarama.OffsetOldest
+		consumerConfig.Offsets.ProcessingTimeout = 10 * time.Second
+
 		kafkaConsumer, err := kafka.NewPerseverantConsumer(
-			"z-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com",
+			"b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
 			*kafkaConsumerGroup,
 			[]string{*kafkaTopic},
 			kafka.DefaultConsumerConfig(),
@@ -211,10 +217,31 @@ func main() {
 			log.WithError(err).Fatal("failed to create Kafka consumer")
 		}
 
-		go func() {
-			log.Info("starting kafka consumer instance")
-			kafkaConsumer.StartListening(handler.HandleMessage)
-		}()
+		log.Info("starting kafka consumer instance")
+		kafkaConsumer.StartListening(handler.HandleMessage)
+
+		//kafkaProducer, err := kafka.NewProducer(
+		//	"b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
+		//	"unique-topic-name",
+		//	kafka.DefaultProducerConfig(),
+		//	log,
+		//)
+		//
+		//if err != nil {
+		//	log.WithError(err).Fatal("failed to create kafka producer")
+		//}
+		//
+		//message := kafka.FTMessage{
+		//	Headers: map[string]string{
+		//		"Test": "123 test",
+		//	},
+		//	Body: "Test test 123 test",
+		//}
+		//err = kafkaProducer.SendMessage(message)
+		//
+		//if err != nil {
+		//	log.WithError(err).Fatal("failed to write to kafka")
+		//}
 
 		//healthService := health.NewHealthService(&queueConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
 		serveMux := http.NewServeMux()

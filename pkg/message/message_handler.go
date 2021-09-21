@@ -3,7 +3,7 @@ package message
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Financial-Times/kafka-client-go/kafka"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/kafka"
 	"net/http"
 	"strings"
 
@@ -27,10 +27,10 @@ const (
 type ESClient func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error)
 
 type Handler struct {
-	esService       es.Service
-	Mapper          *mapper.Handler
-	httpClient      *http.Client
-	log             *logger.UPPLogger
+	esService  es.Service
+	Mapper     *mapper.Handler
+	httpClient *http.Client
+	log        *logger.UPPLogger
 }
 
 func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, logger *logger.UPPLogger) *Handler {
