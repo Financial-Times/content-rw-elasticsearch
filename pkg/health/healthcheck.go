@@ -3,6 +3,7 @@ package health
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/kafka"
 	"net/http"
 
 	status "github.com/Financial-Times/service-status-go/httphandlers"
@@ -11,7 +12,6 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger/v2"
-	consumer "github.com/Financial-Times/message-queue-gonsumer"
 	"github.com/Financial-Times/service-status-go/gtg"
 )
 
@@ -24,15 +24,20 @@ const (
 type Service struct {
 	ESHealthService  es.HealthStatus
 	ConcordanceAPI   *concept.ConcordanceAPIService
-	ConsumerInstance consumer.MessageConsumer
+	ConsumerInstance kafka.Consumer
 	HTTPClient       *http.Client
 	Checks           []fthealth.Check
 	AppSystemCode    string
 	log              *logger.UPPLogger
 }
 
-func NewHealthService(config *consumer.QueueConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
-	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client, log)
+func NewHealthService(config kafka.Config, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
+	consumerInstance, err := kafka.NewConsumer(config)
+
+	if err != nil {
+		// TODO
+	}
+
 	service := &Service{
 		ESHealthService:  esHealthService,
 		ConcordanceAPI:   concordanceAPI,
@@ -141,7 +146,15 @@ func (s *Service) checkKafkaProxyConnectivity() fthealth.Check {
 		PanicGuide:       panicGuide,
 		Severity:         1,
 		TechnicalSummary: "Messages couldn't be read from the queue. Check if kafka-proxy is reachable.",
-		Checker:          s.ConsumerInstance.ConnectivityCheck,
+		Checker: func() (string, error) {
+			err := s.ConsumerInstance.ConnectivityCheck()
+
+			if err != nil {
+				return "", err
+			}
+
+			return "", nil
+		},
 	}
 }
 

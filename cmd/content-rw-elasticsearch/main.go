@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/health"
 	"github.com/Financial-Times/kafka/consumergroup"
 	"github.com/Shopify/sarama"
 	"net/http"
@@ -36,12 +37,12 @@ func main() {
 		Desc:   "System Code of the application",
 		EnvVar: "APP_SYSTEM_CODE",
 	})
-	//appName := app.String(cli.StringOpt{
-	//	Name:   "app-name",
-	//	Value:  config.AppName,
-	//	Desc:   "Application name",
-	//	EnvVar: "APP_NAME",
-	//})
+	appName := app.String(cli.StringOpt{
+		Name:   "app-name",
+		Value:  config.AppName,
+		Desc:   "Application name",
+		EnvVar: "APP_NAME",
+	})
 	port := app.String(cli.StringOpt{
 		Name:   "port",
 		Value:  "8080",
@@ -217,8 +218,9 @@ func main() {
 			log.WithError(err).Fatal("failed to create Kafka consumer")
 		}
 
-		log.Info("starting kafka consumer instance")
-		kafkaConsumer.StartListening(handler.HandleMessage)
+		go func() {
+			kafkaConsumer.StartListening(handler.HandleMessage)
+		}()
 
 		//kafkaProducer, err := kafka.NewProducer(
 		//	"b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
@@ -243,9 +245,18 @@ func main() {
 		//	log.WithError(err).Fatal("failed to write to kafka")
 		//}
 
-		//healthService := health.NewHealthService(&queueConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
+		healthCheckConfig := kafka.Config{
+			BrokersConnectionString: "b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
+			ConsumerGroup:           *kafkaConsumerGroup + "-health",
+			Topics:                  []string{*kafkaTopic},
+			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
+			Err:                     nil,
+			Logger:                  log,
+		}
+
+		healthService := health.NewHealthService(healthCheckConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
 		serveMux := http.NewServeMux()
-		//serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
+		serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
 		pkghttp.StartServer(log, serveMux, *port)
 
 		ch := make(chan os.Signal, 1)

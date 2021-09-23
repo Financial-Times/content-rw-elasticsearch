@@ -152,6 +152,6 @@ func (c *MessageConsumer) ConnectivityCheck() error {
 
 func DefaultConsumerConfig() *sarama.Config {
 	config := sarama.NewConfig()
-	config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	//config.Consumer.Offsets.Initial = sarama.OffsetNewest
 	return config
 }
