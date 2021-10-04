@@ -40,6 +40,8 @@ spec:
               key: aws.content.elasticsearch.endpoint
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
+        - name: KAFKA_ADDR
+          value: "{{ .Values.env.KAFKA_ADDR }}"
         - name: KAFKA_CONSUMER_GROUP
           value: "k8s-{{ .Values.service.name }}"
         - name: KAFKA_TOPIC
