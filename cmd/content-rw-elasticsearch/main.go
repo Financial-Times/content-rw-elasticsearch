@@ -215,29 +215,6 @@ func main() {
 			kafkaConsumer.StartListening(handler.HandleMessage)
 		}()
 
-		//kafkaProducer, err := kafka.NewProducer(
-		//	"b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
-		//	"unique-topic-name",
-		//	kafka.DefaultProducerConfig(),
-		//	log,
-		//)
-		//
-		//if err != nil {
-		//	log.WithError(err).Fatal("failed to create kafka producer")
-		//}
-		//
-		//message := kafka.FTMessage{
-		//	Headers: map[string]string{
-		//		"Test": "123 test",
-		//	},
-		//	Body: "Test test 123 test",
-		//}
-		//err = kafkaProducer.SendMessage(message)
-		//
-		//if err != nil {
-		//	log.WithError(err).Fatal("failed to write to kafka")
-		//}
-
 		healthCheckConfig := kafka.Config{
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup + "-health",

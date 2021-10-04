@@ -25,22 +25,6 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     networks:
       - common
-#  kafka:
-#    image: blacktop/kafka
-#    ports:
-#      - 9092:9092
-#    environment:
-#      - "KAFKA_BROKER_ID=1"
-#      - "KAFKA_CREATE_TOPICS=CombinedPostPublicationEvents:1:1"
-#      - "KAFKA_ADVERTISED_HOSTNAME=localhost"
-#      - "KAFKA_ADVERTISED_PORT=9092"
-#      - "KAFKA_LISTENERS=LISTENER_BOB://localhost:9092"
-#      - "KAFKA_ADVERTISED_LISTENERS=LISTENER_BOB://localhost:9092"
-#      - "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=LISTENER_BOB:PLAINTEXT"
-#      - "KAFKA_INTER_BROKER_LISTENER_NAME=LISTENER_BOB"
-#      - "ALLOW_PLAINTEXT_LISTENER=yes"
-#    networks:
-#      - common
   app:
     build:
       context: .

@@ -67,7 +67,6 @@ func (c *ConsumerHandler) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 				WithField("method", "ConsumeClaim").
 				WithField("messageKey", message.Key).
 				Error("Error processing message")
-			return err
 		}
 		session.MarkMessage(message, "")
 	}
