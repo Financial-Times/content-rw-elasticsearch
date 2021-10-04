@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	brokerURL         = "b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092"
+	brokerURL         = "localhost:29092"
 	testConsumerGroup = "testgroup"
 )
 
@@ -54,7 +54,7 @@ func TestNewConsumer(t *testing.T) {
 
 func TestConsumerNotConnectedConnectivityCheckError(t *testing.T) {
 	log := logger.NewUPPLogger("test", "INFO")
-	consumer := MessageConsumer{brokers: []string{"127.0.0.1:9092"}, consumerGroup: testConsumerGroup, topics: []string{testTopic}, config: nil, logger: log}
+	consumer := messageConsumer{brokersConnectionString: "unknown:9092", consumerGroup: testConsumerGroup, topics: []string{testTopic}, config: nil, logger: log}
 
 	err := consumer.ConnectivityCheck()
 	assert.Error(t, err)
@@ -65,8 +65,19 @@ func TestNewPerseverantConsumer(t *testing.T) {
 		t.Skip("Skipping test as it requires a connection to Kafka.")
 	}
 
-	log := logger.NewUPPLogger("test", "INFO")
-	consumer, err := NewPerseverantConsumer(brokerURL, testConsumerGroup, []string{testTopic}, nil, time.Second, nil, log)
+	config := DefaultConsumerConfig()
+	errCh := make(chan error, 1)
+	defer close(errCh)
+	log := logger.NewUPPLogger("test", "PANIC")
+
+	consumer, err := NewPerseverantConsumer(Config{
+		BrokersConnectionString: brokerURL,
+		ConsumerGroup:           testConsumerGroup,
+		Topics:                  []string{testTopic},
+		ConsumerGroupConfig:     config,
+		Err:                     errCh,
+		Logger:                  log,
+	}, time.Second)
 	assert.NoError(t, err)
 
 	err = consumer.ConnectivityCheck()
@@ -76,7 +87,7 @@ func TestNewPerseverantConsumer(t *testing.T) {
 		consumer.StartListening(func(msg FTMessage) error { return nil })
 	}()
 
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second)
 
 	err = consumer.ConnectivityCheck()
 	assert.NoError(t, err)
@@ -117,45 +128,6 @@ func (c *MockConsumerGroupClaim) Messages() <-chan *sarama.ConsumerMessage {
 	return outChan
 }
 
-type MockConsumerGroupClaimer struct {
-	ready   chan bool
-	handler func(message FTMessage) error
-}
-
-func (c *MockConsumerGroupClaimer) SetHandler(handler func(message FTMessage) error) {
-	c.handler = handler
-}
-
-func (c *MockConsumerGroupClaimer) Ready() <-chan bool {
-	return c.ready
-}
-
-func (c *MockConsumerGroupClaimer) Reset() {
-	c.ready = make(chan bool)
-}
-
-func (c *MockConsumerGroupClaimer) Setup(sarama.ConsumerGroupSession) error {
-	close(c.ready)
-	return nil
-}
-
-func (c *MockConsumerGroupClaimer) Cleanup(sarama.ConsumerGroupSession) error {
-	return nil
-}
-
-func (c *MockConsumerGroupClaimer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	for message := range claim.Messages() {
-		ftMsg := rawToFTMessage(message.Value)
-		err := c.handler(ftMsg)
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 type MockConsumerGroup struct {
 	errChan         chan error
 	messages        []*sarama.ConsumerMessage
@@ -178,11 +150,12 @@ func (cg *MockConsumerGroup) Close() error {
 
 func (cg *MockConsumerGroup) Consume(ctx context.Context, topics []string, handler sarama.ConsumerGroupHandler) error {
 	for _, v := range cg.messages {
+		session := &MockConsumerGroupSession{}
 		claim := &MockConsumerGroupClaim{
 			messages: []*sarama.ConsumerMessage{v},
 		}
 
-		err := handler.ConsumeClaim(nil, claim)
+		err := handler.ConsumeClaim(session, claim)
 		if err != nil {
 			cg.errChan <- err
 		}
@@ -194,23 +167,55 @@ func (cg *MockConsumerGroup) Consume(ctx context.Context, topics []string, handl
 	return nil
 }
 
+type MockConsumerGroupSession struct {}
+
+func (m *MockConsumerGroupSession) Claims() map[string][]int32 {
+	return make(map[string][]int32)
+}
+
+func (m *MockConsumerGroupSession) MemberID() string {
+	return ""
+}
+
+func (m *MockConsumerGroupSession) GenerationID() int32 {
+	return 1
+}
+
+func (m *MockConsumerGroupSession) MarkOffset(topic string, partition int32, offset int64, metadata string) {
+
+}
+
+func (m *MockConsumerGroupSession) Commit() {
+
+}
+
+func (m *MockConsumerGroupSession) ResetOffset(topic string, partition int32, offset int64, metadata string) {
+
+}
+
+func (m *MockConsumerGroupSession) MarkMessage(msg *sarama.ConsumerMessage, metadata string) {
+
+}
+
+func (m *MockConsumerGroupSession) Context() context.Context {
+	return context.TODO()
+}
+
+
 func NewTestConsumerWithErrChan() (Consumer, chan error) {
 	errCh := make(chan error, len(expectedErrors))
 	log := logger.NewUPPLogger("test", "INFO")
 
-	return &MessageConsumer{
-		topics:        []string{"topic"},
-		consumerGroup: "group",
-		brokers:       []string{"node"},
+	return &messageConsumer{
+		topics:                  []string{"topic"},
+		consumerGroup:           "group",
+		brokersConnectionString: "node",
 		consumer: &MockConsumerGroup{
 			messages:        messages,
 			errors:          []error{},
 			errChan:         make(chan error),
 			IsShutdown:      false,
 			errorOnShutdown: true,
-		},
-		claimer: &MockConsumerGroupClaimer{
-			ready: make(chan bool),
 		},
 		errCh:  errCh,
 		logger: log,
@@ -226,18 +231,15 @@ func NewTestConsumerWithErrors() (Consumer, chan error) {
 		errChan <- e
 	}
 
-	return &MessageConsumer{
-		topics:        []string{"topic"},
-		consumerGroup: "group",
-		brokers:       []string{"node"},
+	return &messageConsumer{
+		topics:                  []string{"topic"},
+		consumerGroup:           "group",
+		brokersConnectionString: "node",
 		consumer: &MockConsumerGroup{
 			messages:   messages,
 			errors:     expectedErrors,
 			IsShutdown: false,
 			errChan:    errChan,
-		},
-		claimer: &MockConsumerGroupClaimer{
-			ready: make(chan bool),
 		},
 		errCh:  errCh,
 		logger: log,
@@ -246,18 +248,15 @@ func NewTestConsumerWithErrors() (Consumer, chan error) {
 
 func NewTestConsumer() Consumer {
 	log := logger.NewUPPLogger("test", "INFO")
-	return &MessageConsumer{
-		topics:        []string{"topic"},
-		consumerGroup: "group",
-		brokers:       []string{"node"},
+	return &messageConsumer{
+		topics:                  []string{"topic"},
+		consumerGroup:           "group",
+		brokersConnectionString: "node",
 		consumer: &MockConsumerGroup{
 			messages:   messages,
 			errors:     []error{},
 			IsShutdown: false,
 			errChan:    make(chan error),
-		},
-		claimer: &MockConsumerGroupClaimer{
-			ready: make(chan bool),
 		},
 		logger: log,
 	}

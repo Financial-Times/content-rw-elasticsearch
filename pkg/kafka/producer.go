@@ -1,24 +1,22 @@
 package kafka
 
 import (
-	"strings"
-	"sync"
-	"time"
-
 	logger "github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama"
-	"github.com/pkg/errors"
+	"strings"
 )
 
 const errProducerNotConnected = "producer is not connected to Kafka"
 
+// Producer represents the producer instance which sends Kafka messages.
 type Producer interface {
 	SendMessage(message FTMessage) error
 	ConnectivityCheck() error
 	Shutdown()
 }
 
-type MessageProducer struct {
+// messageProducer implements the Producer interface and is the library's main producer implementation.
+type messageProducer struct {
 	brokers  []string
 	topic    string
 	config   *sarama.Config
@@ -26,15 +24,7 @@ type MessageProducer struct {
 	logger   *logger.UPPLogger
 }
 
-type perseverantProducer struct {
-	sync.RWMutex
-	brokers  string
-	topic    string
-	config   *sarama.Config
-	producer Producer
-	logger   *logger.UPPLogger
-}
-
+// NewProducer creates a new producer instance using Sarama's SyncProducer.
 func NewProducer(brokers string, topic string, config *sarama.Config, logger *logger.UPPLogger) (Producer, error) {
 	if config == nil {
 		config = DefaultProducerConfig()
@@ -50,7 +40,7 @@ func NewProducer(brokers string, topic string, config *sarama.Config, logger *lo
 		return nil, err
 	}
 
-	return &MessageProducer{
+	return &messageProducer{
 		brokers:  brokerSlice,
 		topic:    topic,
 		config:   config,
@@ -59,20 +49,8 @@ func NewProducer(brokers string, topic string, config *sarama.Config, logger *lo
 	}, nil
 }
 
-func NewPerseverantProducer(brokers string, topic string, config *sarama.Config, initialDelay time.Duration, retryInterval time.Duration, logger *logger.UPPLogger) (Producer, error) {
-	producer := &perseverantProducer{sync.RWMutex{}, brokers, topic, config, nil, logger}
-
-	go func() {
-		if initialDelay > 0 {
-			time.Sleep(initialDelay)
-		}
-		producer.connect(retryInterval)
-	}()
-
-	return producer, nil
-}
-
-func (p *MessageProducer) SendMessage(message FTMessage) error {
+// SendMessage sends a message to Kafka.
+func (p *messageProducer) SendMessage(message FTMessage) error {
 	_, _, err := p.producer.SendMessage(&sarama.ProducerMessage{
 		Topic: p.topic,
 		Value: sarama.StringEncoder(message.Build()),
@@ -85,7 +63,8 @@ func (p *MessageProducer) SendMessage(message FTMessage) error {
 	return err
 }
 
-func (p *MessageProducer) Shutdown() {
+// Shutdown closes the producer's connection.
+func (p *messageProducer) Shutdown() {
 	if err := p.producer.Close(); err != nil {
 		p.logger.WithError(err).
 			WithField("method", "Shutdown").
@@ -93,7 +72,8 @@ func (p *MessageProducer) Shutdown() {
 	}
 }
 
-func (p *MessageProducer) ConnectivityCheck() error {
+// ConnectivityCheck tries to create a new producer, then shuts it down if successful.
+func (p *messageProducer) ConnectivityCheck() error {
 	// like the consumer check, establishing a new connection gives us some degree of confidence
 	tmp, err := NewProducer(strings.Join(p.brokers, ","), p.topic, p.config, p.logger)
 	if tmp != nil {
@@ -103,62 +83,7 @@ func (p *MessageProducer) ConnectivityCheck() error {
 	return err
 }
 
-func (p *perseverantProducer) connect(retryInterval time.Duration) {
-	connectorLog := p.logger.WithField("brokers", p.brokers).
-		WithField("topic", p.topic)
-	for {
-		producer, err := NewProducer(p.brokers, p.topic, p.config, p.logger)
-		if err == nil {
-			connectorLog.Info("connected to Kafka producer")
-			p.setProducer(producer)
-			break
-		}
-
-		connectorLog.WithError(err).
-			Warn(errProducerNotConnected)
-		time.Sleep(retryInterval)
-	}
-}
-
-func (p *perseverantProducer) setProducer(producer Producer) {
-	p.Lock()
-	defer p.Unlock()
-
-	p.producer = producer
-}
-
-func (p *perseverantProducer) isConnected() bool {
-	p.RLock()
-	defer p.RUnlock()
-
-	return p.producer != nil
-}
-
-func (p *perseverantProducer) SendMessage(message FTMessage) error {
-	if !p.isConnected() {
-		return errors.New(errProducerNotConnected)
-	}
-
-	p.RLock()
-	defer p.RUnlock()
-
-	return p.producer.SendMessage(message)
-}
-
-func (p *perseverantProducer) Shutdown() {
-	if p.isConnected() {
-		p.producer.Shutdown()
-	}
-}
-
-func (p *perseverantProducer) ConnectivityCheck() error {
-	if !p.isConnected() {
-		return errors.New(errProducerNotConnected)
-	}
-
-	return p.producer.ConnectivityCheck()
-}
-
+// DefaultProducerConfig creates a new Sarama producer configuration with default values.
 func DefaultProducerConfig() *sarama.Config {
 	config := sarama.NewConfig()
 	config.Producer.MaxMessageBytes = 16777216

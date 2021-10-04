@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	testBrokers = "b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092"
+	testBrokers = "localhost:29092"
 	testTopic   = "testTopic"
 )
 
@@ -41,7 +41,7 @@ func NewTestProducer(t *testing.T, brokers string, topic string) (Producer, erro
 
 	msp.ExpectSendMessageAndSucceed()
 
-	return &MessageProducer{
+	return &messageProducer{
 		brokers:  brokerSlice,
 		topic:    topic,
 		producer: msp,
@@ -61,7 +61,7 @@ func TestNewProducer(t *testing.T) {
 	err = producer.ConnectivityCheck()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 16777216, producer.(*MessageProducer).config.Producer.MaxMessageBytes, "maximum message size using default config")
+	assert.Equal(t, 16777216, producer.(*messageProducer).config.Producer.MaxMessageBytes, "maximum message size using default config")
 }
 
 func TestNewProducerBadUrl(t *testing.T) {
@@ -77,7 +77,9 @@ func TestNewProducerBadUrl(t *testing.T) {
 
 func TestClient_SendMessage(t *testing.T) {
 	kc, _ := NewTestProducer(t, testBrokers, testTopic)
-	kc.SendMessage(NewFTMessage(nil, "Body"))
+	err := kc.SendMessage(NewFTMessage(nil, "Body"))
+
+	assert.NoError(t, err)
 }
 
 func TestNewPerseverantProducer(t *testing.T) {

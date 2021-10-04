@@ -2,41 +2,42 @@ package kafka
 
 import (
 	"context"
+	"fmt"
+	"math/rand"
 	"strings"
 	"sync"
 
-	logger "github.com/Financial-Times/go-logger/v2"
+	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama"
 )
 
 const errConsumerNotConnected = "consumer is not connected to Kafka"
 
-type ConsumerGroupClaimer interface {
-	SetHandler(handler func(message FTMessage) error)
-	Ready() <-chan bool
-	Reset()
-	Setup(session sarama.ConsumerGroupSession) error
-	Cleanup(session sarama.ConsumerGroupSession) error
-	ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error
-}
-
+// Consumer represents the consumer instance which handles Kafka messages
 type Consumer interface {
+	// StartListening accepts a function which will get called for each incoming message.
 	StartListening(messageHandler func(message FTMessage) error)
+
+	// Shutdown must be called before the application exits to stop the consumer instance.
 	Shutdown()
+
+	// ConnectivityCheck checks if the consumer can connect to the Kafka broker.
 	ConnectivityCheck() error
 }
 
-type MessageConsumer struct {
-	topics        []string
-	consumerGroup string
-	brokers       []string
-	consumer      sarama.ConsumerGroup
-	config        *sarama.Config
-	errCh         chan error
-	logger        *logger.UPPLogger
-	claimer       ConsumerGroupClaimer
+// messageConsumer represents the library's main kafka consumer
+type messageConsumer struct {
+	topics                  []string
+	consumerGroup           string
+	brokersConnectionString string
+	consumer                sarama.ConsumerGroup
+	config                  *sarama.Config
+	errCh                   chan error
+	logger                  *logger.UPPLogger
+	handler                 *ConsumerHandler
 }
 
+// Config keeps together all the values needed to create a consumer instance
 type Config struct {
 	BrokersConnectionString string
 	ConsumerGroup           string
@@ -46,6 +47,8 @@ type Config struct {
 	Logger                  *logger.UPPLogger
 }
 
+// NewConsumer creates a new consumer instance using a Sarama ConsumerGroup
+// to connect to Kafka.
 func NewConsumer(config Config) (Consumer, error) {
 	config.Logger.Debug("Creating new consumer")
 
@@ -62,28 +65,23 @@ func NewConsumer(config Config) (Consumer, error) {
 		return nil, err
 	}
 
-	return &MessageConsumer{
-		topics:        config.Topics,
-		consumerGroup: config.ConsumerGroup,
-		brokers:       strings.Split(config.BrokersConnectionString, ","),
-		consumer:      consumer,
-		config:        config.ConsumerGroupConfig,
-		errCh:         config.Err,
-		logger:        config.Logger,
+	return &messageConsumer{
+		topics:                  config.Topics,
+		consumerGroup:           config.ConsumerGroup,
+		brokersConnectionString: config.BrokersConnectionString,
+		consumer:                consumer,
+		config:                  config.ConsumerGroupConfig,
+		errCh:                   config.Err,
+		logger:                  config.Logger,
 	}, nil
 }
 
-func (c *MessageConsumer) StartListening(messageHandler func(message FTMessage) error) {
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	if c.claimer == nil {
-		c.claimer = NewConsumerClient(c.logger)
+// StartListening is a blocking function that will start listening for message from Kafka
+// If you don't want it to block the execution, you should run it in a separate goroutine.
+func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) error) {
+	if c.handler == nil {
+		c.handler = NewConsumerHandler(c.logger, messageHandler)
 	}
-
-	c.claimer.SetHandler(messageHandler)
 
 	go func() {
 		c.logger.Debug("Start listening for consumer errors")
@@ -98,10 +96,16 @@ func (c *MessageConsumer) StartListening(messageHandler func(message FTMessage) 
 		}
 	}()
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
 	go func() {
 		defer wg.Done()
 		for {
-			if err := c.consumer.Consume(ctx, c.topics, c.claimer); err != nil {
+			if err := c.consumer.Consume(ctx, c.topics, c.handler); err != nil {
 				c.logger.WithError(err).
 					WithField("method", "StartListening").
 					Error("error starting consumer")
@@ -110,16 +114,18 @@ func (c *MessageConsumer) StartListening(messageHandler func(message FTMessage) 
 			if ctx.Err() != nil {
 				return
 			}
-			c.claimer.Reset()
+			c.handler.Reset()
 		}
 	}()
 
-	<-c.claimer.Ready()
+	<-c.handler.Ready()
 	c.logger.Info("consumer up and running")
 	wg.Wait()
 }
 
-func (c *MessageConsumer) Shutdown() {
+// Shutdown closes the consumer's connection to Kafka
+// It should be called before terminating the process.
+func (c *messageConsumer) Shutdown() {
 	if err := c.consumer.Close(); err != nil {
 		c.logger.WithError(err).
 			WithField("method", "Shutdown").
@@ -131,12 +137,12 @@ func (c *MessageConsumer) Shutdown() {
 	}
 }
 
-func (c *MessageConsumer) ConnectivityCheck() error {
-	// establishing (or failing to establish) a new connection (with a distinct consumer group) is a reasonable check
-	// as experiment shows the consumer's existing connection is automatically repaired after any interruption
+// ConnectivityCheck tries to establish a new Kafka connection with a separate consumer group
+// The consumer's existing connection is automatically repaired after any interruption.
+func (c *messageConsumer) ConnectivityCheck() error {
 	config := Config{
-		BrokersConnectionString: strings.Join(c.brokers, ","),
-		ConsumerGroup:           c.consumerGroup + "-healthcheck",
+		BrokersConnectionString: c.brokersConnectionString,
+		ConsumerGroup:           fmt.Sprintf("%s-healthcheck-%d", c.consumerGroup, rand.Intn(100)),
 		Topics:                  c.topics,
 		ConsumerGroupConfig:     c.config,
 		Logger:                  c.logger,
@@ -150,8 +156,9 @@ func (c *MessageConsumer) ConnectivityCheck() error {
 	return nil
 }
 
+// DefaultConsumerConfig returns a new sarama configuration with predefined default settings.
 func DefaultConsumerConfig() *sarama.Config {
 	config := sarama.NewConfig()
-	//config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	config.Consumer.Offsets.Initial = sarama.OffsetNewest
 	return config
 }

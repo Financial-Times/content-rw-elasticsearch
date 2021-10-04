@@ -1,5 +1,46 @@
 version: '3'
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - common
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - common
+#  kafka:
+#    image: blacktop/kafka
+#    ports:
+#      - 9092:9092
+#    environment:
+#      - "KAFKA_BROKER_ID=1"
+#      - "KAFKA_CREATE_TOPICS=CombinedPostPublicationEvents:1:1"
+#      - "KAFKA_ADVERTISED_HOSTNAME=localhost"
+#      - "KAFKA_ADVERTISED_PORT=9092"
+#      - "KAFKA_LISTENERS=LISTENER_BOB://localhost:9092"
+#      - "KAFKA_ADVERTISED_LISTENERS=LISTENER_BOB://localhost:9092"
+#      - "KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=LISTENER_BOB:PLAINTEXT"
+#      - "KAFKA_INTER_BROKER_LISTENER_NAME=LISTENER_BOB"
+#      - "ALLOW_PLAINTEXT_LISTENER=yes"
+#    networks:
+#      - common
   app:
     build:
       context: .
@@ -10,28 +51,14 @@ services:
     container_name: content-rw-elasticsearch
     environment:
       ELASTICSEARCH_SAPI_ENDPOINT: "http://es:9200"
+      KAFKA_ADDR: "kafka:9092"
     ports:
       - "8080:8080"
     networks:
       - common
     depends_on:
       - es
-  app-second:
-    build:
-      context: .
-      args:
-        GITHUB_USERNAME: ${GITHUB_USERNAME}
-        GITHUB_TOKEN: ${GITHUB_TOKEN}
-    image: content-rw-elasticsearch:local
-    container_name: content-rw-elasticsearch-second
-    environment:
-      ELASTICSEARCH_SAPI_ENDPOINT: "http://es:9200"
-    ports:
-      - "8081:8080"
-    networks:
-      - common
-    depends_on:
-      - es
+      - kafka
   es:
     image: elasticsearch:1.5
     ports:
@@ -42,7 +69,12 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - esdata:/usr/share/elasticsearch/data
+
 volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
   esdata:
     driver: local
 

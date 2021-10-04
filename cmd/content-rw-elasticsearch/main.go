@@ -2,8 +2,6 @@ package main
 
 import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/health"
-	"github.com/Financial-Times/kafka/consumergroup"
-	"github.com/Shopify/sarama"
 	"net/http"
 	"os"
 	"os/signal"
@@ -77,12 +75,12 @@ func main() {
 		Desc:   "The name of the elaticsearch index",
 		EnvVar: "ELASTICSEARCH_SAPI_INDEX",
 	})
-	//kafkaProxyAddress := app.String(cli.StringOpt{
-	//	Name:   "kafka-proxy-address",
-	//	Value:  "http://localhost:8080",
-	//	Desc:   "Addresses used by the queue consumer to connect to the queue",
-	//	EnvVar: "KAFKA_PROXY_ADDR",
-	//})
+	kafkaAddress := app.String(cli.StringOpt{
+		Name:   "kafka-address",
+		Value:  "http://kafka:9092",
+		Desc:   "Addresses used by the queue consumer to connect to the queue",
+		EnvVar: "KAFKA_ADDR",
+	})
 	kafkaConsumerGroup := app.String(cli.StringOpt{
 		Name:   "kafka-consumer-group",
 		Value:  "default-consumer-group",
@@ -200,19 +198,14 @@ func main() {
 			log,
 		)
 
-		consumerConfig := consumergroup.NewConfig()
-		consumerConfig.Offsets.Initial = sarama.OffsetOldest
-		consumerConfig.Offsets.ProcessingTimeout = 10 * time.Second
-
-		kafkaConsumer, err := kafka.NewPerseverantConsumer(
-			"b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
-			*kafkaConsumerGroup,
-			[]string{*kafkaTopic},
-			kafka.DefaultConsumerConfig(),
-			time.Minute,
-			nil,
-			log,
-		)
+		kafkaConsumer, err := kafka.NewPerseverantConsumer(kafka.Config{
+			BrokersConnectionString: *kafkaAddress,
+			ConsumerGroup:           *kafkaConsumerGroup,
+			Topics:                  []string{*kafkaTopic},
+			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
+			Err:                     nil,
+			Logger:                  log,
+		}, time.Minute)
 
 		if err != nil {
 			log.WithError(err).Fatal("failed to create Kafka consumer")
@@ -246,7 +239,7 @@ func main() {
 		//}
 
 		healthCheckConfig := kafka.Config{
-			BrokersConnectionString: "b-1.upp-poc-kafka.vmh5a4.c6.kafka.eu-west-1.amazonaws.com:9092",
+			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup + "-health",
 			Topics:                  []string{*kafkaTopic},
 			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
