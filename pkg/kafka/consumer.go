@@ -32,7 +32,6 @@ type messageConsumer struct {
 	brokersConnectionString string
 	consumer                sarama.ConsumerGroup
 	config                  *sarama.Config
-	errCh                   chan error
 	logger                  *logger.UPPLogger
 	handler                 *ConsumerHandler
 }
@@ -43,7 +42,6 @@ type Config struct {
 	ConsumerGroup           string
 	Topics                  []string
 	ConsumerGroupConfig     *sarama.Config
-	Err                     chan error
 	Logger                  *logger.UPPLogger
 }
 
@@ -71,7 +69,6 @@ func NewConsumer(config Config) (Consumer, error) {
 		brokersConnectionString: config.BrokersConnectionString,
 		consumer:                consumer,
 		config:                  config.ConsumerGroupConfig,
-		errCh:                   config.Err,
 		logger:                  config.Logger,
 	}, nil
 }
@@ -84,15 +81,10 @@ func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) 
 	}
 
 	go func() {
-		c.logger.Debug("Start listening for consumer errors")
 		for err := range c.consumer.Errors() {
 			c.logger.WithError(err).
 				WithField("method", "StartListening").
 				Error("error processing message")
-
-			if c.errCh != nil {
-				c.errCh <- err
-			}
 		}
 	}()
 
@@ -130,10 +122,6 @@ func (c *messageConsumer) Shutdown() {
 		c.logger.WithError(err).
 			WithField("method", "Shutdown").
 			Error("Error closing consumer")
-
-		if c.errCh != nil {
-			c.errCh <- err
-		}
 	}
 }
 

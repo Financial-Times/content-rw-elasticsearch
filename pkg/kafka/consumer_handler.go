@@ -56,10 +56,6 @@ func (c *ConsumerHandler) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 		Infof("claimed partition %d", claim.Partition())
 
 	for message := range claim.Messages() {
-		c.logger.
-			WithField("method", "ConsumeClaim").
-			Info("consuming message")
-
 		ftMsg := rawToFTMessage(message.Value)
 		err := c.handler(ftMsg)
 		if err != nil {

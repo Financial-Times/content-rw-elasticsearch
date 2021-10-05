@@ -30,7 +30,6 @@ func NewPerseverantConsumer(config Config, retryInterval time.Duration) (Consume
 		consumerGroup:           config.ConsumerGroup,
 		topics:                  config.Topics,
 		config:                  config.ConsumerGroupConfig,
-		errCh:                   &config.Err,
 		logger:                  config.Logger,
 		brokersConnectionString: config.BrokersConnectionString,
 		retryInterval:           retryInterval,
@@ -44,17 +43,11 @@ func (c *perseverantConsumer) connect() {
 		WithField("topics", c.topics).
 		WithField("consumerGroup", c.consumerGroup)
 	for {
-		var errCh chan error
-		if c.errCh != nil {
-			errCh = *c.errCh
-		}
-
 		consumer, err := NewConsumer(Config{
 			BrokersConnectionString: c.brokersConnectionString,
 			ConsumerGroup:           c.consumerGroup,
 			Topics:                  c.topics,
 			ConsumerGroupConfig:     c.config,
-			Err:                     errCh,
 			Logger:                  c.logger,
 		})
 

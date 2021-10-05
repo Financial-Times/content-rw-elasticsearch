@@ -1,7 +1,12 @@
 package kafka
 
 import (
+	"bufio"
+	"bytes"
 	"context"
+	"log"
+	"os"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -17,7 +22,7 @@ const (
 	testConsumerGroup = "testgroup"
 )
 
-var expectedErrors = []error{errors.New("booster separation failure"), errors.New("payload missing")}
+var expectedErrors = []error{errors.New("booster Separation Failure"), errors.New("payload missing")}
 var messages = []*sarama.ConsumerMessage{{Value: []byte("Message1")}, {Value: []byte("Message2")}}
 
 func TestNewConsumer(t *testing.T) {
@@ -29,13 +34,15 @@ func TestNewConsumer(t *testing.T) {
 	errCh := make(chan error, 1)
 	defer close(errCh)
 
+	var buf bytes.Buffer
 	log := logger.NewUPPLogger("test", "INFO")
+	log.Out = &buf
+
 	consumer, err := NewConsumer(Config{
 		BrokersConnectionString: brokerURL,
 		ConsumerGroup:           testConsumerGroup,
 		Topics:                  []string{testTopic},
 		ConsumerGroupConfig:     config,
-		Err:                     errCh,
 		Logger:                  log,
 	})
 	assert.NoError(t, err)
@@ -75,7 +82,6 @@ func TestNewPerseverantConsumer(t *testing.T) {
 		ConsumerGroup:           testConsumerGroup,
 		Topics:                  []string{testTopic},
 		ConsumerGroupConfig:     config,
-		Err:                     errCh,
 		Logger:                  log,
 	}, time.Second)
 	assert.NoError(t, err)
@@ -167,7 +173,7 @@ func (cg *MockConsumerGroup) Consume(ctx context.Context, topics []string, handl
 	return nil
 }
 
-type MockConsumerGroupSession struct {}
+type MockConsumerGroupSession struct{}
 
 func (m *MockConsumerGroupSession) Claims() map[string][]int32 {
 	return make(map[string][]int32)
@@ -201,51 +207,6 @@ func (m *MockConsumerGroupSession) Context() context.Context {
 	return context.TODO()
 }
 
-
-func NewTestConsumerWithErrChan() (Consumer, chan error) {
-	errCh := make(chan error, len(expectedErrors))
-	log := logger.NewUPPLogger("test", "INFO")
-
-	return &messageConsumer{
-		topics:                  []string{"topic"},
-		consumerGroup:           "group",
-		brokersConnectionString: "node",
-		consumer: &MockConsumerGroup{
-			messages:        messages,
-			errors:          []error{},
-			errChan:         make(chan error),
-			IsShutdown:      false,
-			errorOnShutdown: true,
-		},
-		errCh:  errCh,
-		logger: log,
-	}, errCh
-}
-
-func NewTestConsumerWithErrors() (Consumer, chan error) {
-	errCh := make(chan error, len(expectedErrors))
-	log := logger.NewUPPLogger("test", "INFO")
-
-	errChan := make(chan error, len(expectedErrors))
-	for _, e := range expectedErrors {
-		errChan <- e
-	}
-
-	return &messageConsumer{
-		topics:                  []string{"topic"},
-		consumerGroup:           "group",
-		brokersConnectionString: "node",
-		consumer: &MockConsumerGroup{
-			messages:   messages,
-			errors:     expectedErrors,
-			IsShutdown: false,
-			errChan:    errChan,
-		},
-		errCh:  errCh,
-		logger: log,
-	}, errCh
-}
-
 func NewTestConsumer() Consumer {
 	log := logger.NewUPPLogger("test", "INFO")
 	return &messageConsumer{
@@ -263,96 +224,48 @@ func NewTestConsumer() Consumer {
 }
 
 func TestErrorDuringShutdown(t *testing.T) {
-	consumer, errCh := NewTestConsumerWithErrChan()
+	var buf bytes.Buffer
+	l := logger.NewUPPLogger("test", "INFO")
+	l.Out = &buf
+
+	consumer, errCh := NewTestConsumerWithErrChan(l)
 	defer close(errCh)
 
 	consumer.Shutdown()
 
-	var actualError error
-	select {
-	case actualError = <-errCh:
-		assert.NotNil(t, actualError, "Was expecting non-nil error on consumer shutdown")
-	default:
-		assert.NotNil(t, actualError, "Was expecting error on consumer shutdown")
-	}
+	assert.Equal(t, true, strings.Contains(buf.String(), "Error closing consumer"))
 }
 
-func TestMessageConsumer_StartListeningConsumerErrors(t *testing.T) {
-	var count int32
-	consumer, errChan := NewTestConsumerWithErrors()
-	defer close(errChan)
+func NewTestConsumerWithErrChan(log *logger.UPPLogger) (Consumer, chan error) {
+	errCh := make(chan error, len(expectedErrors))
 
-	var actualErrors []error
-	stopChan := make(chan struct{})
-	stoppedChan := make(chan struct{})
-
-	go func() {
-		defer close(stoppedChan)
-		for {
-			select {
-			case actualError := <-errChan:
-				actualErrors = append(actualErrors, actualError)
-			case <-stopChan:
-				return
-			}
-		}
-	}()
-
-	go func() {
-		consumer.StartListening(func(msg FTMessage) error {
-			atomic.AddInt32(&count, 1)
-			return nil
-		})
-	}()
-
-	time.Sleep(1 * time.Second)
-
-	close(stopChan)
-	<-stoppedChan
-	assert.Equal(t, int32(len(messages)), atomic.LoadInt32(&count), "Handler wasn't called the expected number of times.")
-	assert.Equal(t, expectedErrors, actualErrors, "Didn't get the expected errors from the consumer.")
+	return &messageConsumer{
+		topics:                  []string{"topic"},
+		consumerGroup:           "group",
+		brokersConnectionString: brokerURL,
+		consumer: &MockConsumerGroup{
+			messages:        messages,
+			errors:          []error{},
+			IsShutdown:      false,
+			errorOnShutdown: true,
+		},
+		logger: log,
+	}, errCh
 }
 
-func TestMessageConsumer_StartListeningHandlerErrors(t *testing.T) {
-	var count int32
-	consumer, errChan := NewTestConsumerWithErrChan()
-	defer close(errChan)
-
-	var actualErrors []error
-	stopChan := make(chan struct{})
-	stoppedChan := make(chan struct{})
-	go func() {
-		defer close(stoppedChan)
-		for {
-			select {
-			case actualError := <-errChan:
-				actualErrors = append(actualErrors, actualError)
-			case <-stopChan:
-				return
-			}
-		}
-	}()
-
-	go func() {
-		consumer.StartListening(func(msg FTMessage) error {
-			atomic.AddInt32(&count, 1)
-			index := atomic.LoadInt32(&count) - 1
-
-			if index < int32(len(expectedErrors)) {
-				return expectedErrors[index]
-			}
-
-			return nil
-		})
-	}()
-
-	time.Sleep(1 * time.Second)
-
-	close(stopChan)
-	<-stoppedChan
-
-	assert.Equal(t, int32(len(messages)), atomic.LoadInt32(&count))
-	assert.Equal(t, expectedErrors, actualErrors, "Didn't get the expected errors from the consumer handler.")
+func NewTestConsumerWithErrors(log *logger.UPPLogger) (Consumer, chan error) {
+	errCh := make(chan error, len(expectedErrors))
+	return &messageConsumer{
+		topics:                  []string{"topic"},
+		consumerGroup:           "group",
+		brokersConnectionString: brokerURL,
+		consumer: &MockConsumerGroup{
+			messages:   messages,
+			errors:     expectedErrors,
+			IsShutdown: false,
+		},
+		logger: log,
+	}, errCh
 }
 
 func TestMessageConsumer_StartListening(t *testing.T) {
@@ -396,4 +309,14 @@ func TestPerseverantConsumerListensToConsumer(t *testing.T) {
 	assert.Equal(t, int32(len(messages)), atomic.LoadInt32(&count))
 
 	consumer.Shutdown()
+}
+
+func mockLogger(t *testing.T) (*bufio.Scanner, *os.File, *os.File) {
+	reader, writer, err := os.Pipe()
+	if err != nil {
+		assert.Fail(t, "couldn't get os Pipe: %v", err)
+	}
+	log.SetOutput(writer)
+
+	return bufio.NewScanner(reader), reader, writer
 }

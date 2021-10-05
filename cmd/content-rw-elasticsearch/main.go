@@ -203,7 +203,6 @@ func main() {
 			ConsumerGroup:           *kafkaConsumerGroup,
 			Topics:                  []string{*kafkaTopic},
 			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
-			Err:                     nil,
 			Logger:                  log,
 		}, time.Minute)
 
@@ -220,7 +219,6 @@ func main() {
 			ConsumerGroup:           *kafkaConsumerGroup + "-health",
 			Topics:                  []string{*kafkaTopic},
 			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
-			Err:                     nil,
 			Logger:                  log,
 		}
 
