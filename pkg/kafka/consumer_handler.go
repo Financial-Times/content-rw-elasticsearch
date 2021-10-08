@@ -3,13 +3,11 @@ package kafka
 import (
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama"
-	"sync"
 )
 
 // ConsumerHandler represents a Sarama consumer group consumer.
 type ConsumerHandler struct {
-	sync.RWMutex
-	ready   chan bool
+	ready   chan struct{}
 	logger  *logger.UPPLogger
 	handler func(message FTMessage) error
 }
@@ -17,30 +15,15 @@ type ConsumerHandler struct {
 // NewConsumerHandler creates a new ConsumerHandler.
 func NewConsumerHandler(logger *logger.UPPLogger, handler func(message FTMessage) error) *ConsumerHandler {
 	return &ConsumerHandler{
-		RWMutex: sync.RWMutex{},
-		ready:   make(chan bool),
+		ready:   make(chan struct{}),
 		logger:  logger,
 		handler: handler,
 	}
 }
 
-func (c *ConsumerHandler) Ready() <-chan bool {
-	c.Lock()
-	defer c.Unlock()
-
-	return c.ready
-}
-
-func (c *ConsumerHandler) Reset() {
-	c.Lock()
-	defer c.Unlock()
-
-	c.ready = make(chan bool)
-}
-
 // Setup is run at the beginning of a new session, before ConsumeClaim.
 func (c *ConsumerHandler) Setup(sarama.ConsumerGroupSession) error {
-	close(c.ready)
+	c.ready <- struct{}{}
 	return nil
 }
 

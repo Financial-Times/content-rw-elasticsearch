@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
-	"sync"
 
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama"
@@ -34,6 +33,7 @@ type messageConsumer struct {
 	config                  *sarama.Config
 	logger                  *logger.UPPLogger
 	handler                 *ConsumerHandler
+	closed                  chan struct{}
 }
 
 // Config keeps together all the values needed to create a consumer instance
@@ -70,11 +70,11 @@ func NewConsumer(config Config) (Consumer, error) {
 		consumer:                consumer,
 		config:                  config.ConsumerGroupConfig,
 		logger:                  config.Logger,
+		closed:                  make(chan struct{}),
 	}, nil
 }
 
-// StartListening is a blocking function that will start listening for message from Kafka
-// If you don't want it to block the execution, you should run it in a separate goroutine.
+// StartListening will start listening for message from Kafka.
 func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) error) {
 	if c.handler == nil {
 		c.handler = NewConsumerHandler(c.logger, messageHandler)
@@ -89,13 +89,8 @@ func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) 
 	}()
 
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
 
 	go func() {
-		defer wg.Done()
 		for {
 			if err := c.consumer.Consume(ctx, c.topics, c.handler); err != nil {
 				c.logger.WithError(err).
@@ -106,18 +101,30 @@ func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) 
 			if ctx.Err() != nil {
 				return
 			}
-			c.handler.Reset()
 		}
 	}()
 
-	<-c.handler.Ready()
-	c.logger.Info("consumer up and running")
-	wg.Wait()
+	go func() {
+		for {
+			select {
+			case <-c.handler.ready:
+				c.logger.Debug("New consumer group session starting...")
+			case <-c.closed:
+				// Terminate the message consumption.
+				cancel()
+				return
+			}
+		}
+	}()
+
+	c.logger.Info("Starting consumer...")
 }
 
 // Shutdown closes the consumer's connection to Kafka
 // It should be called before terminating the process.
 func (c *messageConsumer) Shutdown() {
+	close(c.closed)
+
 	if err := c.consumer.Close(); err != nil {
 		c.logger.WithError(err).
 			WithField("method", "Shutdown").
