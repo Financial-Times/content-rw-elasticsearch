@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -31,7 +30,7 @@ func TestNewConsumer(t *testing.T) {
 	log := logger.NewUPPLogger("test", "INFO")
 	log.Out = &buf
 
-	consumer, err := NewConsumer(Config{
+	consumer, err := newConsumer(consumerConfig{
 		BrokersConnectionString: brokerURL,
 		ConsumerGroup:           testConsumerGroup,
 		Topics:                  []string{testTopic},
@@ -40,17 +39,18 @@ func TestNewConsumer(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	err = consumer.ConnectivityCheck()
+	err = consumer.connectivityCheck()
 	assert.NoError(t, err)
 
-	consumer.Shutdown()
+	err = consumer.close()
+	assert.NoError(t, err)
 }
 
 func TestConsumerNotConnectedConnectivityCheckError(t *testing.T) {
 	log := logger.NewUPPLogger("test", "INFO")
-	consumer := messageConsumer{brokersConnectionString: "unknown:9092", consumerGroup: testConsumerGroup, topics: []string{testTopic}, config: nil, logger: log}
+	consumer := messageConsumer{brokersConnectionString: "unknown:9092", consumerGroupName: testConsumerGroup, topics: []string{testTopic}, config: nil, logger: log}
 
-	err := consumer.ConnectivityCheck()
+	err := consumer.connectivityCheck()
 	assert.Error(t, err)
 }
 
@@ -62,28 +62,27 @@ func TestNewPerseverantConsumer(t *testing.T) {
 	config := DefaultConsumerConfig()
 	log := logger.NewUPPLogger("test", "INFO")
 
-	consumer, err := NewPerseverantConsumer(Config{
+	consumer, err := NewPerseverantConsumer(PerseverantConsumerConfig{
 		BrokersConnectionString: brokerURL,
 		ConsumerGroup:           testConsumerGroup,
 		Topics:                  []string{testTopic},
 		ConsumerGroupConfig:     config,
 		Logger:                  log,
-	}, time.Second)
+		RetryInterval:           time.Second,
+	})
 	assert.NoError(t, err)
 
-	err = consumer.ConnectivityCheck()
-	assert.EqualError(t, err, errConsumerNotConnected)
-
-	consumer.StartListening(func(msg FTMessage) error { return nil })
+	consumer.StartListening(func(msg FTMessage) {})
 
 	time.Sleep(3 * time.Second)
 
 	err = consumer.ConnectivityCheck()
 	assert.NoError(t, err)
 
-	time.Sleep(time.Second)
+	time.Sleep(3 * time.Second)
 
-	consumer.Shutdown()
+	err = consumer.Close()
+	assert.NoError(t, err)
 }
 
 type MockConsumerGroupClaim struct {
@@ -190,13 +189,13 @@ func (m *MockConsumerGroupSession) Context() context.Context {
 	return context.TODO()
 }
 
-func NewTestConsumer() Consumer {
+func NewTestConsumer() *messageConsumer {
 	log := logger.NewUPPLogger("test", "INFO")
 	return &messageConsumer{
 		topics:                  []string{"topic"},
-		consumerGroup:           "group",
+		consumerGroupName:       "group",
 		brokersConnectionString: "node",
-		consumer: &MockConsumerGroup{
+		consumerGroup: &MockConsumerGroup{
 			messages:   messages,
 			errors:     []error{},
 			IsShutdown: false,
@@ -214,17 +213,18 @@ func TestErrorDuringShutdown(t *testing.T) {
 
 	consumer := NewTestConsumerWithErrOnShutdown(l)
 
-	consumer.Shutdown()
-
-	assert.Equal(t, true, strings.Contains(buf.String(), "Error closing consumer"))
+	err := consumer.close()
+	fmt.Println(err)
+	assert.Error(t, err)
+	assert.Equal(t, "foobar", "foobar")
 }
 
-func NewTestConsumerWithErrOnShutdown(log *logger.UPPLogger) Consumer {
+func NewTestConsumerWithErrOnShutdown(log *logger.UPPLogger) *messageConsumer {
 	return &messageConsumer{
 		topics:                  []string{"topic"},
-		consumerGroup:           "group",
+		consumerGroupName:       "group",
 		brokersConnectionString: brokerURL,
-		consumer: &MockConsumerGroup{
+		consumerGroup: &MockConsumerGroup{
 			messages:        messages,
 			errors:          []error{},
 			IsShutdown:      false,
@@ -239,22 +239,8 @@ func TestMessageConsumer_StartListening(t *testing.T) {
 	var count int32
 	consumer := NewTestConsumer()
 
-	consumer.StartListening(func(msg FTMessage) error {
+	consumer.startListening(func(msg FTMessage) {
 		atomic.AddInt32(&count, 1)
-		return nil
-	})
-
-	time.Sleep(1 * time.Second)
-	assert.Equal(t, int32(len(messages)), atomic.LoadInt32(&count))
-}
-
-func TestMessageConsumerContinuesWhenHandlerReturnsError(t *testing.T) {
-	var count int32
-	consumer := NewTestConsumer()
-
-	consumer.StartListening(func(msg FTMessage) error {
-		atomic.AddInt32(&count, 1)
-		return fmt.Errorf("test error")
 	})
 
 	time.Sleep(1 * time.Second)
@@ -263,15 +249,15 @@ func TestMessageConsumerContinuesWhenHandlerReturnsError(t *testing.T) {
 
 func TestPerseverantConsumerListensToConsumer(t *testing.T) {
 	var count int32
-	consumer := perseverantConsumer{consumer: NewTestConsumer()}
+	consumer := PerseverantConsumer{consumer: NewTestConsumer()}
 
-	consumer.StartListening(func(msg FTMessage) error {
+	consumer.StartListening(func(msg FTMessage) {
 		atomic.AddInt32(&count, 1)
-		return nil
 	})
 
 	time.Sleep(1 * time.Second)
 	assert.Equal(t, int32(len(messages)), atomic.LoadInt32(&count))
 
-	consumer.Shutdown()
+	err := consumer.Close()
+	assert.NoError(t, err)
 }

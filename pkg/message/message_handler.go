@@ -38,7 +38,7 @@ func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *h
 	return indexer
 }
 
-func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
+func (h *Handler) HandleMessage(msg kafka.FTMessage) {
 	tid := msg.Headers[transactionIDHeader]
 	log := h.log.WithTransactionID(tid)
 
@@ -50,14 +50,14 @@ func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
 
 	if strings.Contains(tid, syntheticRequestPrefix) {
 		log.Info("Ignoring synthetic message")
-		return nil
+		return
 	}
 
 	var combinedPostPublicationEvent schema.EnrichedContent
 	err := json.Unmarshal([]byte(msg.Body), &combinedPostPublicationEvent)
 	if err != nil {
 		log.WithError(err).Error("Cannot unmarshal message body")
-		return err
+		return
 	}
 
 	if combinedPostPublicationEvent.Content.BodyXML != "" && combinedPostPublicationEvent.Content.Body == "" {
@@ -67,7 +67,7 @@ func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
 
 	if !isAllowedType(combinedPostPublicationEvent.Content.Type) {
 		log.Infof("Ignoring message of type %s", combinedPostPublicationEvent.Content.Type)
-		return nil
+		return
 	}
 
 	uuid := combinedPostPublicationEvent.UUID
@@ -77,7 +77,7 @@ func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
 	contentType := h.readContentType(msg, combinedPostPublicationEvent)
 	if contentType == "" && msg.Headers[originHeader] != config.PACOrigin {
 		log.Error("Failed to index content. Could not infer type of content")
-		return nil
+		return
 	}
 
 	conceptType := h.Mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
@@ -85,15 +85,15 @@ func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
 		_, err = h.esService.DeleteData(conceptType, uuid)
 		if err != nil {
 			log.WithError(err).Error("Failed to delete indexed content")
-			return err
+			return
 		}
 		log.WithMonitoringEvent("ContentDeleteElasticsearch", tid, contentType).Info("Successfully deleted")
-		return nil
+		return
 	}
 
 	if combinedPostPublicationEvent.Content.UUID == "" || contentType == "" {
 		log.Info("Ignoring message with no content")
-		return nil
+		return
 	}
 
 	payload := h.Mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
@@ -101,11 +101,9 @@ func (h *Handler) HandleMessage(msg kafka.FTMessage) error {
 	_, err = h.esService.WriteData(conceptType, uuid, payload)
 	if err != nil {
 		log.WithError(err).Error("Failed to index content")
-		return err
+		return
 	}
 	log.WithMonitoringEvent("ContentWriteElasticsearch", tid, contentType).Info("Successfully saved")
-
-	return nil
 }
 
 func (h *Handler) readContentType(msg kafka.FTMessage, event schema.EnrichedContent) string {

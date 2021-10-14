@@ -198,13 +198,14 @@ func main() {
 			log,
 		)
 
-		kafkaConsumer, err := kafka.NewPerseverantConsumer(kafka.Config{
+		kafkaConsumer, err := kafka.NewPerseverantConsumer(kafka.PerseverantConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
 			Topics:                  []string{*kafkaTopic},
 			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
 			Logger:                  log,
-		}, time.Minute)
+			RetryInterval:           time.Minute,
+		})
 
 		if err != nil {
 			log.WithError(err).Fatal("failed to create Kafka consumer")
@@ -214,7 +215,7 @@ func main() {
 			kafkaConsumer.StartListening(handler.HandleMessage)
 		}()
 
-		healthCheckConfig := kafka.Config{
+		healthCheckConfig := kafka.PerseverantConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup + "-health",
 			Topics:                  []string{*kafkaTopic},
@@ -231,7 +232,7 @@ func main() {
 		signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 		<-ch
 
-		kafkaConsumer.Shutdown()
+		_ = kafkaConsumer.Close()
 	}
 	err := app.Run(os.Args)
 	if err != nil {

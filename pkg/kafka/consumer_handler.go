@@ -9,11 +9,11 @@ import (
 type ConsumerHandler struct {
 	ready   chan struct{}
 	logger  *logger.UPPLogger
-	handler func(message FTMessage) error
+	handler func(message FTMessage)
 }
 
 // NewConsumerHandler creates a new ConsumerHandler.
-func NewConsumerHandler(logger *logger.UPPLogger, handler func(message FTMessage) error) *ConsumerHandler {
+func NewConsumerHandler(logger *logger.UPPLogger, handler func(message FTMessage)) *ConsumerHandler {
 	return &ConsumerHandler{
 		ready:   make(chan struct{}),
 		logger:  logger,
@@ -40,13 +40,7 @@ func (c *ConsumerHandler) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 
 	for message := range claim.Messages() {
 		ftMsg := rawToFTMessage(message.Value)
-		err := c.handler(ftMsg)
-		if err != nil {
-			c.logger.WithError(err).
-				WithField("method", "ConsumeClaim").
-				WithField("messageKey", message.Key).
-				Error("Error processing message")
-		}
+		c.handler(ftMsg)
 		session.MarkMessage(message, "")
 	}
 

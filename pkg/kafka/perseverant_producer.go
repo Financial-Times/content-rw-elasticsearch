@@ -9,20 +9,20 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-// perseverantProducer implements the Producer interface.
+// PerseverantProducer implements the Producer interface.
 // It will attempt to create a new producer instance continuously until successful.
-type perseverantProducer struct {
+type PerseverantProducer struct {
 	sync.RWMutex
 	brokers  string
 	topic    string
 	config   *sarama.Config
-	producer Producer
+	producer *messageProducer
 	logger   *logger.UPPLogger
 }
 
-// NewPerseverantProducer creates a new perseverantProducer
-func NewPerseverantProducer(brokers string, topic string, config *sarama.Config, initialDelay time.Duration, retryInterval time.Duration, logger *logger.UPPLogger) (Producer, error) {
-	producer := &perseverantProducer{sync.RWMutex{}, brokers, topic, config, nil, logger}
+// NewPerseverantProducer creates a new PerseverantProducer
+func NewPerseverantProducer(brokers string, topic string, config *sarama.Config, initialDelay time.Duration, retryInterval time.Duration, logger *logger.UPPLogger) (*PerseverantProducer, error) {
+	producer := &PerseverantProducer{sync.RWMutex{}, brokers, topic, config, nil, logger}
 
 	go func() {
 		if initialDelay > 0 {
@@ -35,11 +35,11 @@ func NewPerseverantProducer(brokers string, topic string, config *sarama.Config,
 }
 
 // connect tries to establish a connection to Kafka and will retry endlessly.
-func (p *perseverantProducer) connect(retryInterval time.Duration) {
+func (p *PerseverantProducer) connect(retryInterval time.Duration) {
 	connectorLog := p.logger.WithField("brokers", p.brokers).
 		WithField("topic", p.topic)
 	for {
-		producer, err := NewProducer(p.brokers, p.topic, p.config, p.logger)
+		producer, err := newProducer(p.brokers, p.topic, p.config, p.logger)
 		if err == nil {
 			connectorLog.Info("connected to Kafka producer")
 			p.setProducer(producer)
@@ -53,7 +53,7 @@ func (p *perseverantProducer) connect(retryInterval time.Duration) {
 }
 
 // setProducer sets the underlying producer instance.
-func (p *perseverantProducer) setProducer(producer Producer) {
+func (p *PerseverantProducer) setProducer(producer *messageProducer) {
 	p.Lock()
 	defer p.Unlock()
 
@@ -61,7 +61,7 @@ func (p *perseverantProducer) setProducer(producer Producer) {
 }
 
 // isConnected checks if the underlying producer instance is set.
-func (p *perseverantProducer) isConnected() bool {
+func (p *PerseverantProducer) isConnected() bool {
 	p.RLock()
 	defer p.RUnlock()
 
@@ -69,7 +69,7 @@ func (p *perseverantProducer) isConnected() bool {
 }
 
 // SendMessage checks if the producer is connected, then sends a message to Kafka.
-func (p *perseverantProducer) SendMessage(message FTMessage) error {
+func (p *PerseverantProducer) SendMessage(message FTMessage) error {
 	if !p.isConnected() {
 		return errors.New(errProducerNotConnected)
 	}
@@ -77,21 +77,23 @@ func (p *perseverantProducer) SendMessage(message FTMessage) error {
 	p.RLock()
 	defer p.RUnlock()
 
-	return p.producer.SendMessage(message)
+	return p.producer.sendMessage(message)
 }
 
-// Shutdown closes the connection to Kafka if the producer is connected
-func (p *perseverantProducer) Shutdown() {
+// Close closes the connection to Kafka if the producer is connected
+func (p *PerseverantProducer) Close() error {
 	if p.isConnected() {
-		p.producer.Shutdown()
+		return p.producer.close()
 	}
+
+	return nil
 }
 
 // ConnectivityCheck checks if the producer has established connection to Kafka.
-func (p *perseverantProducer) ConnectivityCheck() error {
+func (p *PerseverantProducer) ConnectivityCheck() error {
 	if !p.isConnected() {
 		return errors.New(errProducerNotConnected)
 	}
 
-	return p.producer.ConnectivityCheck()
+	return p.producer.connectivityCheck()
 }

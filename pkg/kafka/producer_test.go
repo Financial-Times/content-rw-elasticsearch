@@ -9,7 +9,6 @@ import (
 	logger "github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 const (
@@ -17,25 +16,7 @@ const (
 	testTopic   = "testTopic"
 )
 
-type mockProducer struct {
-	mock.Mock
-}
-
-func (p *mockProducer) SendMessage(message FTMessage) error {
-	args := p.Called(message)
-	return args.Error(0)
-}
-
-func (p *mockProducer) ConnectivityCheck() error {
-	args := p.Called()
-	return args.Error(0)
-}
-
-func (p *mockProducer) Shutdown() {
-	p.Called()
-}
-
-func NewTestProducer(t *testing.T, brokers string, topic string) (Producer, error) {
+func NewTestProducer(t *testing.T, brokers string, topic string) (*messageProducer, error) {
 	msp := mocks.NewSyncProducer(t, nil)
 	brokerSlice := strings.Split(brokers, ",")
 
@@ -54,14 +35,14 @@ func TestNewProducer(t *testing.T) {
 	}
 
 	log := logger.NewUPPLogger("test", "INFO")
-	producer, err := NewProducer(testBrokers, testTopic, DefaultProducerConfig(), log)
+	producer, err := newProducer(testBrokers, testTopic, DefaultProducerConfig(), log)
 
 	assert.NoError(t, err)
 
-	err = producer.ConnectivityCheck()
+	err = producer.connectivityCheck()
 	assert.NoError(t, err)
 
-	assert.Equal(t, 16777216, producer.(*messageProducer).config.Producer.MaxMessageBytes, "maximum message size using default config")
+	assert.Equal(t, 16777216, producer.config.Producer.MaxMessageBytes, "maximum message size using default config")
 }
 
 func TestNewProducerBadUrl(t *testing.T) {
@@ -70,14 +51,14 @@ func TestNewProducerBadUrl(t *testing.T) {
 	server.Close()
 
 	log := logger.NewUPPLogger("test", "INFO")
-	_, err := NewProducer(kURL, testTopic, DefaultProducerConfig(), log)
+	_, err := newProducer(kURL, testTopic, DefaultProducerConfig(), log)
 
 	assert.Error(t, err)
 }
 
 func TestClient_SendMessage(t *testing.T) {
 	kc, _ := NewTestProducer(t, testBrokers, testTopic)
-	err := kc.SendMessage(NewFTMessage(nil, "Body"))
+	err := kc.sendMessage(NewFTMessage(nil, "Body"))
 
 	assert.NoError(t, err)
 }
@@ -128,11 +109,8 @@ func TestNewPerseverantProducerWithInitialDelay(t *testing.T) {
 }
 
 func TestPerseverantProducerForwardsToProducer(t *testing.T) {
-	mp := mockProducer{}
-	mp.On("SendMessage", mock.AnythingOfType("kafka.FTMessage")).Return(nil)
-	mp.On("Shutdown").Return()
-
-	p := perseverantProducer{producer: &mp}
+	mp, _ := NewTestProducer(t, brokerURL, testTopic)
+	p := PerseverantProducer{producer: mp}
 
 	msg := FTMessage{
 		Headers: map[string]string{
@@ -144,13 +122,12 @@ func TestPerseverantProducerForwardsToProducer(t *testing.T) {
 	actual := p.SendMessage(msg)
 	assert.NoError(t, actual)
 
-	p.Shutdown()
-
-	mp.AssertExpectations(t)
+	err := p.Close()
+	assert.NoError(t, err)
 }
 
 func TestPerseverantProducerNotConnectedCannotSendMessages(t *testing.T) {
-	p := perseverantProducer{}
+	p := PerseverantProducer{}
 
 	msg := FTMessage{
 		Headers: map[string]string{

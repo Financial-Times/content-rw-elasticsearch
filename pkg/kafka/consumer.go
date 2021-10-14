@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
 
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama"
@@ -12,32 +13,20 @@ import (
 
 const errConsumerNotConnected = "consumer is not connected to Kafka"
 
-// Consumer represents the consumer instance which handles Kafka messages
-type Consumer interface {
-	// StartListening accepts a function which will get called for each incoming message.
-	StartListening(messageHandler func(message FTMessage) error)
-
-	// Shutdown must be called before the application exits to stop the consumer instance.
-	Shutdown()
-
-	// ConnectivityCheck checks if the consumer can connect to the Kafka broker.
-	ConnectivityCheck() error
-}
-
 // messageConsumer represents the library's main kafka consumer
 type messageConsumer struct {
 	topics                  []string
-	consumerGroup           string
+	consumerGroupName       string
 	brokersConnectionString string
-	consumer                sarama.ConsumerGroup
+	consumerGroup           sarama.ConsumerGroup
 	config                  *sarama.Config
 	logger                  *logger.UPPLogger
 	handler                 *ConsumerHandler
 	closed                  chan struct{}
 }
 
-// Config keeps together all the values needed to create a consumer instance
-type Config struct {
+// consumerConfig keeps together all the values needed to create a consumer instance
+type consumerConfig struct {
 	BrokersConnectionString string
 	ConsumerGroup           string
 	Topics                  []string
@@ -45,9 +34,9 @@ type Config struct {
 	Logger                  *logger.UPPLogger
 }
 
-// NewConsumer creates a new consumer instance using a Sarama ConsumerGroup
+// newConsumer creates a new consumer instance using a Sarama ConsumerGroup
 // to connect to Kafka.
-func NewConsumer(config Config) (Consumer, error) {
+func newConsumer(config consumerConfig) (*messageConsumer, error) {
 	config.Logger.Debug("Creating new consumer")
 
 	if config.ConsumerGroupConfig == nil {
@@ -65,23 +54,23 @@ func NewConsumer(config Config) (Consumer, error) {
 
 	return &messageConsumer{
 		topics:                  config.Topics,
-		consumerGroup:           config.ConsumerGroup,
+		consumerGroupName:       config.ConsumerGroup,
 		brokersConnectionString: config.BrokersConnectionString,
-		consumer:                consumer,
+		consumerGroup:           consumer,
 		config:                  config.ConsumerGroupConfig,
 		logger:                  config.Logger,
 		closed:                  make(chan struct{}),
 	}, nil
 }
 
-// StartListening will start listening for message from Kafka.
-func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) error) {
+// startListening will start listening for message from Kafka.
+func (c *messageConsumer) startListening(messageHandler func(message FTMessage)) {
 	if c.handler == nil {
 		c.handler = NewConsumerHandler(c.logger, messageHandler)
 	}
 
 	go func() {
-		for err := range c.consumer.Errors() {
+		for err := range c.consumerGroup.Errors() {
 			c.logger.WithError(err).
 				WithField("method", "StartListening").
 				Error("error processing message")
@@ -92,7 +81,7 @@ func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) 
 
 	go func() {
 		for {
-			if err := c.consumer.Consume(ctx, c.topics, c.handler); err != nil {
+			if err := c.consumerGroup.Consume(ctx, c.topics, c.handler); err != nil {
 				c.logger.WithError(err).
 					WithField("method", "StartListening").
 					Error("error starting consumer")
@@ -120,33 +109,29 @@ func (c *messageConsumer) StartListening(messageHandler func(message FTMessage) 
 	c.logger.Info("Starting consumer...")
 }
 
-// Shutdown closes the consumer's connection to Kafka
+// close closes the consumer's connection to Kafka
 // It should be called before terminating the process.
-func (c *messageConsumer) Shutdown() {
+func (c *messageConsumer) close() error {
 	close(c.closed)
 
-	if err := c.consumer.Close(); err != nil {
-		c.logger.WithError(err).
-			WithField("method", "Shutdown").
-			Error("Error closing consumer")
-	}
+	return c.consumerGroup.Close()
 }
 
-// ConnectivityCheck tries to establish a new Kafka connection with a separate consumer group
+// connectivityCheck tries to establish a new Kafka connection with a separate consumer group
 // The consumer's existing connection is automatically repaired after any interruption.
-func (c *messageConsumer) ConnectivityCheck() error {
-	config := Config{
+func (c *messageConsumer) connectivityCheck() error {
+	config := consumerConfig{
 		BrokersConnectionString: c.brokersConnectionString,
-		ConsumerGroup:           fmt.Sprintf("%s-healthcheck-%d", c.consumerGroup, rand.Intn(100)),
+		ConsumerGroup:           fmt.Sprintf("healthcheck-%d", rand.Intn(100)),
 		Topics:                  c.topics,
 		ConsumerGroupConfig:     c.config,
 		Logger:                  c.logger,
 	}
-	healthcheckConsumer, err := NewConsumer(config)
+	healthCheckConsumer, err := newConsumer(config)
 	if err != nil {
 		return err
 	}
-	defer healthcheckConsumer.Shutdown()
+	_ = healthCheckConsumer.close()
 
 	return nil
 }
@@ -155,5 +140,6 @@ func (c *messageConsumer) ConnectivityCheck() error {
 func DefaultConsumerConfig() *sarama.Config {
 	config := sarama.NewConfig()
 	config.Consumer.Offsets.Initial = sarama.OffsetNewest
+	config.Consumer.MaxProcessingTime = 10 * time.Second
 	return config
 }

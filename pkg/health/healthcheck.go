@@ -24,15 +24,15 @@ const (
 type Service struct {
 	ESHealthService  es.HealthStatus
 	ConcordanceAPI   *concept.ConcordanceAPIService
-	ConsumerInstance kafka.Consumer
+	ConsumerInstance *kafka.PerseverantConsumer
 	HTTPClient       *http.Client
 	Checks           []fthealth.Check
 	AppSystemCode    string
 	log              *logger.UPPLogger
 }
 
-func NewHealthService(config kafka.Config, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
-	consumerInstance, err := kafka.NewConsumer(config)
+func NewHealthService(config kafka.PerseverantConsumerConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
+	consumerInstance, err := kafka.NewPerseverantConsumer(config)
 
 	if err != nil {
 		// TODO

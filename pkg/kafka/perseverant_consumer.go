@@ -1,49 +1,57 @@
 package kafka
 
 import (
-	"fmt"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Shopify/sarama"
 	"sync"
 	"time"
 )
 
-// perseverantConsumer implements the Consumer interface by creating
+// PerseverantConsumer implements the Consumer interface by creating
 // a consumer which will keep trying to reconnect to Kafka on a specified interval.
 // The underlying consumer is created lazily when perseverantConsumer starts listening for messages.
-type perseverantConsumer struct {
+type PerseverantConsumer struct {
 	sync.RWMutex
 	consumerGroup           string
 	topics                  []string
 	config                  *sarama.Config
-	consumer                Consumer
+	consumer                *messageConsumer
 	retryInterval           time.Duration
 	errCh                   *chan error
 	logger                  *logger.UPPLogger
 	brokersConnectionString string
 }
 
+type PerseverantConsumerConfig struct {
+	BrokersConnectionString string
+	ConsumerGroup           string
+	Topics                  []string
+	ConsumerGroupConfig     *sarama.Config
+	Logger                  *logger.UPPLogger
+	RetryInterval           time.Duration
+}
+
 // NewPerseverantConsumer creates a perseverantConsumer
-func NewPerseverantConsumer(config Config, retryInterval time.Duration) (Consumer, error) {
-	consumer := &perseverantConsumer{
+func NewPerseverantConsumer(config PerseverantConsumerConfig) (*PerseverantConsumer, error) {
+	consumer := &PerseverantConsumer{
 		RWMutex:                 sync.RWMutex{},
 		consumerGroup:           config.ConsumerGroup,
 		topics:                  config.Topics,
 		config:                  config.ConsumerGroupConfig,
 		logger:                  config.Logger,
 		brokersConnectionString: config.BrokersConnectionString,
-		retryInterval:           retryInterval,
+		retryInterval:           config.RetryInterval,
 	}
 	return consumer, nil
 }
 
 // connect will attempt to create a new consumer continuously until successful.
-func (c *perseverantConsumer) connect() {
+func (c *PerseverantConsumer) connect() {
 	connectorLog := c.logger.WithField("brokers", c.brokersConnectionString).
 		WithField("topics", c.topics).
 		WithField("consumerGroup", c.consumerGroup)
 	for {
-		consumer, err := NewConsumer(Config{
+		consumer, err := newConsumer(consumerConfig{
 			BrokersConnectionString: c.brokersConnectionString,
 			ConsumerGroup:           c.consumerGroup,
 			Topics:                  c.topics,
@@ -63,7 +71,7 @@ func (c *perseverantConsumer) connect() {
 }
 
 // setConsumer sets the perseverantConsumer's consumer instance
-func (c *perseverantConsumer) setConsumer(consumer Consumer) {
+func (c *PerseverantConsumer) setConsumer(consumer *messageConsumer) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -72,7 +80,7 @@ func (c *perseverantConsumer) setConsumer(consumer Consumer) {
 
 // isConnected returns if the consumer property is set.
 // It is only set if a successful connection is established.
-func (c *perseverantConsumer) isConnected() bool {
+func (c *PerseverantConsumer) isConnected() bool {
 	c.RLock()
 	defer c.RUnlock()
 
@@ -80,7 +88,7 @@ func (c *perseverantConsumer) isConnected() bool {
 }
 
 // StartListening is a blocking call that tries to establish a connection to Kafka then starts listening.
-func (c *perseverantConsumer) StartListening(messageHandler func(message FTMessage) error) {
+func (c *PerseverantConsumer) StartListening(messageHandler func(message FTMessage)) {
 	if !c.isConnected() {
 		c.connect()
 	}
@@ -88,27 +96,28 @@ func (c *perseverantConsumer) StartListening(messageHandler func(message FTMessa
 	c.RLock()
 	defer c.RUnlock()
 
-	c.consumer.StartListening(messageHandler)
+	c.consumer.startListening(messageHandler)
 }
 
-// Shutdown closes the consumer connection if it exists.
-func (c *perseverantConsumer) Shutdown() {
-	c.RLock()
-	defer c.RUnlock()
-
+// Close closes the consumer connection if it exists.
+func (c *PerseverantConsumer) Close() error {
 	if c.isConnected() {
-		c.consumer.Shutdown()
+		c.RLock()
+		defer c.RUnlock()
+		return c.consumer.close()
 	}
+
+	return nil
 }
 
 // ConnectivityCheck tests if the consumer instance is created, then checks if it can connect to Kafka.
-func (c *perseverantConsumer) ConnectivityCheck() error {
+func (c *PerseverantConsumer) ConnectivityCheck() error {
+	if !c.isConnected() {
+		c.connect()
+	}
+
 	c.RLock()
 	defer c.RUnlock()
 
-	if !c.isConnected() {
-		return fmt.Errorf(errConsumerNotConnected)
-	}
-
-	return c.consumer.ConnectivityCheck()
+	return c.consumer.connectivityCheck()
 }
