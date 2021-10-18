@@ -1,29 +1,24 @@
 package main
 
 import (
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/health"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	cli "github.com/jawher/mow.cli"
-
-	"github.com/Financial-Times/go-logger/v2"
-	//consumer "github.com/Financial-Times/message-queue-gonsumer"
-	"github.com/Financial-Times/upp-go-sdk/pkg/api"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
-
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/kafka"
-
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
-	//"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/health"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/health"
 	pkghttp "github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
+	"github.com/Financial-Times/go-logger/v2"
+	"github.com/Financial-Times/kafka-client-go/kafka"
+	"github.com/Financial-Times/upp-go-sdk/pkg/api"
+	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
+	cli "github.com/jawher/mow.cli"
 )
 
 func main() {
@@ -198,7 +193,7 @@ func main() {
 			log,
 		)
 
-		kafkaConsumer, err := kafka.NewPerseverantConsumer(kafka.PerseverantConsumerConfig{
+		kafkaConsumer := kafka.NewPerseverantConsumer(kafka.PerseverantConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
 			Topics:                  []string{*kafkaTopic},
@@ -211,9 +206,7 @@ func main() {
 			log.WithError(err).Fatal("failed to create Kafka consumer")
 		}
 
-		go func() {
-			kafkaConsumer.StartListening(handler.HandleMessage)
-		}()
+		kafkaConsumer.StartListening(handler.HandleMessage)
 
 		healthCheckConfig := kafka.PerseverantConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,
@@ -232,7 +225,8 @@ func main() {
 		signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 		<-ch
 
-		_ = kafkaConsumer.Close()
+		err = kafkaConsumer.Close()
+		log.WithError(err).Error("Kafka consumer failed to close")
 	}
 	err := app.Run(os.Args)
 	if err != nil {

@@ -3,16 +3,15 @@ package health
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/kafka"
 	"net/http"
-
-	status "github.com/Financial-Times/service-status-go/httphandlers"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger/v2"
+	"github.com/Financial-Times/kafka-client-go/kafka"
 	"github.com/Financial-Times/service-status-go/gtg"
+	status "github.com/Financial-Times/service-status-go/httphandlers"
 )
 
 const (
@@ -32,11 +31,7 @@ type Service struct {
 }
 
 func NewHealthService(config kafka.PerseverantConsumerConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
-	consumerInstance, err := kafka.NewPerseverantConsumer(config)
-
-	if err != nil {
-		// TODO
-	}
+	consumerInstance := kafka.NewPerseverantConsumer(config)
 
 	service := &Service{
 		ESHealthService:  esHealthService,
@@ -46,6 +41,7 @@ func NewHealthService(config kafka.PerseverantConsumerConfig, esHealthService es
 		AppSystemCode:    appSystemCode,
 		log:              log,
 	}
+
 	service.Checks = []fthealth.Check{
 		service.clusterIsHealthyCheck(),
 		service.connectivityHealthyCheck(),
