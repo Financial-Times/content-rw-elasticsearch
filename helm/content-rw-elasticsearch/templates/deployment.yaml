@@ -41,7 +41,10 @@ spec:
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
         - name: KAFKA_ADDR
-          value: "{{ .Values.env.KAFKA_ADDR }}"
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: msk.kafka.broker.url
         - name: KAFKA_CONSUMER_GROUP
           value: "k8s-{{ .Values.service.name }}"
         - name: KAFKA_TOPIC
