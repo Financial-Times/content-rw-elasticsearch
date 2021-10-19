@@ -2,7 +2,7 @@ dry-run: null
 hookfiles: ./_ft/dredd-hooks.js
 language: nodejs
 server: ./content-rw-elasticsearch
-server-wait: 1
+server-wait: 5
 init: false
 custom: {}
 names: false

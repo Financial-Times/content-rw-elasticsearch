@@ -181,7 +181,7 @@ func main() {
 		esClient, err := es.NewClient(accessConfig, httpClient, log)
 
 		if err != nil {
-			log.WithError(err).Fatal("failed to create Elasticsearch client")
+			log.WithError(err).Error("failed to create Elasticsearch client")
 		}
 
 		esService.SetClient(esClient)
@@ -202,11 +202,9 @@ func main() {
 			RetryInterval:           time.Minute,
 		})
 
-		if err != nil {
-			log.WithError(err).Fatal("failed to create Kafka consumer")
-		}
-
-		kafkaConsumer.StartListening(handler.HandleMessage)
+		go func() {
+			kafkaConsumer.StartListening(handler.HandleMessage)
+		}()
 
 		healthCheckConfig := kafka.PerseverantConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,

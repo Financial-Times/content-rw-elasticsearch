@@ -13,6 +13,8 @@ github.com/Financial-Times/kafka-client-go v1.0.2 h1:+Pf1lYXC72Y/0kuIsF0oSJtZPPL
 github.com/Financial-Times/kafka-client-go v1.0.2/go.mod h1:hqAvNpfFJJFtYcq6ILh2jY9B1pftas861UFKePbYeiM=
 github.com/Financial-Times/kafka-client-go v1.1.0-rc1 h1:UddkfmVWWfynvpBBEBmeIcmJMCuIEk0JGyjIRbuYYF8=
 github.com/Financial-Times/kafka-client-go v1.1.0-rc1/go.mod h1:nfD1QymuqCkF2TmQfyXwdVZXGQbevun3uJeLPhgKpRM=
+github.com/Financial-Times/kafka-client-go v1.1.0-rc2 h1:iNeoxGKG4YOkEy5LrBEvDvlSKeswl5jrwPv6XkeVKBk=
+github.com/Financial-Times/kafka-client-go v1.1.0-rc2/go.mod h1:nfD1QymuqCkF2TmQfyXwdVZXGQbevun3uJeLPhgKpRM=
 github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d h1:USNBTIof6vWGM49SYrxvC5Y8NqyDL3YuuYmID81ORZQ=
 github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d/go.mod h1:7zULC9rrq6KxFkpB3Y5zNVaEwrf1g2m3dvXJBPDXyvM=
 github.com/Financial-Times/transactionid-utils-go v0.2.0 h1:YcET5Hd1fUGWWpQSVszYUlAc15ca8tmjRetUuQKRqEQ=
