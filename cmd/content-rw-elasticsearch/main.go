@@ -217,14 +217,20 @@ func main() {
 		healthService := health.NewHealthService(healthCheckConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
 		serveMux := http.NewServeMux()
 		serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
-		pkghttp.StartServer(log, serveMux, *port)
+
+		go func() {
+			pkghttp.StartServer(log, serveMux, *port)
+		}()
 
 		ch := make(chan os.Signal, 1)
 		signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
 		<-ch
 
 		err = kafkaConsumer.Close()
-		log.WithError(err).Error("Kafka consumer failed to close")
+		if err != nil {
+			log.WithError(err).Error("Kafka consumer failed to close")
+		}
+
 	}
 	err := app.Run(os.Args)
 	if err != nil {
