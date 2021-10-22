@@ -30,13 +30,11 @@ type Service struct {
 	log              *logger.UPPLogger
 }
 
-func NewHealthService(config kafka.PerseverantConsumerConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
-	consumerInstance := kafka.NewPerseverantConsumer(config)
-
+func NewHealthService(consumer *kafka.PerseverantConsumer, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
 	service := &Service{
 		ESHealthService:  esHealthService,
 		ConcordanceAPI:   concordanceAPI,
-		ConsumerInstance: consumerInstance,
+		ConsumerInstance: consumer,
 		HTTPClient:       client,
 		AppSystemCode:    appSystemCode,
 		log:              log,
@@ -46,7 +44,7 @@ func NewHealthService(config kafka.PerseverantConsumerConfig, esHealthService es
 		service.clusterIsHealthyCheck(),
 		service.connectivityHealthyCheck(),
 		service.schemaHealthyCheck(),
-		service.checkKafkaProxyConnectivity(),
+		service.checkKafkaConsumerConnectivity(),
 		service.checkConcordanceAPI(),
 	}
 	return service
@@ -134,22 +132,22 @@ func (s *Service) schemaChecker() (string, error) {
 	}
 }
 
-func (s *Service) checkKafkaProxyConnectivity() fthealth.Check {
+func (s *Service) checkKafkaConsumerConnectivity() fthealth.Check {
 	return fthealth.Check{
 		ID:               s.AppSystemCode,
-		BusinessImpact:   "CombinedPostPublication messages can't be read from the queue. Indexing for search won't work.",
-		Name:             "Check kafka-proxy connectivity.",
+		BusinessImpact:   "CombinedPostPublication messages can't be read from the Kafka. Indexing for search won't work.",
+		Name:             "Check MSK connectivity.",
 		PanicGuide:       panicGuide,
 		Severity:         1,
-		TechnicalSummary: "Messages couldn't be read from the queue. Check if kafka-proxy is reachable.",
+		TechnicalSummary: "Messages couldn't be read from Kafka. Check if MSK is reachable.",
 		Checker: func() (string, error) {
 			err := s.ConsumerInstance.ConnectivityCheck()
 
 			if err != nil {
-				return "", err
+				return "Kafka is not reachable", err
 			}
 
-			return "", nil
+			return "Kafka is reachable", nil
 		},
 	}
 }

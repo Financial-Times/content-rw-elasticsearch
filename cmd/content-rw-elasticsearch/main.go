@@ -193,28 +193,19 @@ func main() {
 			log,
 		)
 
-		kafkaConsumer := kafka.NewPerseverantConsumer(kafka.PerseverantConsumerConfig{
+		consumerConfig := kafka.ConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
 			Topics:                  []string{*kafkaTopic},
-			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
-			Logger:                  log,
-			RetryInterval:           time.Minute,
-		})
+			Options:                 kafka.DefaultConsumerOptions(),
+		}
+		kafkaConsumer := kafka.NewPerseverantConsumer(consumerConfig, log, time.Minute)
 
 		go func() {
 			kafkaConsumer.StartListening(handler.HandleMessage)
 		}()
 
-		healthCheckConfig := kafka.PerseverantConsumerConfig{
-			BrokersConnectionString: *kafkaAddress,
-			ConsumerGroup:           *kafkaConsumerGroup + "-health",
-			Topics:                  []string{*kafkaTopic},
-			ConsumerGroupConfig:     kafka.DefaultConsumerConfig(),
-			Logger:                  log,
-		}
-
-		healthService := health.NewHealthService(healthCheckConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
+		healthService := health.NewHealthService(kafkaConsumer, esService, httpClient, concordanceAPIService, *appSystemCode, log)
 		serveMux := http.NewServeMux()
 		serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
 
@@ -230,7 +221,6 @@ func main() {
 		if err != nil {
 			log.WithError(err).Error("Kafka consumer failed to close")
 		}
-
 	}
 	err := app.Run(os.Args)
 	if err != nil {
