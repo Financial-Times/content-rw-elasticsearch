@@ -4,6 +4,5 @@ service:
   name: content-rw-elasticsearch
 env:
   KAFKA_TOPIC: CombinedPostPublicationEvents
-  KAFKA_CONCURRENT_PROCESSING: false
   PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080
   INTERNAL_CONTENT_API_URL: http://internal-content-api:8080

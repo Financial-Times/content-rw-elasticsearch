@@ -9,7 +9,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/kafka"
+	"github.com/Financial-Times/kafka-client-go/v2"
 	"github.com/Financial-Times/service-status-go/gtg"
 	status "github.com/Financial-Times/service-status-go/httphandlers"
 )
@@ -23,14 +23,14 @@ const (
 type Service struct {
 	ESHealthService  es.HealthStatus
 	ConcordanceAPI   *concept.ConcordanceAPIService
-	ConsumerInstance *kafka.PerseverantConsumer
+	ConsumerInstance *kafka.Consumer
 	HTTPClient       *http.Client
 	Checks           []fthealth.Check
 	AppSystemCode    string
 	log              *logger.UPPLogger
 }
 
-func NewHealthService(consumer *kafka.PerseverantConsumer, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
+func NewHealthService(consumer *kafka.Consumer, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
 	service := &Service{
 		ESHealthService:  esHealthService,
 		ConcordanceAPI:   concordanceAPI,

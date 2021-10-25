@@ -15,7 +15,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/kafka"
+	"github.com/Financial-Times/kafka-client-go/v2"
 	"github.com/Financial-Times/upp-go-sdk/pkg/api"
 	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
 	cli "github.com/jawher/mow.cli"
@@ -72,13 +72,13 @@ func main() {
 	})
 	kafkaAddress := app.String(cli.StringOpt{
 		Name:   "kafka-address",
-		Value:  "http://kafka:9092",
-		Desc:   "Addresses used by the queue consumer to connect to the queue",
+		Value:  "http://kafka:29092",
+		Desc:   "Addresses used by the consumer to connect to Kafka",
 		EnvVar: "KAFKA_ADDR",
 	})
 	kafkaConsumerGroup := app.String(cli.StringOpt{
 		Name:   "kafka-consumer-group",
-		Value:  "default-consumer-group",
+		Value:  "content-rw-elasticsearch",
 		Desc:   "Group used to read the messages from the queue",
 		EnvVar: "KAFKA_CONSUMER_GROUP",
 	})
@@ -88,18 +88,6 @@ func main() {
 		Desc:   "The topic to read the messages from",
 		EnvVar: "KAFKA_TOPIC",
 	})
-	//kafkaHeader := app.String(cli.StringOpt{
-	//	Name:   "kafka-header",
-	//	Value:  "kafka",
-	//	Desc:   "The header identifying the queue to read the messages from",
-	//	EnvVar: "KAFKA_HEADER",
-	//})
-	//kafkaConcurrentProcessing := app.Bool(cli.BoolOpt{
-	//	Name:   "kafka-concurrent-processing",
-	//	Value:  false,
-	//	Desc:   "Whether the consumer uses concurrent processing for the messages",
-	//	EnvVar: "KAFKA_CONCURRENT_PROCESSING",
-	//})
 	publicConcordancesEndpoint := app.String(cli.StringOpt{
 		Name:   "public-concordances-endpoint",
 		Value:  "http://public-concordances-api:8080",
@@ -134,20 +122,10 @@ func main() {
 		EnvVar: "API_BASIC_PASS",
 	})
 
-	//queueConfig := consumer.QueueConfig{
-	//	Addrs:                []string{*kafkaProxyAddress},
-	//	Group:                *kafkaConsumerGroup,
-	//	Topic:                *kafkaTopic,
-	//	Queue:                *kafkaHeader,
-	//	ConcurrentProcessing: *kafkaConcurrentProcessing,
-	//}
-
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
 
 	app.Action = func() {
-		time.Sleep(5 * time.Second)
-
 		accessConfig := es.AccessConfig{
 			AccessKey: *accessKey,
 			SecretKey: *secretKey,
@@ -199,7 +177,7 @@ func main() {
 			Topics:                  []string{*kafkaTopic},
 			Options:                 kafka.DefaultConsumerOptions(),
 		}
-		kafkaConsumer := kafka.NewPerseverantConsumer(consumerConfig, log, time.Minute)
+		kafkaConsumer := kafka.NewConsumer(consumerConfig, log, time.Minute)
 
 		go func() {
 			kafkaConsumer.StartListening(handler.HandleMessage)
