@@ -54,6 +54,8 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 		h.BaseAPIURL = strings.Replace(h.BaseAPIURL, "http", "https", 1)
 	}
 	h.populateContentRelatedFields(&model, enrichedContent, contentType, tid)
+	model.Type = new(string)
+	*model.Type = h.Config.ESContentTypeMetadataMap.Get(contentType).Collection
 
 	annotations, concepts, err := h.prepareAnnotationsWithConcepts(&enrichedContent, tid)
 	log := h.log.WithTransactionID(tid).WithUUID(enrichedContent.UUID)

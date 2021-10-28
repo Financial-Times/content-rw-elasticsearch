@@ -1,6 +1,7 @@
 package message
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -124,9 +125,8 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 		return
 	}
 
-	conceptType := h.mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
 	if combinedPostPublicationEvent.Deleted {
-		_, err = h.esService.DeleteData(conceptType, uuid)
+		_, err = h.esService.DeleteData(context.Background(), uuid)
 		if err != nil {
 			log.WithError(err).Error("Failed to delete indexed content")
 			return
@@ -142,7 +142,7 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 
 	payload := h.mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
 
-	_, err = h.esService.WriteData(conceptType, uuid, payload)
+	_, err = h.esService.WriteData(context.Background(), uuid, payload)
 	if err != nil {
 		log.WithError(err).Error("Failed to index content")
 		return

@@ -1,6 +1,7 @@
 package health
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -78,7 +79,7 @@ func (s *Service) clusterIsHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) healthChecker() (string, error) {
-	output, err := s.ESHealthService.GetClusterHealth()
+	output, err := s.ESHealthService.GetClusterHealth(context.Background())
 	if err != nil {
 		return "Cluster is not healthy: ", err
 	} else if output.Status != "green" {
@@ -101,7 +102,7 @@ func (s *Service) connectivityHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) connectivityChecker() (string, error) {
-	_, err := s.ESHealthService.GetClusterHealth()
+	_, err := s.ESHealthService.GetClusterHealth(context.Background())
 	if err != nil {
 		return "Could not connect to elasticsearch", err
 	}
@@ -122,7 +123,7 @@ func (s *Service) schemaHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) schemaChecker() (string, error) {
-	output, err := s.ESHealthService.GetSchemaHealth()
+	output, err := s.ESHealthService.GetSchemaHealth(context.Background())
 	if err != nil {
 		return "Could not get schema: ", err
 	} else if output != "ok" {
@@ -195,7 +196,7 @@ func (s *Service) gtgCheck() gtg.Status {
 // HealthDetails returns the response from elasticsearch service /__health endpoint - describing the cluster health
 func (s *Service) healthDetails(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	output, err := s.ESHealthService.GetClusterHealth()
+	output, err := s.ESHealthService.GetClusterHealth(context.Background())
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		return

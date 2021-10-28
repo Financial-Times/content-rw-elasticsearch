@@ -3,7 +3,7 @@ fixtures:
   /:
     get:
       status: 200
-  /_cluster/health/:
+  /_cluster/health:
     get:
       body:
         cluster_name: "070529446553:upp-sapi-v1-k8s-dev"

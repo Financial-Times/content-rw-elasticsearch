@@ -1,6 +1,7 @@
 package es
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,8 +9,7 @@ import (
 	"sync"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-
-	"gopkg.in/olivere/elastic.v2"
+	"github.com/olivere/elastic/v7"
 )
 
 var referenceIndex *elasticIndex
@@ -27,28 +27,28 @@ type ElasticsearchService struct {
 type Service interface {
 	HealthStatus
 	SetClient(client Client)
-	WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error)
-	DeleteData(conceptType string, uuid string) (*elastic.DeleteResult, error)
+	WriteData(ctx context.Context, uuid string, payload interface{}) (*elastic.IndexResponse, error)
+	DeleteData(ctx context.Context, uuid string) (*elastic.DeleteResponse, error)
 }
 
 type HealthStatus interface {
-	GetClusterHealth() (*elastic.ClusterHealthResponse, error)
-	GetSchemaHealth() (string, error)
+	GetClusterHealth(ctx context.Context) (*elastic.ClusterHealthResponse, error)
+	GetSchemaHealth(ctx context.Context) (string, error)
 }
 
 func NewService(indexName string) Service {
 	return &ElasticsearchService{IndexName: indexName}
 }
 
-func (s *ElasticsearchService) GetClusterHealth() (*elastic.ClusterHealthResponse, error) {
+func (s *ElasticsearchService) GetClusterHealth(ctx context.Context) (*elastic.ClusterHealthResponse, error) {
 	if s.ElasticClient == nil {
 		return nil, errors.New("client could not be created, please check the application parameters/env variables, and restart the service")
 	}
 
-	return s.ElasticClient.ClusterHealth().Do()
+	return s.ElasticClient.ClusterHealth().Do(ctx)
 }
 
-func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
+func (s *ElasticsearchService) GetSchemaHealth(ctx context.Context) (string, error) {
 	if referenceIndex == nil {
 		referenceIndex = new(elasticIndex)
 
@@ -72,7 +72,7 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 		return "not ok, connection to ES couldn't be established", nil
 	}
 
-	liveIndex, err := s.ElasticClient.IndexGet().Index(s.IndexName).Do()
+	liveIndex, err := s.ElasticClient.IndexGet().Index(s.IndexName).Do(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -117,23 +117,21 @@ func (s *ElasticsearchService) SetClient(client Client) {
 	s.ElasticClient = client
 }
 
-func (s *ElasticsearchService) WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error) {
+func (s *ElasticsearchService) WriteData(ctx context.Context, uuid string, payload interface{}) (*elastic.IndexResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.ElasticClient.Index().
 		Index(s.IndexName).
-		Type(conceptType).
 		Id(uuid).
 		BodyJson(payload).
-		Do()
+		Do(ctx)
 }
 
-func (s *ElasticsearchService) DeleteData(conceptType string, uuid string) (*elastic.DeleteResult, error) {
+func (s *ElasticsearchService) DeleteData(ctx context.Context, uuid string) (*elastic.DeleteResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.ElasticClient.Delete().
 		Index(s.IndexName).
-		Type(conceptType).
 		Id(uuid).
-		Do()
+		Do(ctx)
 }

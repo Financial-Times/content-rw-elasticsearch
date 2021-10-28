@@ -10,11 +10,11 @@ require (
 	github.com/Financial-Times/transactionid-utils-go v0.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/jawher/mow.cli v1.0.4
+	github.com/olivere/elastic/v7 v7.0.29
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
-	github.com/smartystreets/go-aws-auth v0.0.0-20170504205021-8ef1316913ee
+	github.com/smartystreets/go-aws-auth v0.0.0-20180515143844-0c1422d1fdb9
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
-	gopkg.in/olivere/elastic.v2 v2.0.61
 )
 
 require (
@@ -35,16 +35,17 @@ require (
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
+	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/mapstructure v1.4.2 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/smartystreets/assertions v1.0.1 // indirect
-	github.com/smartystreets/gunit v1.1.3 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
