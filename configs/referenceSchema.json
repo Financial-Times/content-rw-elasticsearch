@@ -29,4358 +29,745 @@
   },
   "mappings": {
     "properties": {
-      "FTBlogs": {
-        "properties": {
-          "articleBrands": {
-            "type": "text"
-          },
-          "bestStory": {
-            "type": "boolean"
-          },
-          "body": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "scoop": {
-            "type": "boolean"
-          },
-          "canBeDistributed": {
-            "type": "text"
-          },
-          "canBeSyndicated": {
-            "type": "text"
-          },
-          "byline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "category": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_authors": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_authors_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_brands": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_brands_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_companynames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_genre": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_genre_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_icb_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_iptc_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_mediatype": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_mediatype_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_orgnames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_orgnames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_people_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_regions_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_sections_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_specialreports": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_specialreports_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_subjects_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_topics_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "companyNamesAuto": {
-            "type": "text"
-          },
-          "companyTickerCodeAuto": {
-            "type": "text"
-          },
-          "companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "companynamesid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "content_type": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "contributor_rights": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "dateinitialpublished": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "datelastpublished": {
-            "type": "date",
-            "format": "dateOptionalTime",
-            "copy_to": "meta_all_fields"
-          },
-          "format": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "gadateearticle": {
-            "type": "date",
-            "format": "date"
-          },
-          "gadatetimearticle": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "gapublication": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icbid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "index_date": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "initial_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "internalContentType": {
-            "type": "text"
-          },
-          "iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "iptcid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "last_metadata_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "last_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "lead_headline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "length_millis": {
-            "type": "long"
-          },
-          "lookupFailure": {
-            "type": "boolean"
-          },
-          "mark_deleted": {
-            "type": "boolean"
-          },
-          "model_api_url": {
-            "type": "text"
-          },
-          "model_master_id": {
-            "type": "text"
-          },
-          "model_master_source": {
-            "type": "text"
-          },
-          "model_resource_uri": {
-            "type": "text"
-          },
-          "organisationNamesAuto": {
-            "type": "text"
-          },
-          "pagecontentbody": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentbyline": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentheadline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "peopleid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "provider_name": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "publishReference": {
-            "type": "text"
-          },
-          "region": {
-            "type": "text"
-          },
-          "regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "regionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "section_link": {
-            "type": "text"
-          },
-          "sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "sectionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "short_description": {
-            "type": "text"
-          },
-          "source_code": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "ssdatepage": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "ssfturl": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagekeywords": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagename": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "story_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "storymodel_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "subjectsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "thumbnail_url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "topicsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "uid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "meta_all_fields": {
-            "type": "text",
+      "type": { "type": "keyword" },
+      "articleBrands": {
+        "type": "text"
+      },
+      "articleTypes": {
+        "type": "text"
+      },
+      "bestStory": {
+        "type": "boolean"
+      },
+      "body": {
+        "type": "text",
+        "copy_to": "meta_all_fields"
+      },
+      "scoop": {
+        "type": "boolean"
+      },
+      "canBeDistributed": {
+        "type": "text"
+      },
+      "canBeSyndicated": {
+        "type": "text"
+      },
+      "byline": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "category": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
             "index": true
           }
         }
       },
-      "FTCom": {
-        "properties": {
-          "articleBrands": {
-            "type": "text"
-          },
-          "articleTypes": {
-            "type": "text"
-          },
-          "bestStory": {
-            "type": "boolean"
-          },
-          "body": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "scoop": {
-            "type": "boolean"
-          },
-          "canBeDistributed": {
-            "type": "text"
-          },
-          "canBeSyndicated": {
-            "type": "text"
-          },
-          "byline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "category": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_authors": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_authors_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_brands": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_brands_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_companynames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_genre": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_genre_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_icb_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_iptc_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_mediatype": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_mediatype_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_orgnames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_orgnames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_people_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_regions_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_sections_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_specialreports": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_specialreports_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_subjects_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_topics_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "companyNamesAuto": {
-            "type": "text"
-          },
-          "companyNamesEditorial": {
-            "type": "text"
-          },
-          "companyTickerCodeAuto": {
-            "type": "text"
-          },
-          "companyTickerCodeEditorial": {
-            "type": "text"
-          },
-          "companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "companynamesid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "content_type": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "contributor_rights": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "dateinitialpublished": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "datelastpublished": {
-            "type": "date",
-            "format": "dateOptionalTime",
-            "copy_to": "meta_all_fields"
-          },
-          "displayCodeNames": {
-            "type": "text"
-          },
-          "displayCodes": {
-            "type": "text"
-          },
-          "editorsTags": {
-            "type": "text"
-          },
-          "format": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "gadateearticle": {
-            "type": "date",
-            "format": "date"
-          },
-          "gadatetimearticle": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "gapublication": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icbid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "index_date": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "initial_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "internalContentType": {
-            "type": "text"
-          },
-          "iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "iptcid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "last_metadata_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "last_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "lead_headline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "length_millis": {
-            "type": "long"
-          },
-          "lookupFailure": {
-            "type": "boolean"
-          },
-          "mark_deleted": {
-            "type": "boolean"
-          },
-          "model_api_url": {
-            "type": "text"
-          },
-          "model_master_id": {
-            "type": "text"
-          },
-          "model_master_source": {
-            "type": "text"
-          },
-          "model_resource_uri": {
-            "type": "text"
-          },
-          "naicsNames": {
-            "type": "text"
-          },
-          "organisationNamesAuto": {
-            "type": "text"
-          },
-          "pagecontentbody": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentbyline": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentheadline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "peopleid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "provider_name": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "publishReference": {
-            "type": "text"
-          },
-          "region": {
-            "type": "text"
-          },
-          "regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "regionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "section_link": {
-            "type": "text"
-          },
-          "sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "sectionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "short_description": {
-            "type": "text"
-          },
-          "source_code": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "ssdatepage": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "ssfturl": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagekeywords": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagename": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "story_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "storymodel_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "subjectsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "thumbnail_url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "topicsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "uid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "meta_all_fields": {
-            "type": "text",
+      "cmr_authors": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_authors_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
             "index": true
           }
         }
       },
-      "Pages": {
-        "properties": {
-          "articleBrands": {
-            "type": "text"
-          },
-          "bestStory": {
-            "type": "boolean"
-          },
-          "body": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "scoop": {
-            "type": "boolean"
-          },
-          "canBeDistributed": {
-            "type": "text"
-          },
-          "canBeSyndicated": {
-            "type": "text"
-          },
-          "byline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "category": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_authors": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_authors_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_brands": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_brands_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_companynames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_genre": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_genre_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_icb_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_iptc_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_mediatype": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_mediatype_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_orgnames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_orgnames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_people_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_regions_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_sections_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_specialreports": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_specialreports_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_subjects_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_topics_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "companyNamesAuto": {
-            "type": "text"
-          },
-          "companyTickerCodeAuto": {
-            "type": "text"
-          },
-          "companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "companynamesid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "content_type": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "contributor_rights": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "dateinitialpublished": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "datelastpublished": {
-            "type": "date",
-            "format": "dateOptionalTime",
-            "copy_to": "meta_all_fields"
-          },
-          "format": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "gadateearticle": {
-            "type": "date",
-            "format": "date"
-          },
-          "gadatetimearticle": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "gapublication": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icbid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "index_date": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "initial_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "internalContentType": {
-            "type": "text"
-          },
-          "iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "iptcid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "last_metadata_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "last_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "lead_headline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "length_millis": {
-            "type": "long"
-          },
-          "lookupFailure": {
-            "type": "boolean"
-          },
-          "mark_deleted": {
-            "type": "boolean"
-          },
-          "model_api_url": {
-            "type": "text"
-          },
-          "model_master_id": {
-            "type": "text"
-          },
-          "model_master_source": {
-            "type": "text"
-          },
-          "model_resource_uri": {
-            "type": "text"
-          },
-          "organisationNamesAuto": {
-            "type": "text"
-          },
-          "pagecontentbody": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentbyline": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentheadline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "peopleid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "provider_name": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "publishReference": {
-            "type": "text"
-          },
-          "region": {
-            "type": "text"
-          },
-          "regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "regionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "section_link": {
-            "type": "text"
-          },
-          "sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "sectionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "short_description": {
-            "type": "text"
-          },
-          "source_code": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "ssdatepage": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "ssfturl": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagekeywords": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagename": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "story_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "storymodel_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "subjectsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "thumbnail_url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "topicsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "uid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "meta_all_fields": {
-            "type": "text",
+      "cmr_brands": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_brands_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
             "index": true
           }
         }
       },
-      "FTPodcasts": {
-        "properties": {
-          "articleBrands": {
-            "type": "text"
-          },
-          "bestStory": {
-            "type": "boolean"
-          },
-          "body": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "scoop": {
-            "type": "boolean"
-          },
-          "canBeDistributed": {
-            "type": "text"
-          },
-          "canBeSyndicated": {
-            "type": "text"
-          },
-          "byline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "category": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_authors": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_authors_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_brands": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_brands_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_companynames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_genre": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_genre_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_icb_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_iptc_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_mediatype": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_mediatype_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_orgnames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_orgnames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_people_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_regions_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_sections_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_specialreports": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_specialreports_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_subjects_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_topics_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "companyNamesAuto": {
-            "type": "text"
-          },
-          "companyTickerCodeAuto": {
-            "type": "text"
-          },
-          "companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "companynamesid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "content_type": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "contributor_rights": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "dateinitialpublished": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "datelastpublished": {
-            "type": "date",
-            "format": "dateOptionalTime",
-            "copy_to": "meta_all_fields"
-          },
-          "format": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "gadateearticle": {
-            "type": "date",
-            "format": "date"
-          },
-          "gadatetimearticle": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "gapublication": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icbid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "index_date": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "initial_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "internalContentType": {
-            "type": "text"
-          },
-          "iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "iptcid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "last_metadata_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "last_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "lead_headline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "length_millis": {
-            "type": "long"
-          },
-          "lookupFailure": {
-            "type": "boolean"
-          },
-          "mark_deleted": {
-            "type": "boolean"
-          },
-          "model_api_url": {
-            "type": "text"
-          },
-          "model_master_id": {
-            "type": "text"
-          },
-          "model_master_source": {
-            "type": "text"
-          },
-          "model_resource_uri": {
-            "type": "text"
-          },
-          "organisationNamesAuto": {
-            "type": "text"
-          },
-          "pagecontentbody": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentbyline": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentheadline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "peopleid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "provider_name": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "publishReference": {
-            "type": "text"
-          },
-          "region": {
-            "type": "text"
-          },
-          "regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "regionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "section_link": {
-            "type": "text"
-          },
-          "sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "sectionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "short_description": {
-            "type": "text"
-          },
-          "source_code": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "ssdatepage": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "ssfturl": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagekeywords": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagename": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "story_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "storymodel_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "subjectsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "thumbnail_url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "topicsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "uid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "meta_all_fields": {
-            "type": "text",
+      "cmr_companynames": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_companynames_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
             "index": true
           }
         }
       },
-      "FTVideos": {
-        "properties": {
-          "articleBrands": {
-            "type": "text"
-          },
-          "bestStory": {
-            "type": "boolean"
-          },
-          "body": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "scoop": {
-            "type": "boolean"
-          },
-          "canBeDistributed": {
-            "type": "text"
-          },
-          "canBeSyndicated": {
-            "type": "text"
-          },
-          "byline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "category": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_authors": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_authors_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_brands": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_brands_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_companynames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_genre": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_genre_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_icb_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_iptc_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_mediatype": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_mediatype_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_orgnames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_orgnames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_people_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_regions_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_sections_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_specialreports": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_specialreports_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_subjects_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_topics_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "companyNamesAuto": {
-            "type": "text"
-          },
-          "companyTickerCodeAuto": {
-            "type": "text"
-          },
-          "companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "companynamesid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "content_type": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "contributor_rights": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "dateinitialpublished": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "datelastpublished": {
-            "type": "date",
-            "format": "dateOptionalTime",
-            "copy_to": "meta_all_fields"
-          },
-          "format": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "gadateearticle": {
-            "type": "date",
-            "format": "date"
-          },
-          "gadatetimearticle": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "gapublication": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icbid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "index_date": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "initial_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "internalContentType": {
-            "type": "text"
-          },
-          "iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "iptcid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "last_metadata_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "last_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "lead_headline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "length_millis": {
-            "type": "long"
-          },
-          "lookupFailure": {
-            "type": "boolean"
-          },
-          "mark_deleted": {
-            "type": "boolean"
-          },
-          "model_api_url": {
-            "type": "text"
-          },
-          "model_master_id": {
-            "type": "text"
-          },
-          "model_master_source": {
-            "type": "text"
-          },
-          "model_resource_uri": {
-            "type": "text"
-          },
-          "organisationNamesAuto": {
-            "type": "text"
-          },
-          "pagecontentbody": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentbyline": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentheadline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "peopleid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "provider_name": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "publishReference": {
-            "type": "text"
-          },
-          "region": {
-            "type": "text"
-          },
-          "regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "regionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "section_link": {
-            "type": "text"
-          },
-          "sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "sectionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "short_description": {
-            "type": "text"
-          },
-          "source_code": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "ssdatepage": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "ssfturl": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagekeywords": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagename": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "story_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "storymodel_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "subjectsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "thumbnail_url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "topicsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "uid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "meta_all_fields": {
-            "type": "text",
+      "cmr_genre": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_genre_id": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
             "index": true
           }
         }
       },
-      "FTAudios": {
-        "properties": {
-          "articleBrands": {
-            "type": "text"
-          },
-          "bestStory": {
-            "type": "boolean"
-          },
-          "body": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "scoop": {
-            "type": "boolean"
-          },
-          "canBeDistributed": {
-            "type": "text"
-          },
-          "canBeSyndicated": {
-            "type": "text"
-          },
-          "byline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "category": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_authors": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_authors_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_brands": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_brands_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_companynames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_genre": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_genre_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_icb_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_iptc_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_mediatype": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_mediatype_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_orgnames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_orgnames_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_people_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarysection_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_primarytheme_id": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_regions_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_sections_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_specialreports": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_specialreports_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_subjects_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "cmr_topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "cmr_topics_ids": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "companyNamesAuto": {
-            "type": "text"
-          },
-          "companyTickerCodeAuto": {
-            "type": "text"
-          },
-          "companynames": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "companynamesid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "content_type": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "contributor_rights": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "dateinitialpublished": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "datelastpublished": {
-            "type": "date",
-            "format": "dateOptionalTime",
-            "copy_to": "meta_all_fields"
-          },
-          "format": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "gadateearticle": {
-            "type": "date",
-            "format": "date"
-          },
-          "gadatetimearticle": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "gapublication": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icb": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "icbid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "index_date": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "initial_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "internalContentType": {
-            "type": "text"
-          },
-          "iptc": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "iptcid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "last_metadata_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "last_publish": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "lead_headline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "length_millis": {
-            "type": "long"
-          },
-          "lookupFailure": {
-            "type": "boolean"
-          },
-          "mark_deleted": {
-            "type": "boolean"
-          },
-          "model_api_url": {
-            "type": "text"
-          },
-          "model_master_id": {
-            "type": "text"
-          },
-          "model_master_source": {
-            "type": "text"
-          },
-          "model_resource_uri": {
-            "type": "text"
-          },
-          "organisationNamesAuto": {
-            "type": "text"
-          },
-          "pagecontentbody": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentbyline": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "pagecontentheadline": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "people": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "peopleid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "provider_name": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "publishReference": {
-            "type": "text"
-          },
-          "region": {
-            "type": "text"
-          },
-          "regions": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "regionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "section_link": {
-            "type": "text"
-          },
-          "sections": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "sectionsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "short_description": {
-            "type": "text"
-          },
-          "source_code": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "ssdatepage": {
-            "type": "date",
-            "format": "dateOptionalTime"
-          },
-          "ssfturl": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagekeywords": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "sspagename": {
-            "type": "text",
-            "copy_to": "meta_all_fields"
-          },
-          "story_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "storymodel_id": {
-            "type": "long",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "subjects": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "subjectsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "thumbnail_url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "topics": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            },
-            "copy_to": "meta_all_fields"
-          },
-          "topicsid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "uid": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "url": {
-            "type": "text",
-            "fields": {
-              "raw": {
-                "type": "keyword",
-                "index": true
-              }
-            }
-          },
-          "meta_all_fields": {
-            "type": "text",
+      "cmr_icb": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_icb_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
             "index": true
           }
         }
+      },
+      "cmr_iptc": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_iptc_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_mediatype": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_mediatype_id": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_orgnames": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_orgnames_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_people": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_people_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_primarysection": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_primarysection_id": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_primarytheme": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_primarytheme_id": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_regions": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_regions_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_sections": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_sections_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_specialreports": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_specialreports_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_subjects": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_subjects_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "cmr_topics": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "cmr_topics_ids": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "companyNamesAuto": {
+        "type": "text"
+      },
+      "companyNamesEditorial": {
+        "type": "text"
+      },
+      "companyTickerCodeAuto": {
+        "type": "text"
+      },
+      "companyTickerCodeEditorial": {
+        "type": "text"
+      },
+      "companynames": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "companynamesid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "content_type": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "contributor_rights": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "dateinitialpublished": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "datelastpublished": {
+        "type": "date",
+        "format": "dateOptionalTime",
+        "copy_to": "meta_all_fields"
+      },
+      "displayCodeNames": {
+        "type": "text"
+      },
+      "displayCodes": {
+        "type": "text"
+      },
+      "editorsTags": {
+        "type": "text"
+      },
+      "format": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "gadateearticle": {
+        "type": "date",
+        "format": "date"
+      },
+      "gadatetimearticle": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "gapublication": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "icb": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "icbid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "index_date": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "initial_publish": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "internalContentType": {
+        "type": "text"
+      },
+      "iptc": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "iptcid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "last_metadata_publish": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "last_publish": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "lead_headline": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "length_millis": {
+        "type": "long"
+      },
+      "lookupFailure": {
+        "type": "boolean"
+      },
+      "mark_deleted": {
+        "type": "boolean"
+      },
+      "model_api_url": {
+        "type": "text"
+      },
+      "model_master_id": {
+        "type": "text"
+      },
+      "model_master_source": {
+        "type": "text"
+      },
+      "model_resource_uri": {
+        "type": "text"
+      },
+      "naicsNames": {
+        "type": "text"
+      },
+      "organisationNamesAuto": {
+        "type": "text"
+      },
+      "pagecontentbody": {
+        "type": "text",
+        "copy_to": "meta_all_fields"
+      },
+      "pagecontentbyline": {
+        "type": "text",
+        "copy_to": "meta_all_fields"
+      },
+      "pagecontentheadline": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "people": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "peopleid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "provider_name": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "publishReference": {
+        "type": "text"
+      },
+      "region": {
+        "type": "text"
+      },
+      "regions": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "regionsid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "section_link": {
+        "type": "text"
+      },
+      "sections": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "sectionsid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "short_description": {
+        "type": "text"
+      },
+      "source_code": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "ssdatepage": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      },
+      "ssfturl": {
+        "type": "text",
+        "copy_to": "meta_all_fields"
+      },
+      "sspagekeywords": {
+        "type": "text",
+        "copy_to": "meta_all_fields"
+      },
+      "sspagename": {
+        "type": "text",
+        "copy_to": "meta_all_fields"
+      },
+      "story_id": {
+        "type": "long",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "storymodel_id": {
+        "type": "long",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "subjects": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "subjectsid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "thumbnail_url": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "topics": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        },
+        "copy_to": "meta_all_fields"
+      },
+      "topicsid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "uid": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "url": {
+        "type": "text",
+        "fields": {
+          "raw": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      },
+      "meta_all_fields": {
+        "type": "text",
+        "index": true
       }
     }
   }
