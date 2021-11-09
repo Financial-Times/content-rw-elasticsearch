@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
-	status "github.com/Financial-Times/service-status-go/httphandlers"
-
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
 	fthealth "github.com/Financial-Times/go-fthealth/v1_1"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
 	"github.com/Financial-Times/service-status-go/gtg"
+	status "github.com/Financial-Times/service-status-go/httphandlers"
 )
 
 const (
@@ -24,19 +23,18 @@ const (
 type Service struct {
 	ESHealthService  es.HealthStatus
 	ConcordanceAPI   *concept.ConcordanceAPIService
-	ConsumerInstance consumer.MessageConsumer
+	ConsumerInstance message.Consumer
 	HTTPClient       *http.Client
 	Checks           []fthealth.Check
 	AppSystemCode    string
 	log              *logger.UPPLogger
 }
 
-func NewHealthService(config *consumer.QueueConfig, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
-	consumerInstance := consumer.NewConsumer(*config, func(m consumer.Message) {}, client)
+func NewHealthService(consumer message.Consumer, esHealthService es.HealthStatus, client *http.Client, concordanceAPI *concept.ConcordanceAPIService, appSystemCode string, log *logger.UPPLogger) *Service {
 	service := &Service{
 		ESHealthService:  esHealthService,
 		ConcordanceAPI:   concordanceAPI,
-		ConsumerInstance: consumerInstance,
+		ConsumerInstance: consumer,
 		HTTPClient:       client,
 		AppSystemCode:    appSystemCode,
 		log:              log,
@@ -45,7 +43,7 @@ func NewHealthService(config *consumer.QueueConfig, esHealthService es.HealthSta
 		service.clusterIsHealthyCheck(),
 		service.connectivityHealthyCheck(),
 		service.schemaHealthyCheck(),
-		service.checkKafkaProxyConnectivity(),
+		service.kafkaConnectivityCheck(),
 		service.checkConcordanceAPI(),
 	}
 	return service
@@ -133,16 +131,24 @@ func (s *Service) schemaChecker() (string, error) {
 	}
 }
 
-func (s *Service) checkKafkaProxyConnectivity() fthealth.Check {
+func (s *Service) kafkaConnectivityCheck() fthealth.Check {
 	return fthealth.Check{
 		ID:               s.AppSystemCode,
 		BusinessImpact:   "CombinedPostPublication messages can't be read from the queue. Indexing for search won't work.",
-		Name:             "Check kafka-proxy connectivity.",
+		Name:             "Check Kafka connectivity",
 		PanicGuide:       panicGuide,
 		Severity:         1,
-		TechnicalSummary: "Messages couldn't be read from the queue. Check if kafka-proxy is reachable.",
-		Checker:          s.ConsumerInstance.ConnectivityCheck,
+		TechnicalSummary: "Messages couldn't be read from the queue. Check if Kafka is reachable.",
+		Checker:          s.kafkaConnectivityChecker,
 	}
+}
+
+func (s *Service) kafkaConnectivityChecker() (string, error) {
+	err := s.ConsumerInstance.ConnectivityCheck()
+	if err != nil {
+		return "Could not connect to Kafka", err
+	}
+	return "Successfully connected to Kafka", nil
 }
 
 func (s *Service) checkConcordanceAPI() fthealth.Check {

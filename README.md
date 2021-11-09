@@ -32,10 +32,10 @@ export GITHUB_TOKEN="<token>"
 docker-compose build --no-cache app
 ```
 
-**Step 2.** Run Elasticsearch
+**Step 2.** Run Elasticsearch, Zookeeper & Kafka
 
 ```sh
-docker-compose up -d es
+docker-compose up -d es zookeeper kafka
 ```
 
 **Step 3.** Create Elasticsearch index mapping
@@ -83,16 +83,12 @@ Options:
       --aws-secret-access-key          AWS SECRET ACCES KEY (env $AWS_SECRET_ACCESS_KEY)
       --elasticsearch-sapi-endpoint    AES endpoint (env $ELASTICSEARCH_SAPI_ENDPOINT) (default "http://localhost:9200")
       --index-name                     The name of the elaticsearch index (env $ELASTICSEARCH_SAPI_INDEX) (default "ft")
-      --kafka-proxy-address            Addresses used by the queue consumer to connect to the queue (env $KAFKA_PROXY_ADDR) (default "http://localhost:8080")
+      --kafka-address                  Addresses used by the consumer to connect to Kafka (env $KAFKA_ADDR) (default "http://kafka:9092")
       --kafka-consumer-group           Group used to read the messages from the queue (env $KAFKA_CONSUMER_GROUP) (default "default-consumer-group")
       --kafka-topic                    The topic to read the messages from (env $KAFKA_TOPIC) (default "CombinedPostPublicationEvents")
-      --kafka-header                   The header identifying the queue to read the messages from (env $KAFKA_HEADER) (default "kafka")
-      --kafka-concurrent-processing    Whether the consumer uses concurrent processing for the messages (env $KAFKA_CONCURRENT_PROCESSING)
       --public-concordances-endpoint   Endpoint to concord ids with (env $PUBLIC_CONCORDANCES_ENDPOINT) (default "http://public-concordances-api:8080")
       --base-api-url                   Base API URL (env $BASE_API_URL) (default "https://api.ft.com/")
 ```
-
-Whether the consumer uses concurrent processing for the messages ($KAFKA_CONCURRENT_PROCESSING)
 
 ## Build and deployment
 

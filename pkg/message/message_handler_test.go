@@ -1,6 +1,7 @@
 package message
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -8,21 +9,19 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"gopkg.in/olivere/elastic.v2"
-
-	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/Financial-Times/upp-go-sdk/pkg/api"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
-
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
+	"github.com/Financial-Times/go-logger/v2"
+	"github.com/Financial-Times/kafka-client-go/v2"
+	"github.com/Financial-Times/upp-go-sdk/pkg/api"
+	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"gopkg.in/olivere/elastic.v2"
 )
 
 type esServiceMock struct {
@@ -103,6 +102,24 @@ func (m *concordanceAPIMock) GetConcepts(tid string, ids []string) (map[string]c
 	return args.Get(0).(map[string]concept.Model), args.Error(1)
 }
 
+type consumerMock struct {
+	mock.Mock
+}
+
+func (c *consumerMock) StartListening(messageHandler func(message kafka.FTMessage)) {
+	c.Called(messageHandler)
+}
+
+func (c *consumerMock) Close() error {
+	args := c.Called()
+	return args.Error(0)
+}
+
+func (c *consumerMock) ConnectivityCheck() error {
+	args := c.Called()
+	return args.Error(0)
+}
+
 func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfig, *Handler) {
 	uppLogger := logger.NewUPPLogger(config.AppName, config.AppDefaultLogLevel)
 
@@ -112,22 +129,18 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 		Endpoint:  "endpoint",
 	}
 
-	queueConfig := consumer.QueueConfig{
-		Addrs:                []string{"address"},
-		Group:                "group",
-		Topic:                "topic",
-		Queue:                "queue",
-		ConcurrentProcessing: false,
-	}
+	var concordanceAPI *concordanceAPIMock
+	var esService *esServiceMock
+	var consumer *consumerMock
 
-	concordanceAPI := new(concordanceAPIMock)
-	esService := new(esServiceMock)
 	for _, m := range mocks {
 		switch m.(type) {
 		case *concordanceAPIMock:
 			concordanceAPI = m.(*concordanceAPIMock)
 		case *esServiceMock:
 			esService = m.(*esServiceMock)
+		case *consumerMock:
+			consumer = m.(*consumerMock)
 		}
 	}
 
@@ -137,10 +150,14 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 
 	mapperHandler := mockMapperHandler(concordanceAPI, uppLogger, internalContentClient)
 
-	handler := NewMessageHandler(esService, mapperHandler, http.DefaultClient, queueConfig, esClient, uppLogger)
-	if mocks == nil {
-		handler = NewMessageHandler(es.NewService("index"), mapperHandler, http.DefaultClient, queueConfig, esClient, uppLogger)
+	var handler *Handler
+
+	if esService == nil {
+		handler = NewMessageHandler(es.NewService("index"), mapperHandler, http.DefaultClient, consumer, esClient, uppLogger)
+	} else {
+		handler = NewMessageHandler(esService, mapperHandler, http.DefaultClient, consumer, esClient, uppLogger)
 	}
+
 	return accessConfig, handler
 }
 
@@ -161,7 +178,11 @@ func initAppConfig() config.AppConfig {
 func TestStartClient(t *testing.T) {
 	expect := assert.New(t)
 
-	accessConfig, handler := mockMessageHandler(defaultESClient)
+	consumer := &consumerMock{}
+	consumer.On("StartListening", mock.AnythingOfType("func(kafka.FTMessage)")).Return()
+	consumer.On("Close").Return(nil)
+
+	accessConfig, handler := mockMessageHandler(defaultESClient, consumer)
 
 	handler.Start("http://api.ft.com/", accessConfig)
 	defer handler.Stop()
@@ -175,7 +196,12 @@ func TestStartClient(t *testing.T) {
 func TestStartClientError(t *testing.T) {
 	expect := assert.New(t)
 
-	accessConfig, handler := mockMessageHandler(errorESClient)
+	consumer := &consumerMock{}
+	consumer.On("StartListening", mock.AnythingOfType("func(kafka.FTMessage)")).Return()
+	consumer.On("ConnectivityCheck").Return(fmt.Errorf("queue error"))
+	consumer.On("Close").Return(nil)
+
+	accessConfig, handler := mockMessageHandler(errorESClient, consumer)
 
 	handler.Start("http://api.ft.com/", accessConfig)
 	defer handler.Stop()
@@ -185,6 +211,7 @@ func TestStartClientError(t *testing.T) {
 	expect.NotNil(handler.esService, "Elastic Service should be initialized")
 	expect.Equal("index", handler.esService.(*es.ElasticsearchService).IndexName, "Wrong index")
 	expect.Nil(handler.esService.(*es.ElasticsearchService).ElasticClient, "Elastic client should not be initialized")
+	expect.Error(handler.consumer.ConnectivityCheck(), "queue error")
 }
 
 func TestHandleWriteMessage(t *testing.T) {
@@ -198,7 +225,7 @@ func TestHandleWriteMessage(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: string(inputJSON)})
+	handler.handleMessage(kafka.FTMessage{Body: string(inputJSON)})
 
 	expect.Equal(1, len(serviceMock.Calls))
 
@@ -224,7 +251,7 @@ func TestHandleWriteMessageFromBodyXML(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: string(inputJSON)})
+	handler.handleMessage(kafka.FTMessage{Body: string(inputJSON)})
 
 	expect.Equal(1, len(serviceMock.Calls))
 
@@ -248,7 +275,7 @@ func TestHandleWriteMessageBlog(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input})
+	handler.handleMessage(kafka.FTMessage{Body: input})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
@@ -263,7 +290,7 @@ func TestHandleWriteMessageBlogWithHeader(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Origin-System-Id": "wordpress", "Content-Type": "application/json"}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{"Origin-System-Id": "wordpress", "Content-Type": "application/json"}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
@@ -278,7 +305,7 @@ func TestHandleWriteMessageVideo(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Content-Type": "application/json"}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{"Content-Type": "application/json"}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
@@ -293,7 +320,7 @@ func TestHandleWriteMessageAudio(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Content-Type": "vnd.ft-upp-audio+json"}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{"Content-Type": "vnd.ft-upp-audio+json"}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
@@ -310,7 +337,7 @@ func TestHandleWriteMessageAudioWithoutHeader(t *testing.T) {
 	concordanceAPIMock := new(concordanceAPIMock)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{
+	handler.handleMessage(kafka.FTMessage{
 		Body:    input,
 		Headers: map[string]string{},
 	})
@@ -327,7 +354,7 @@ func TestHandleWriteMessageArticleByHeaderType(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{"Content-Type": "application/vnd.ft-upp-article"}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{"Content-Type": "application/vnd.ft-upp-article"}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
@@ -341,7 +368,7 @@ func TestHandleWriteMessageUnknownType(t *testing.T) {
 	serviceMock := &esServiceMock{}
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Body: input})
+	handler.handleMessage(kafka.FTMessage{Body: input})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, "aae9611e-f66c-4fe4-a6c6-2e2bdea69060")
@@ -354,8 +381,8 @@ func TestHandleWriteMessageNoUUIDForMetadataPublish(t *testing.T) {
 	serviceMock := &esServiceMock{}
 
 	_, h := mockMessageHandler(defaultESClient, serviceMock)
-	methodeOrigin := h.Mapper.Config.ContentMetadataMap.Get("methode").Origin
-	h.handleMessage(consumer.Message{
+	methodeOrigin := h.mapper.Config.ContentMetadataMap.Get("methode").Origin
+	h.handleMessage(kafka.FTMessage{
 		Body: string(inputJSON),
 		Headers: map[string]string{
 			originHeader: methodeOrigin,
@@ -373,7 +400,7 @@ func TestHandleWriteMessageNoType(t *testing.T) {
 	serviceMock := &esServiceMock{}
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Body: input})
+	handler.handleMessage(kafka.FTMessage{Body: input})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
@@ -388,7 +415,7 @@ func TestHandleWriteMessageError(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: string(inputJSON)})
+	handler.handleMessage(kafka.FTMessage{Body: string(inputJSON)})
 
 	serviceMock.AssertExpectations(t)
 
@@ -403,7 +430,7 @@ func TestHandleDeleteMessage(t *testing.T) {
 	serviceMock.On("DeleteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResult{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Body: input})
+	handler.handleMessage(kafka.FTMessage{Body: input})
 
 	serviceMock.AssertExpectations(t)
 }
@@ -417,7 +444,7 @@ func TestHandleDeleteMessageError(t *testing.T) {
 	serviceMock.On("DeleteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResult{}, elastic.ErrTimeout)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Body: input})
+	handler.handleMessage(kafka.FTMessage{Body: input})
 
 	serviceMock.AssertExpectations(t)
 }
@@ -425,7 +452,7 @@ func TestHandleDeleteMessageError(t *testing.T) {
 func TestHandleMessageJsonError(t *testing.T) {
 	serviceMock := &esServiceMock{}
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Body: "malformed json"})
+	handler.handleMessage(kafka.FTMessage{Body: "malformed json"})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
@@ -434,7 +461,7 @@ func TestHandleMessageJsonError(t *testing.T) {
 func TestHandleSyntheticMessage(t *testing.T) {
 	serviceMock := &esServiceMock{}
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Headers: map[string]string{"X-Request-Id": "SYNTHETIC-REQ-MON_WuLjbRpCgh"}})
+	handler.handleMessage(kafka.FTMessage{Headers: map[string]string{"X-Request-Id": "SYNTHETIC-REQ-MON_WuLjbRpCgh"}})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
@@ -443,7 +470,7 @@ func TestHandleSyntheticMessage(t *testing.T) {
 func TestHandlePACMessage(t *testing.T) {
 	serviceMock := &esServiceMock{}
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(consumer.Message{Headers: map[string]string{"Origin-System-Id": config.PACOrigin}, Body: "{}"})
+	handler.handleMessage(kafka.FTMessage{Headers: map[string]string{"Origin-System-Id": config.PACOrigin}, Body: "{}"})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
@@ -458,7 +485,7 @@ func TestHandlePACMessageWithOldSparkContent(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
@@ -473,7 +500,7 @@ func TestHandlePACMessageWithSparkContent(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(consumer.Message{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)

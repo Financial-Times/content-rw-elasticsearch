@@ -1,5 +1,32 @@
 version: '3'
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.0.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+    networks:
+      - common
+
+  kafka:
+    image: confluentinc/cp-kafka:6.0.0
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "content-rw-elasticsearch:1:1"
+    networks:
+      - common
+
   app:
     build:
       context: .
@@ -10,12 +37,15 @@ services:
     container_name: content-rw-elasticsearch
     environment:
       ELASTICSEARCH_SAPI_ENDPOINT: "http://es:9200"
+      KAFKA_ADDR: "kafka:9092"
     ports:
       - "8080:8080"
     networks:
       - common
     depends_on:
       - es
+      - kafka
+
   es:
     image: elasticsearch:1.5
     ports:
@@ -28,6 +58,10 @@ services:
       - esdata:/usr/share/elasticsearch/data
 
 volumes:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
   esdata:
     driver: local
 

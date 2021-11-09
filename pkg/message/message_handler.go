@@ -12,7 +12,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
+	"github.com/Financial-Times/kafka-client-go/v2"
 	transactionid "github.com/Financial-Times/transactionid-utils-go"
 )
 
@@ -27,23 +27,35 @@ const (
 
 type ESClient func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error)
 
-type Handler struct {
-	esService       es.Service
-	messageConsumer consumer.MessageConsumer
-	Mapper          *mapper.Handler
-	httpClient      *http.Client
-	esClient        ESClient
-	log             *logger.UPPLogger
+type Consumer interface {
+	StartListening(messageHandler func(message kafka.FTMessage))
+	Close() error
+	ConnectivityCheck() error
 }
 
-func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, queueConfig consumer.QueueConfig, esClient ESClient, logger *logger.UPPLogger) *Handler {
-	indexer := &Handler{esService: service, Mapper: mapper, httpClient: httpClient, esClient: esClient, log: logger}
-	indexer.messageConsumer = consumer.NewConsumer(queueConfig, indexer.handleMessage, httpClient)
+type Handler struct {
+	esService  es.Service
+	consumer   Consumer
+	mapper     *mapper.Handler
+	httpClient *http.Client
+	esClient   ESClient
+	log        *logger.UPPLogger
+}
+
+func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, consumer Consumer, esClient ESClient, logger *logger.UPPLogger) *Handler {
+	indexer := &Handler{
+		esService:  service,
+		consumer:   consumer,
+		mapper:     mapper,
+		httpClient: httpClient,
+		esClient:   esClient,
+		log:        logger,
+	}
 	return indexer
 }
 
 func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
-	h.Mapper.BaseAPIURL = baseAPIURL
+	h.mapper.BaseAPIURL = baseAPIURL
 	go func() {
 		for {
 			ec, err := h.esClient(accessConfig, h.httpClient, h.log)
@@ -55,19 +67,21 @@ func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 			h.esService.SetClient(ec)
 			h.log.Info("Connected to Elasticsearch")
 			// this is a blocking method
-			h.messageConsumer.Start()
+			h.consumer.StartListening(h.handleMessage)
 			return
 		}
 	}()
 }
 
 func (h *Handler) Stop() {
-	if h.messageConsumer != nil {
-		h.messageConsumer.Stop()
+	if h.consumer != nil {
+		if err := h.consumer.Close(); err != nil {
+			h.log.WithError(err).Error("Failed closing consumer connection")
+		}
 	}
 }
 
-func (h *Handler) handleMessage(msg consumer.Message) {
+func (h *Handler) handleMessage(msg kafka.FTMessage) {
 	tid := msg.Headers[transactionIDHeader]
 	log := h.log.WithTransactionID(tid)
 
@@ -109,7 +123,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 		return
 	}
 
-	conceptType := h.Mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
+	conceptType := h.mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
 	if combinedPostPublicationEvent.Deleted {
 		_, err = h.esService.DeleteData(conceptType, uuid)
 		if err != nil {
@@ -125,7 +139,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 		return
 	}
 
-	payload := h.Mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
+	payload := h.mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
 
 	_, err = h.esService.WriteData(conceptType, uuid, payload)
 	if err != nil {
@@ -135,7 +149,7 @@ func (h *Handler) handleMessage(msg consumer.Message) {
 	log.WithMonitoringEvent("ContentWriteElasticsearch", tid, contentType).Info("Successfully saved")
 }
 
-func (h *Handler) readContentType(msg consumer.Message, event schema.EnrichedContent) string {
+func (h *Handler) readContentType(msg kafka.FTMessage, event schema.EnrichedContent) string {
 	typeHeader := msg.Headers[contentTypeHeader]
 	if strings.Contains(typeHeader, audioContentTypeHeader) || event.Content.Type == config.ContentTypeAudio {
 		return config.AudioType
@@ -143,7 +157,7 @@ func (h *Handler) readContentType(msg consumer.Message, event schema.EnrichedCon
 	if strings.Contains(typeHeader, articleContentTypeHeader) {
 		return config.ArticleType
 	}
-	contentMetadata := h.Mapper.Config.ContentMetadataMap
+	contentMetadata := h.mapper.Config.ContentMetadataMap
 	for _, identifier := range event.Content.Identifiers {
 		for _, t := range contentMetadata {
 			if t.Authority != "" && strings.Contains(identifier.Authority, t.Authority) {

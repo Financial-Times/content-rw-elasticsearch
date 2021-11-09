@@ -41,16 +41,14 @@ spec:
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
         - name: KAFKA_CONSUMER_GROUP
-          value: "k8s-{{ .Values.service.name }}"
+          value: {{ .Values.service.name }}
         - name: KAFKA_TOPIC
           value: {{ .Values.env.KAFKA_TOPIC }}
-        - name: KAFKA_CONCURRENT_PROCESSING
-          value: "{{ .Values.env.KAFKA_CONCURRENT_PROCESSING }}"
-        - name: KAFKA_PROXY_ADDR
+        - name: KAFKA_ADDR
           valueFrom:
             configMapKeyRef:
               name: global-config
-              key: kafka.proxy.url.with.protocol
+              key: msk.kafka.broker.url
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
