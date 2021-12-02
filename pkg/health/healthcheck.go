@@ -118,7 +118,16 @@ func (s *Service) schemaHealthyCheck() fthealth.Check {
 		PanicGuide:       "https://runbooks.in.ft.com/content-rw-elasticsearch",
 		Severity:         1,
 		TechnicalSummary: "Elasticsearch mapping does not match expected mapping. Please check index against the reference https://github.com/Financial-Times/content-rw-elasticsearch/blob/master/configs/referenceSchema.json",
-		Checker:          s.schemaChecker,
+		Checker: func() (string, error) {
+			status, err := s.schemaChecker()
+			if err != nil {
+				s.log.WithError(err).WithField("status", status).Error("Error verifying schema")
+			} else {
+				s.log.WithField("status", status).Info("Successfully verified schema")
+			}
+
+			return status, err
+		},
 	}
 }
 
