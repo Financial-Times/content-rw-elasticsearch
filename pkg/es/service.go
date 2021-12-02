@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Financial-Times/go-logger/v2"
 	"reflect"
 	"sync"
 
@@ -33,7 +34,7 @@ type Service interface {
 
 type HealthStatus interface {
 	GetClusterHealth() (*elastic.ClusterHealthResponse, error)
-	GetSchemaHealth() (string, error)
+	GetSchemaHealth(logger *logger.UPPLogger) (string, error)
 }
 
 func NewService(indexName string) Service {
@@ -48,7 +49,7 @@ func (s *ElasticsearchService) GetClusterHealth() (*elastic.ClusterHealthRespons
 	return s.ElasticClient.ClusterHealth().Do()
 }
 
-func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
+func (s *ElasticsearchService) GetSchemaHealth(log *logger.UPPLogger) (string, error) {
 	if referenceIndex == nil {
 		referenceIndex = new(elasticIndex)
 
@@ -96,6 +97,9 @@ func (s *ElasticsearchService) GetSchemaHealth() (string, error) {
 	}
 
 	if !reflect.DeepEqual(liveIndex[realIndexName].Settings, referenceIndex.index[s.IndexName].Settings) {
+		log.WithField("index_name", realIndexName).WithField("settings", liveIndex[realIndexName].Settings).Info("Live index settings")
+		log.WithField("index_name", s.IndexName).WithField("settings", referenceIndex.index[s.IndexName].Settings).Info("Reference index settings")
+
 		return "not ok, wrong settings", nil
 	}
 

@@ -132,7 +132,7 @@ func (s *Service) schemaHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) schemaChecker() (string, error) {
-	output, err := s.ESHealthService.GetSchemaHealth()
+	output, err := s.ESHealthService.GetSchemaHealth(s.log)
 	if err != nil {
 		return "Could not get schema: ", err
 	} else if output != "ok" {
