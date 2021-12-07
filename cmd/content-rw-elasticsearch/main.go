@@ -70,7 +70,7 @@ func main() {
 	})
 	kafkaAddress := app.String(cli.StringOpt{
 		Name:   "kafka-address",
-		Value:  "http://kafka:9092",
+		Value:  "kafka:9092",
 		Desc:   "Addresses used by the queue consumer to connect to Kafka",
 		EnvVar: "KAFKA_ADDR",
 	})
