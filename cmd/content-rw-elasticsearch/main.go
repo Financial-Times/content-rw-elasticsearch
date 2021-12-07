@@ -5,13 +5,6 @@ import (
 	"os"
 	"time"
 
-	cli "github.com/jawher/mow.cli"
-
-	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/message-queue-gonsumer/consumer"
-	"github.com/Financial-Times/upp-go-sdk/pkg/api"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
-
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
@@ -19,6 +12,11 @@ import (
 	pkghttp "github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
+	"github.com/Financial-Times/go-logger/v2"
+	"github.com/Financial-Times/kafka-client-go/v2"
+	"github.com/Financial-Times/upp-go-sdk/pkg/api"
+	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
+	cli "github.com/jawher/mow.cli"
 )
 
 func main() {
@@ -70,15 +68,15 @@ func main() {
 		Desc:   "The name of the elaticsearch index",
 		EnvVar: "ELASTICSEARCH_SAPI_INDEX",
 	})
-	kafkaProxyAddress := app.String(cli.StringOpt{
-		Name:   "kafka-proxy-address",
-		Value:  "http://localhost:8080",
-		Desc:   "Addresses used by the queue consumer to connect to the queue",
-		EnvVar: "KAFKA_PROXY_ADDR",
+	kafkaAddress := app.String(cli.StringOpt{
+		Name:   "kafka-address",
+		Value:  "kafka:9092",
+		Desc:   "Addresses used by the queue consumer to connect to Kafka",
+		EnvVar: "KAFKA_ADDR",
 	})
 	kafkaConsumerGroup := app.String(cli.StringOpt{
 		Name:   "kafka-consumer-group",
-		Value:  "default-consumer-group",
+		Value:  "content-rw-elasticsearch",
 		Desc:   "Group used to read the messages from the queue",
 		EnvVar: "KAFKA_CONSUMER_GROUP",
 	})
@@ -87,18 +85,6 @@ func main() {
 		Value:  "CombinedPostPublicationEvents",
 		Desc:   "The topic to read the messages from",
 		EnvVar: "KAFKA_TOPIC",
-	})
-	kafkaHeader := app.String(cli.StringOpt{
-		Name:   "kafka-header",
-		Value:  "kafka",
-		Desc:   "The header identifying the queue to read the messages from",
-		EnvVar: "KAFKA_HEADER",
-	})
-	kafkaConcurrentProcessing := app.Bool(cli.BoolOpt{
-		Name:   "kafka-concurrent-processing",
-		Value:  false,
-		Desc:   "Whether the consumer uses concurrent processing for the messages",
-		EnvVar: "KAFKA_CONCURRENT_PROCESSING",
 	})
 	publicConcordancesEndpoint := app.String(cli.StringOpt{
 		Name:   "public-concordances-endpoint",
@@ -134,14 +120,6 @@ func main() {
 		EnvVar: "API_BASIC_PASS",
 	})
 
-	queueConfig := consumer.QueueConfig{
-		Addrs:                []string{*kafkaProxyAddress},
-		Group:                *kafkaConsumerGroup,
-		Topic:                *kafkaTopic,
-		Queue:                *kafkaHeader,
-		ConcurrentProcessing: *kafkaConcurrentProcessing,
-	}
-
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
 
@@ -176,19 +154,27 @@ func main() {
 			internalContentClient,
 		)
 
+		consumerConfig := kafka.ConsumerConfig{
+			BrokersConnectionString: *kafkaAddress,
+			ConsumerGroup:           *kafkaConsumerGroup,
+			Topics:                  []string{*kafkaTopic},
+			Options:                 kafka.DefaultConsumerOptions(),
+		}
+		messageConsumer := kafka.NewConsumer(consumerConfig, log, time.Minute)
+
 		handler := message.NewMessageHandler(
 			esService,
 			mapperHandler,
 			httpClient,
-			queueConfig,
+			messageConsumer,
 			es.NewClient,
 			log,
 		)
 
 		handler.Start(*baseAPIUrl, accessConfig)
 
-		healthService := health.NewHealthService(&queueConfig, esService, httpClient, concordanceAPIService, *appSystemCode, log)
-		//
+		healthService := health.NewHealthService(messageConsumer, esService, httpClient, concordanceAPIService, *appSystemCode, log)
+
 		serveMux := http.NewServeMux()
 		serveMux = healthService.AttachHTTPEndpoints(serveMux, *appName, config.AppDescription)
 		pkghttp.StartServer(log, serveMux, *port)

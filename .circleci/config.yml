@@ -27,8 +27,8 @@ jobs:
           command: |
             GOPRIVATE="github.com/Financial-Times"
             git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
-            curl -sL https://deb.nodesource.com/setup_11.x | bash -
-            DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=11.\*
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
+            DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=14.\*
             npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@11.2.19
             rm -rf /var/lib/apt/lists/*
             GO111MODULE=off go get -u github.com/myitcv/gobin
