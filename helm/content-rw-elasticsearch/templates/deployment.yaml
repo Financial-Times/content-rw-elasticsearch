@@ -61,8 +61,6 @@ spec:
               key: aws.secret_access_key
         - name: PUBLIC_CONCORDANCES_ENDPOINT
           value: "{{ .Values.env.PUBLIC_CONCORDANCES_ENDPOINT }}"
-        - name: INTERNAL_CONTENT_API_URL
-          value: "{{ .Values.env.INTERNAL_CONTENT_API_URL }}"
         - name: "BASE_API_URL"
           valueFrom:
             configMapKeyRef:
