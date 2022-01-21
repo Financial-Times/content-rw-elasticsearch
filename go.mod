@@ -8,7 +8,6 @@ require (
 	github.com/Financial-Times/kafka-client-go/v2 v2.0.0
 	github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d
 	github.com/Financial-Times/transactionid-utils-go v0.2.0
-	github.com/Financial-Times/upp-go-sdk v0.0.7
 	github.com/gorilla/mux v1.8.0
 	github.com/jawher/mow.cli v1.0.4
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c

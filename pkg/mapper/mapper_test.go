@@ -2,8 +2,6 @@ package mapper
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
 	"testing"
 	"time"
 
@@ -11,14 +9,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/upp-go-sdk/pkg/api"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
-
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
+	"github.com/Financial-Times/go-logger/v2"
 )
 
 type concordanceAPIMock struct {
@@ -28,50 +23,6 @@ type concordanceAPIMock struct {
 func (m *concordanceAPIMock) GetConcepts(tid string, ids []string) (map[string]concept.Model, error) {
 	args := m.Called(tid, ids)
 	return args.Get(0).(map[string]concept.Model), args.Error(1)
-}
-
-var mainImageContent = `{"mainImage": {
-        "apiUrl": "https://test.api.ft.com/content/ad038207-bfe6-4805-a04c-864af12efef2",
-        "description": "Traffic on the M4 motorway near Datchet, Berkshire, on Monday",
-        "id": "https://test.api.ft.com/content/ad038207-bfe6-4805-a04c-864af12efef2",
-        "lastModified": "2020-04-27T10:50:44.186Z",
-        "members": [
-            {
-                "apiUrl": "https://test.api.ft.com/content/5546cbc4-d4f7-47f9-3f3e-941fb0799c4f",
-                "binaryUrl": "https://d1e00ek4ebabms.cloudfront.net/production/5546cbc4-d4f7-47f9-3f3e-941fb0799c4f.jpg",
-                "copyright": {
-                    "notice": "© PA"
-                },
-                "description": "Traffic on the M4 motorway near Datchet, Berkshire, on Monday",
-                "firstPublishedDate": "2020-04-27T10:50:35.897Z",
-                "id": "https://test.api.ft.com/content/f93fd066-380e-4f68-be63-c27f1fe2fddc",
-                "identifiers": [
-                    {
-                        "authority": "http://api.ft.com/system/cct",
-                        "identifierValue": "f93fd066-380e-4f68-be63-c27f1fe2fddc"
-                    }
-                ],
-                "lastModified": "2020-04-27T10:50:44.182Z",
-                "publishReference": "tid_cct_image_5546cbc4-d4f7-47f9-3f3e-941fb0799c4f_1587984635897",
-                "publishedDate": "2020-04-27T10:50:35.897Z",
-                "title": "Admiral announced last week that it would issue customers with a £25 refund per vehicle insured because lockdown restrictions mean fewer people are driving",
-                "type": "http://www.ft.com/ontology/content/Image"
-            }
-        ],
-        "publishReference": "tid_cct_imageSet_ad038207-bfe6-4805-a04c-864af12efef2_1587984635898",
-        "publishedDate": "2020-04-27T10:50:35.897Z",
-        "type": "http://www.ft.com/ontology/content/ImageSet"
-    }}`
-
-type clientMock struct {
-	sendRequestF func(req *api.Request) (*api.Response, error)
-}
-
-func (m *clientMock) SendRequest(req *api.Request) (*api.Response, error) {
-	if m.sendRequestF != nil {
-		return m.sendRequestF(req)
-	}
-	return nil, fmt.Errorf("not implemented")
 }
 
 func TestConvertToESContentModel(t *testing.T) {
@@ -120,17 +71,8 @@ func TestConvertToESContentModel(t *testing.T) {
 		log.Fatal(err)
 	}
 	concordanceAPIMock := new(concordanceAPIMock)
-	clientAPIMock := &clientMock{
-		sendRequestF: func(req *api.Request) (*api.Response, error) {
-			return &api.Response{
-				StatusCode: http.StatusOK,
-				Body:       mainImageContent,
-			}, nil
-		},
-	}
 
-	internalContentAPIClient := internalcontent.NewContentClient(clientAPIMock, "")
-	mapperHandler := NewMapperHandler(concordanceAPIMock, "http://api.ft.com", appConfig, log, internalContentAPIClient)
+	mapperHandler := NewMapperHandler(concordanceAPIMock, "http://api.ft.com", appConfig, log)
 
 	for _, test := range tests {
 		if test.inputFileConcordanceModel != "" {
