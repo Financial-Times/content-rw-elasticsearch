@@ -7,13 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
-
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/html"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
+	"github.com/Financial-Times/go-logger/v2"
 )
 
 const (
@@ -32,22 +30,20 @@ const (
 )
 
 type Handler struct {
-	ConceptReader  concept.Reader
-	BaseAPIURL     string
-	Config         config.AppConfig
-	log            *logger.UPPLogger
-	internalClient *internalcontent.ContentClient
+	ConceptReader concept.Reader
+	BaseAPIURL    string
+	Config        config.AppConfig
+	log           *logger.UPPLogger
 }
 
 var errNoAnnotation = errors.New("no annotation to be processed")
 
-func NewMapperHandler(reader concept.Reader, baseAPIURL string, appConfig config.AppConfig, logger *logger.UPPLogger, internalClient *internalcontent.ContentClient) *Handler {
+func NewMapperHandler(reader concept.Reader, baseAPIURL string, appConfig config.AppConfig, logger *logger.UPPLogger) *Handler {
 	return &Handler{
-		ConceptReader:  reader,
-		BaseAPIURL:     baseAPIURL,
-		Config:         appConfig,
-		log:            logger,
-		internalClient: internalClient,
+		ConceptReader: reader,
+		BaseAPIURL:    baseAPIURL,
+		Config:        appConfig,
+		log:           logger,
 	}
 }
 
@@ -225,16 +221,15 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 
 		log := h.log.WithTransactionID(tid).WithUUID(enrichedContent.UUID)
 
-		ic, err := h.internalClient.GetContent(enrichedContent.UUID, true)
-		if err != nil || len(ic.MainImage.Members) == 0 || ic.MainImage.Members[0].APIURL == "" {
-			log.WithError(err).Warnf("Couldn't get image UUID from %s", internalcontent.URLInternalContent)
+		if len(enrichedContent.InternalContent.MainImage.Members) == 0 || enrichedContent.InternalContent.MainImage.Members[0].APIURL == "" {
+			log.Warnf("Main image is not present or with empty apiUrl.")
 		} else {
-			uris := strings.Split(ic.MainImage.Members[0].APIURL, "/")
+			uris := strings.Split(enrichedContent.InternalContent.MainImage.Members[0].APIURL, "/")
 			if len(uris) > 0 {
 				imageUUID := uris[len(uris)-1]
 				*model.ThumbnailURL = strings.Replace(imageServiceURL, imagePlaceholder, imageUUID, -1)
 			} else {
-				log.WithError(err).Warnf("Couldn't get image UUID from %s", internalcontent.URLInternalContent)
+				log.Warnf("Couldn't get image UUID from apiUrl %q", enrichedContent.InternalContent.MainImage.Members[0].APIURL)
 			}
 		}
 	}

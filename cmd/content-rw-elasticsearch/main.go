@@ -14,8 +14,6 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v2"
-	"github.com/Financial-Times/upp-go-sdk/pkg/api"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
 	cli "github.com/jawher/mow.cli"
 )
 
@@ -99,27 +97,6 @@ func main() {
 		EnvVar: "BASE_API_URL",
 	})
 
-	internalContentAPIURL := app.String(cli.StringOpt{
-		Name:   "internal-content-api-url",
-		Value:  "http://internal-content-api:8080",
-		Desc:   "URL of the API uses to retrieve lists data from",
-		EnvVar: "INTERNAL_CONTENT_API_URL",
-	})
-
-	apiBasicAuthUsername := app.String(cli.StringOpt{
-		Name:   "api-basic-auth-user",
-		Value:  "",
-		Desc:   "API Basic Auth username",
-		EnvVar: "API_BASIC_USER",
-	})
-
-	apiBasicAuthPassword := app.String(cli.StringOpt{
-		Name:   "api-basic-auth-pass",
-		Value:  "",
-		Desc:   "API Basic Auth password",
-		EnvVar: "API_BASIC_PASS",
-	})
-
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
 
@@ -141,17 +118,11 @@ func main() {
 
 		concordanceAPIService := concept.NewConcordanceAPIService(*publicConcordancesEndpoint, httpClient)
 
-		// initialize apiClient
-		internalAPIConfig := api.NewConfig(*internalContentAPIURL, *apiBasicAuthUsername, *apiBasicAuthPassword)
-		internalContentAPIClient := api.NewClient(*internalAPIConfig, httpClient)
-		internalContentClient := internalcontent.NewContentClient(internalContentAPIClient, internalcontent.URLInternalContent)
-
 		mapperHandler := mapper.NewMapperHandler(
 			concordanceAPIService,
 			*baseAPIUrl,
 			appConfig,
 			log,
-			internalContentClient,
 		)
 
 		consumerConfig := kafka.ConsumerConfig{

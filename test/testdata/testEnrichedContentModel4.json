@@ -70,5 +70,47 @@
   ],
   "contentUri": "",
   "lastModified": "2018-04-25T11:09:11.199Z",
-  "deleted": false
+  "deleted": false,
+  "internalContent": {
+    "mainImage": {
+      "apiUrl": "https://api-t.ft.com/content/41f6b287-0460-4df4-96ec-820fc3b1f628",
+      "brands": [
+        "http://www.ft.com/thing/dbb0bdae-1f0c-11e4-b0cb-b2227cce2b54"
+      ],
+      "canBeSyndicated": "verify",
+      "description": "A man looks desperate on the phone",
+      "id": "https://api-t.ft.com/content/41f6b287-0460-4df4-96ec-820fc3b1f628",
+      "lastModified": "2022-01-18T16:01:05.061Z",
+      "members": [
+        {
+          "apiUrl": "https://api-t.ft.com/content/4831d979-377a-4f86-b1a2-97665e493f16",
+          "binaryUrl": "https://d1e00ek4ebabms.cloudfront.net/production/4831d979-377a-4f86-b1a2-97665e493f16.jpg",
+          "brands": [
+            "http://www.ft.com/thing/dbb0bdae-1f0c-11e4-b0cb-b2227cce2b54"
+          ],
+          "canBeSyndicated": "verify",
+          "copyright": {
+            "notice": "© Courtesy of Netflix"
+          },
+          "description": "A man looks desperate on the phone",
+          "firstPublishedDate": "2022-01-18T16:00:59.077Z",
+          "id": "https://api-t.ft.com/content/4831d979-377a-4f86-b1a2-97665e493f16",
+          "identifiers": [
+            {
+              "authority": "http://api.ft.com/system/cct",
+              "identifierValue": "4831d979-377a-4f86-b1a2-97665e493f16"
+            }
+          ],
+          "lastModified": "2022-01-18T16:01:05.063Z",
+          "publishReference": "tid_cct_image_4831d979-377a-4f86-b1a2-97665e493f16_1642521659077",
+          "publishedDate": "2022-01-18T16:00:59.077Z",
+          "title": "Jason Bateman as the preternaturally calm Marty",
+          "type": "http://www.ft.com/ontology/content/Image"
+        }
+      ],
+      "publishReference": "tid_cct_imageSet_41f6b287-0460-4df4-96ec-820fc3b1f628_1642521659078",
+      "publishedDate": "2022-01-18T16:00:59.078Z",
+      "type": "http://www.ft.com/ontology/content/ImageSet"
+    }
+  }
 }

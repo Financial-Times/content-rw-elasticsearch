@@ -17,8 +17,6 @@ import (
 	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v2"
-	"github.com/Financial-Times/upp-go-sdk/pkg/api"
-	"github.com/Financial-Times/upp-go-sdk/pkg/internalcontent"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/olivere/elastic.v2"
@@ -144,11 +142,7 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 		}
 	}
 
-	internalAPIConfig := api.NewConfig("internalContentAPIURL", "apiBasicAuthUsername", "apiBasicAuthPassword")
-	internalContentAPIClient := api.NewClient(*internalAPIConfig, http.DefaultClient)
-	internalContentClient := internalcontent.NewContentClient(internalContentAPIClient, internalcontent.URLInternalContent)
-
-	mapperHandler := mockMapperHandler(concordanceAPI, uppLogger, internalContentClient)
+	mapperHandler := mockMapperHandler(concordanceAPI, uppLogger)
 
 	var handler *Handler
 
@@ -161,9 +155,9 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 	return accessConfig, handler
 }
 
-func mockMapperHandler(concordanceAPIMock *concordanceAPIMock, log *logger.UPPLogger, internalClient *internalcontent.ContentClient) *mapper.Handler {
+func mockMapperHandler(concordanceAPIMock *concordanceAPIMock, log *logger.UPPLogger) *mapper.Handler {
 	appConfig := initAppConfig()
-	mapperHandler := mapper.NewMapperHandler(concordanceAPIMock, "http://api.ft.com", appConfig, log, internalClient)
+	mapperHandler := mapper.NewMapperHandler(concordanceAPIMock, "http://api.ft.com", appConfig, log)
 	return mapperHandler
 }
 

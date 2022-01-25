@@ -54,8 +54,6 @@ github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d 
 github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d/go.mod h1:7zULC9rrq6KxFkpB3Y5zNVaEwrf1g2m3dvXJBPDXyvM=
 github.com/Financial-Times/transactionid-utils-go v0.2.0 h1:YcET5Hd1fUGWWpQSVszYUlAc15ca8tmjRetUuQKRqEQ=
 github.com/Financial-Times/transactionid-utils-go v0.2.0/go.mod h1:tPAcAFs/dR6Q7hBDGNyUyixHRvg/n9NW/JTq8C58oZ0=
-github.com/Financial-Times/upp-go-sdk v0.0.7 h1:SzF7gvABbYuHGjNl4Macv4fHF1CSrUBByQSHogiQk9I=
-github.com/Financial-Times/upp-go-sdk v0.0.7/go.mod h1:1/Dnsqf8FQ0yOHKG8d/eM3X7rCeqDK4pouCFtp9pdmo=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shopify/sarama v1.30.0 h1:TOZL6r37xJBDEMLx4yjB77jxbZYXPaDow08TSK6vIL0=
 github.com/Shopify/sarama v1.30.0/go.mod h1:zujlQQx1kzHsh4jfV1USnptCQrHAEZ2Hk8fTKCulPVs=

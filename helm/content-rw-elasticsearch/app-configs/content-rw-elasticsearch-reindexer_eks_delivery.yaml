@@ -5,4 +5,3 @@ service:
 env:
   KAFKA_TOPIC: ForcedCombinedPostPublicationEvents
   PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080
-  INTERNAL_CONTENT_API_URL: http://internal-content-api:8080

@@ -88,13 +88,13 @@ type IndexModel struct {
 }
 
 type EnrichedContent struct {
-	UUID     string      `json:"uuid"`
-	Content  Content     `json:"content"`
-	Metadata Annotations `json:"metadata"`
-
-	ContentURI   string `json:"contentUri"`
-	LastModified string `json:"lastModified"`
-	Deleted      bool   `json:"deleted"`
+	UUID            string          `json:"uuid"`
+	Content         Content         `json:"content"`
+	Metadata        Annotations     `json:"metadata"`
+	InternalContent InternalContent `json:"internalContent"`
+	ContentURI      string          `json:"contentUri"`
+	LastModified    string          `json:"lastModified"`
+	Deleted         bool            `json:"deleted"`
 }
 
 type Content struct {
@@ -148,4 +148,18 @@ type ContentType struct {
 	Collection string
 	Format     string
 	Category   string
+}
+
+type InternalContent struct {
+	MainImage ImageSet   `json:"mainImage"`
+	Embeds    []ImageSet `json:"embeds"`
+}
+
+type ImageSet struct {
+	ID      string   `json:"id"`
+	Members []Member `json:"members"`
+}
+
+type Member struct {
+	APIURL string `json:"apiUrl"`
 }
