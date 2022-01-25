@@ -221,15 +221,15 @@ func (h *Handler) populateContentRelatedFields(model *schema.IndexModel, enriche
 
 		log := h.log.WithTransactionID(tid).WithUUID(enrichedContent.UUID)
 
-		if len(enrichedContent.InternalContent.MainImage.Members) == 0 || enrichedContent.InternalContent.MainImage.Members[0].ID == "" {
-			log.Warnf("Main image is not present or with empty ID.")
+		if len(enrichedContent.InternalContent.MainImage.Members) == 0 || enrichedContent.InternalContent.MainImage.Members[0].APIURL == "" {
+			log.Warnf("Main image is not present or with empty apiUrl.")
 		} else {
-			uris := strings.Split(enrichedContent.InternalContent.MainImage.Members[0].ID, "/")
+			uris := strings.Split(enrichedContent.InternalContent.MainImage.Members[0].APIURL, "/")
 			if len(uris) > 0 {
 				imageUUID := uris[len(uris)-1]
 				*model.ThumbnailURL = strings.Replace(imageServiceURL, imagePlaceholder, imageUUID, -1)
 			} else {
-				log.Warnf("Couldn't get image UUID from ID %q", enrichedContent.InternalContent.MainImage.Members[0].ID)
+				log.Warnf("Couldn't get image UUID from apiUrl %q", enrichedContent.InternalContent.MainImage.Members[0].APIURL)
 			}
 		}
 	}

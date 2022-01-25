@@ -161,17 +161,5 @@ type ImageSet struct {
 }
 
 type Member struct {
-	ID               string `json:"id"`
-	Type             string `json:"type"`
-	Title            string `json:"title"`
-	BinaryURL        string `json:"binaryUrl"`
-	Description      string `json:"description"`
-	CanBeSyndicated  string `json:"canBeSyndicated"`
-	CanBeDistributed string `json:"canBeDistributed"`
-	RightsGroup      string `json:"rightsGroup"`
-	Copyright        struct {
-		Notice string `json:"notice"`
-	} `json:"copyright"`
-	MaxDisplayWidth string `json:"maxDisplayWidth"`
-	MinDisplayWidth string `json:"minDisplayWidth"`
+	APIURL string `json:"apiUrl"`
 }
