@@ -22,7 +22,7 @@
       },
       "mapping": {
         "total_fields": {
-          "limit": 12000
+          "limit": "12000"
         }
       }
     }
@@ -41,7 +41,7 @@
       },
       "body": {
         "type": "text",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "scoop": {
         "type": "boolean"
@@ -56,18 +56,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "category": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -75,18 +73,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_authors_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -94,18 +90,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_brands_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -113,18 +107,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_companynames_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -132,18 +124,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_genre_id": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -151,18 +141,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_icb_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -170,18 +158,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_iptc_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -189,18 +175,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_mediatype_id": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -208,18 +192,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_orgnames_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -227,18 +209,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_people_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -246,8 +226,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -255,8 +234,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -264,8 +242,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -273,8 +250,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -282,18 +258,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_regions_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -301,18 +275,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_sections_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -320,18 +292,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_specialreports_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -339,18 +309,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_subjects_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -358,18 +326,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "cmr_topics_ids": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -389,18 +355,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "companynamesid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -408,8 +372,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -417,8 +380,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -429,7 +391,7 @@
       "datelastpublished": {
         "type": "date",
         "format": "dateOptionalTime",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "displayCodeNames": {
         "type": "text"
@@ -444,8 +406,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -461,28 +422,25 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "icb": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "icbid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -501,18 +459,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "iptcid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -528,11 +484,10 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "length_millis": {
         "type": "long"
@@ -563,38 +518,35 @@
       },
       "pagecontentbody": {
         "type": "text",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "pagecontentbyline": {
         "type": "text",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "pagecontentheadline": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "people": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "peopleid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -602,8 +554,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -617,18 +568,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "regionsid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -639,18 +588,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "sectionsid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -661,8 +608,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -672,22 +618,21 @@
       },
       "ssfturl": {
         "type": "text",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "sspagekeywords": {
         "type": "text",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "sspagename": {
         "type": "text",
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "story_id": {
         "type": "long",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -695,8 +640,7 @@
         "type": "long",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -704,18 +648,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "subjectsid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -723,8 +665,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -732,18 +673,16 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         },
-        "copy_to": "meta_all_fields"
+        "copy_to": ["meta_all_fields"]
       },
       "topicsid": {
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -751,8 +690,7 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
@@ -760,14 +698,12 @@
         "type": "text",
         "fields": {
           "raw": {
-            "type": "keyword",
-            "index": true
+            "type": "keyword"
           }
         }
       },
       "meta_all_fields": {
-        "type": "text",
-        "index": true
+        "type": "text"
       }
     }
   }

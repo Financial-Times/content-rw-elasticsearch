@@ -93,6 +93,7 @@ func (s *ElasticsearchService) GetSchemaHealth(ctx context.Context) (string, err
 		delete(settings, "uuid")
 		delete(settings, "version")
 		delete(settings, "created")
+		delete(settings, "provided_name")
 	}
 
 	if !reflect.DeepEqual(liveIndex[realIndexName].Settings, referenceIndex.index[s.IndexName].Settings) {
