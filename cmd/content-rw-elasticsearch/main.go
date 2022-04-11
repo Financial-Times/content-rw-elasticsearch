@@ -13,7 +13,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v2"
+	"github.com/Financial-Times/kafka-client-go/v3"
 	cli "github.com/jawher/mow.cli"
 )
 
@@ -51,7 +51,7 @@ func main() {
 	})
 	secretKey := app.String(cli.StringOpt{
 		Name:   "aws-secret-access-key",
-		Desc:   "AWS SECRET ACCES KEY",
+		Desc:   "AWS SECRET ACCESS KEY",
 		EnvVar: "AWS_SECRET_ACCESS_KEY",
 	})
 	esEndpoint := app.String(cli.StringOpt{
@@ -63,7 +63,7 @@ func main() {
 	indexName := app.String(cli.StringOpt{
 		Name:   "index-name",
 		Value:  "ft",
-		Desc:   "The name of the elaticsearch index",
+		Desc:   "The name of the elasticsearch index",
 		EnvVar: "ELASTICSEARCH_SAPI_INDEX",
 	})
 	kafkaAddress := app.String(cli.StringOpt{
@@ -83,6 +83,16 @@ func main() {
 		Value:  "CombinedPostPublicationEvents",
 		Desc:   "The topic to read the messages from",
 		EnvVar: "KAFKA_TOPIC",
+	})
+	kafkaTopicOffsetFetchInterval := app.Int(cli.IntOpt{
+		Name:   "kafka-topic-offset-fetch-interval",
+		Desc:   "Interval (in minutes) between each offset fetching request",
+		EnvVar: "KAFKA_TOPIC_OFFSET_FETCH_INTERVAL",
+	})
+	kafkaLagTolerance := app.Int(cli.IntOpt{
+		Name:   "kafka-topic-lag-tolerance",
+		Desc:   "Lag tolerance (in number of messages) used for monitoring the Kafka consumer",
+		EnvVar: "KAFKA_TOPIC_LAG_TOLERANCE",
 	})
 	publicConcordancesEndpoint := app.String(cli.StringOpt{
 		Name:   "public-concordances-endpoint",
@@ -115,23 +125,20 @@ func main() {
 		}
 
 		esService := es.NewService(*indexName)
-
 		concordanceAPIService := concept.NewConcordanceAPIService(*publicConcordancesEndpoint, httpClient)
-
-		mapperHandler := mapper.NewMapperHandler(
-			concordanceAPIService,
-			*baseAPIUrl,
-			appConfig,
-			log,
-		)
+		mapperHandler := mapper.NewMapperHandler(concordanceAPIService, *baseAPIUrl, appConfig, log)
 
 		consumerConfig := kafka.ConsumerConfig{
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
-			Topics:                  []string{*kafkaTopic},
+			ConnectionRetryInterval: time.Minute,
+			OffsetFetchInterval:     time.Duration(*kafkaTopicOffsetFetchInterval) * time.Minute,
 			Options:                 kafka.DefaultConsumerOptions(),
 		}
-		messageConsumer := kafka.NewConsumer(consumerConfig, log, time.Minute)
+		topics := []*kafka.Topic{
+			kafka.NewTopic(*kafkaTopic, kafka.WithLagTolerance(int64(*kafkaLagTolerance))),
+		}
+		messageConsumer := kafka.NewConsumer(consumerConfig, topics, log)
 
 		handler := message.NewMessageHandler(
 			esService,

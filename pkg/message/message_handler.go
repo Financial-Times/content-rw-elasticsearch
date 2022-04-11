@@ -12,7 +12,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v2"
+	"github.com/Financial-Times/kafka-client-go/v3"
 	transactionid "github.com/Financial-Times/transactionid-utils-go"
 )
 
@@ -28,9 +28,10 @@ const (
 type ESClient func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error)
 
 type Consumer interface {
-	StartListening(messageHandler func(message kafka.FTMessage))
+	Start(messageHandler func(message kafka.FTMessage))
 	Close() error
 	ConnectivityCheck() error
+	MonitorCheck() error
 }
 
 type Handler struct {
@@ -67,7 +68,7 @@ func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 			h.esService.SetClient(ec)
 			h.log.Info("Connected to Elasticsearch")
 			// this is a blocking method
-			h.consumer.StartListening(h.handleMessage)
+			h.consumer.Start(h.handleMessage)
 			return
 		}
 	}()

@@ -44,6 +44,7 @@ func NewHealthService(consumer message.Consumer, esHealthService es.HealthStatus
 		service.connectivityHealthyCheck(),
 		service.schemaHealthyCheck(),
 		service.kafkaConnectivityCheck(),
+		service.kafkaMonitoringCheck(),
 		service.checkConcordanceAPI(),
 	}
 	return service
@@ -138,7 +139,7 @@ func (s *Service) kafkaConnectivityCheck() fthealth.Check {
 		Name:             "Check Kafka connectivity",
 		PanicGuide:       panicGuide,
 		Severity:         1,
-		TechnicalSummary: "Messages couldn't be read from the queue. Check if Kafka is reachable.",
+		TechnicalSummary: "Establishing Kafka connection failed. Check if Kafka is reachable.",
 		Checker:          s.kafkaConnectivityChecker,
 	}
 }
@@ -146,9 +147,28 @@ func (s *Service) kafkaConnectivityCheck() fthealth.Check {
 func (s *Service) kafkaConnectivityChecker() (string, error) {
 	err := s.ConsumerInstance.ConnectivityCheck()
 	if err != nil {
-		return "Could not connect to Kafka", err
+		return "", err
 	}
 	return "Successfully connected to Kafka", nil
+}
+
+func (s *Service) kafkaMonitoringCheck() fthealth.Check {
+	return fthealth.Check{
+		ID:               s.AppSystemCode,
+		BusinessImpact:   "Consumer is lagging behind when reading messages. Indexing of content is delayed.",
+		Name:             "Check Kafka consumer status",
+		PanicGuide:       panicGuide,
+		Severity:         3,
+		TechnicalSummary: "Messages awaiting handling exceed the configured lag tolerance. Check if Kafka consumer is stuck.",
+		Checker:          s.kafkaMonitoringChecker,
+	}
+}
+
+func (s *Service) kafkaMonitoringChecker() (string, error) {
+	if err := s.ConsumerInstance.MonitorCheck(); err != nil {
+		return "", err
+	}
+	return "Kafka consumer status is healthy", nil
 }
 
 func (s *Service) checkConcordanceAPI() fthealth.Check {

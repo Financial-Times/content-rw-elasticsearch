@@ -4,4 +4,6 @@ service:
   name: content-rw-elasticsearch
 env:
   KAFKA_TOPIC: CombinedPostPublicationEvents
+  KAFKA_TOPIC_OFFSET_FETCH_INTERVAL: 3
+  KAFKA_TOPIC_LAG_TOLERANCE: 250
   PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080
