@@ -211,8 +211,8 @@ func TestStartClientError(t *testing.T) {
 	expect.NotNil(handler.esService, "Elastic Service should be initialized")
 	expect.Equal("index", handler.esService.(*es.ElasticsearchService).IndexName, "Wrong index")
 	expect.Nil(handler.esService.(*es.ElasticsearchService).ElasticClient, "Elastic client should not be initialized")
-	expect.Error(handler.consumer.ConnectivityCheck(), "queue error")
-	expect.Error(handler.consumer.ConnectivityCheck(), "monitor error")
+	expect.EqualError(handler.consumer.ConnectivityCheck(), "queue error")
+	expect.EqualError(handler.consumer.MonitorCheck(), "monitor error")
 }
 
 func TestHandleWriteMessage(t *testing.T) {
