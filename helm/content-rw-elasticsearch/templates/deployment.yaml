@@ -44,6 +44,10 @@ spec:
           value: {{ .Values.service.name }}
         - name: KAFKA_TOPIC
           value: {{ .Values.env.KAFKA_TOPIC }}
+        - name: KAFKA_TOPIC_OFFSET_FETCH_INTERVAL
+          value: "{{ .Values.env.KAFKA_TOPIC_OFFSET_FETCH_INTERVAL }}"
+        - name: KAFKA_TOPIC_LAG_TOLERANCE
+          value: "{{ .Values.env.KAFKA_TOPIC_LAG_TOLERANCE }}"
         - name: KAFKA_ADDR
           valueFrom:
             configMapKeyRef:

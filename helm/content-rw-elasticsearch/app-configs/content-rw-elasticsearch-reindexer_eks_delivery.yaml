@@ -4,4 +4,6 @@ service:
   name: content-rw-elasticsearch-reindexer
 env:
   KAFKA_TOPIC: ForcedCombinedPostPublicationEvents
+  KAFKA_TOPIC_OFFSET_FETCH_INTERVAL: 10
+  KAFKA_TOPIC_LAG_TOLERANCE: 2000
   PUBLIC_CONCORDANCES_ENDPOINT: http://public-concordances-api:8080

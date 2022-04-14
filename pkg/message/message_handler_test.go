@@ -16,7 +16,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
 	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v2"
+	"github.com/Financial-Times/kafka-client-go/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"gopkg.in/olivere/elastic.v2"
@@ -104,7 +104,7 @@ type consumerMock struct {
 	mock.Mock
 }
 
-func (c *consumerMock) StartListening(messageHandler func(message kafka.FTMessage)) {
+func (c *consumerMock) Start(messageHandler func(message kafka.FTMessage)) {
 	c.Called(messageHandler)
 }
 
@@ -114,6 +114,11 @@ func (c *consumerMock) Close() error {
 }
 
 func (c *consumerMock) ConnectivityCheck() error {
+	args := c.Called()
+	return args.Error(0)
+}
+
+func (c *consumerMock) MonitorCheck() error {
 	args := c.Called()
 	return args.Error(0)
 }
@@ -173,7 +178,7 @@ func TestStartClient(t *testing.T) {
 	expect := assert.New(t)
 
 	consumer := &consumerMock{}
-	consumer.On("StartListening", mock.AnythingOfType("func(kafka.FTMessage)")).Return()
+	consumer.On("Start", mock.AnythingOfType("func(kafka.FTMessage)")).Return()
 	consumer.On("Close").Return(nil)
 
 	accessConfig, handler := mockMessageHandler(defaultESClient, consumer)
@@ -191,8 +196,9 @@ func TestStartClientError(t *testing.T) {
 	expect := assert.New(t)
 
 	consumer := &consumerMock{}
-	consumer.On("StartListening", mock.AnythingOfType("func(kafka.FTMessage)")).Return()
+	consumer.On("Start", mock.AnythingOfType("func(kafka.FTMessage)")).Return()
 	consumer.On("ConnectivityCheck").Return(fmt.Errorf("queue error"))
+	consumer.On("MonitorCheck").Return(fmt.Errorf("monitor error"))
 	consumer.On("Close").Return(nil)
 
 	accessConfig, handler := mockMessageHandler(errorESClient, consumer)
@@ -205,7 +211,8 @@ func TestStartClientError(t *testing.T) {
 	expect.NotNil(handler.esService, "Elastic Service should be initialized")
 	expect.Equal("index", handler.esService.(*es.ElasticsearchService).IndexName, "Wrong index")
 	expect.Nil(handler.esService.(*es.ElasticsearchService).ElasticClient, "Elastic client should not be initialized")
-	expect.Error(handler.consumer.ConnectivityCheck(), "queue error")
+	expect.EqualError(handler.consumer.ConnectivityCheck(), "queue error")
+	expect.EqualError(handler.consumer.MonitorCheck(), "monitor error")
 }
 
 func TestHandleWriteMessage(t *testing.T) {
