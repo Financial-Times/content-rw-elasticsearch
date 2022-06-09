@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/Financial-Times/go-fthealth v0.0.0-20180807113633-3d8eb430d5b5
 	github.com/Financial-Times/go-logger/v2 v2.0.1
-	github.com/Financial-Times/kafka-client-go/v3 v3.0.2
+	github.com/Financial-Times/kafka-client-go/v3 v3.0.4
 	github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d
 	github.com/Financial-Times/transactionid-utils-go v0.2.0
 	github.com/gorilla/mux v1.8.0
