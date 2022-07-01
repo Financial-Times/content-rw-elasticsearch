@@ -10,12 +10,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
-	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
+	testdata "github.com/Financial-Times/content-rw-elasticsearch/v4/test"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
 	"github.com/olivere/elastic/v7"
@@ -219,7 +219,7 @@ func TestStartClientError(t *testing.T) {
 func TestHandleWriteMessage(t *testing.T) {
 	expect := assert.New(t)
 
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
@@ -245,7 +245,7 @@ func TestHandleWriteMessage(t *testing.T) {
 func TestHandleWriteMessageFromBodyXML(t *testing.T) {
 	expect := assert.New(t)
 
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModelWithBodyXML.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModelWithBodyXML.json")
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
@@ -330,7 +330,7 @@ func TestHandleWriteMessageAudio(t *testing.T) {
 
 func TestHandleWriteMessageAudioWithoutHeader(t *testing.T) {
 
-	inputJSON := tst.ReadTestResource("exampleAudioModel.json")
+	inputJSON := testdata.ReadTestResource("exampleAudioModel.json")
 	input := strings.Replace(string(inputJSON), "FTCOM-METHODE", "NEXT-VIDEO-EDITOR", 1)
 
 	serviceMock := &esServiceMock{}
@@ -363,7 +363,7 @@ func TestHandleWriteMessageArticleByHeaderType(t *testing.T) {
 }
 
 func TestHandleWriteMessageUnknownType(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 
 	input := strings.Replace(string(inputJSON), `"Article"`, `"Content"`, 1)
 
@@ -378,7 +378,7 @@ func TestHandleWriteMessageUnknownType(t *testing.T) {
 }
 
 func TestHandleWriteMessageNoUUIDForMetadataPublish(t *testing.T) {
-	inputJSON := tst.ReadTestResource("testEnrichedContentModel3.json")
+	inputJSON := testdata.ReadTestResource("testEnrichedContentModel3.json")
 
 	serviceMock := &esServiceMock{}
 
@@ -409,7 +409,7 @@ func TestHandleWriteMessageNoType(t *testing.T) {
 }
 
 func TestHandleWriteMessageError(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 
 	serviceMock := &esServiceMock{}
 	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, elastic.ErrTimeout)
@@ -425,7 +425,7 @@ func TestHandleWriteMessageError(t *testing.T) {
 }
 
 func TestHandleDeleteMessage(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 	input := strings.Replace(string(inputJSON), `"deleted": false`, `"deleted": true`, 1)
 
 	serviceMock := &esServiceMock{}
@@ -438,7 +438,7 @@ func TestHandleDeleteMessage(t *testing.T) {
 }
 
 func TestHandleDeleteMessageError(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 	input := strings.Replace(string(inputJSON), `"deleted": false`, `"deleted": true`, 1)
 
 	serviceMock := &esServiceMock{}
@@ -509,7 +509,7 @@ func TestHandlePACMessageWithSparkContent(t *testing.T) {
 }
 
 func modifyTestInputAuthority(replacement string) string {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 	input := strings.Replace(string(inputJSON), "FTCOM-METHODE", replacement, 1)
 	return input
 }

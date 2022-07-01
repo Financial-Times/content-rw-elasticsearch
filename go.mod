@@ -1,4 +1,4 @@
-module github.com/Financial-Times/content-rw-elasticsearch/v2
+module github.com/Financial-Times/content-rw-elasticsearch/v4
 
 go 1.17
 

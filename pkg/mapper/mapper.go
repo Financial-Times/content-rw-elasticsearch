@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/html"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/html"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
 )
 
