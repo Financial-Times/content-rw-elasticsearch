@@ -18,3 +18,4 @@ env:
   KAFKA_TOPIC: ""
   PUBLIC_CONCORDANCES_ENDPOINT: ""
   ELASTICSEARCH_SAPI_INDEX: "ft-v1"
+serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount
