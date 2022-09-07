@@ -1,6 +1,7 @@
 package message
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,42 +10,42 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
-	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
+	testdata "github.com/Financial-Times/content-rw-elasticsearch/v4/test"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"gopkg.in/olivere/elastic.v2"
 )
 
 type esServiceMock struct {
 	mock.Mock
 }
 
-func (*esServiceMock) GetSchemaHealth() (string, error) {
+func (*esServiceMock) GetSchemaHealth(ctx context.Context) (string, error) {
 	panic("implement me")
 }
 
-func (s *esServiceMock) WriteData(conceptType string, uuid string, payload interface{}) (*elastic.IndexResult, error) {
-	args := s.Called(conceptType, uuid, payload)
-	return args.Get(0).(*elastic.IndexResult), args.Error(1)
+func (s *esServiceMock) WriteData(ctx context.Context, uuid string, payload interface{}) (*elastic.IndexResponse, error) {
+	args := s.Called(uuid, payload)
+	return args.Get(0).(*elastic.IndexResponse), args.Error(1)
 }
 
-func (s *esServiceMock) DeleteData(conceptType string, uuid string) (*elastic.DeleteResult, error) {
-	args := s.Called(conceptType, uuid)
-	return args.Get(0).(*elastic.DeleteResult), args.Error(1)
+func (s *esServiceMock) DeleteData(ctx context.Context, uuid string) (*elastic.DeleteResponse, error) {
+	args := s.Called(uuid)
+	return args.Get(0).(*elastic.DeleteResponse), args.Error(1)
 }
 
 func (s *esServiceMock) SetClient(client es.Client) {
 
 }
 
-func (s *esServiceMock) GetClusterHealth() (*elastic.ClusterHealthResponse, error) {
+func (s *esServiceMock) GetClusterHealth(ctx context.Context) (*elastic.ClusterHealthResponse, error) {
 	args := s.Called()
 	return args.Get(0).(*elastic.ClusterHealthResponse), args.Error(1)
 }
@@ -53,7 +54,7 @@ type elasticClientMock struct {
 	mock.Mock
 }
 
-func (c *elasticClientMock) IndexGet() *elastic.IndicesGetService {
+func (c *elasticClientMock) IndexGet(indices ...string) *elastic.IndicesGetService {
 	args := c.Called()
 	return args.Get(0).(*elastic.IndicesGetService)
 }
@@ -218,10 +219,10 @@ func TestStartClientError(t *testing.T) {
 func TestHandleWriteMessage(t *testing.T) {
 	expect := assert.New(t)
 
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -230,7 +231,7 @@ func TestHandleWriteMessage(t *testing.T) {
 
 	expect.Equal(1, len(serviceMock.Calls))
 
-	data := serviceMock.Calls[0].Arguments.Get(2)
+	data := serviceMock.Calls[0].Arguments.Get(1)
 	model, ok := data.(schema.IndexModel)
 	if !ok {
 		expect.Fail("Result is not content.IndexModel")
@@ -244,10 +245,10 @@ func TestHandleWriteMessage(t *testing.T) {
 func TestHandleWriteMessageFromBodyXML(t *testing.T) {
 	expect := assert.New(t)
 
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModelWithBodyXML.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModelWithBodyXML.json")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -256,7 +257,7 @@ func TestHandleWriteMessageFromBodyXML(t *testing.T) {
 
 	expect.Equal(1, len(serviceMock.Calls))
 
-	data := serviceMock.Calls[0].Arguments.Get(2)
+	data := serviceMock.Calls[0].Arguments.Get(1)
 	model, ok := data.(schema.IndexModel)
 	if !ok {
 		expect.Fail("Result is not content.IndexModel")
@@ -271,7 +272,7 @@ func TestHandleWriteMessageBlog(t *testing.T) {
 	input := modifyTestInputAuthority("FT-LABS-WP1234")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTBlogs", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -286,7 +287,7 @@ func TestHandleWriteMessageBlogWithHeader(t *testing.T) {
 	input := modifyTestInputAuthority("invalid")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTBlogs", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -301,7 +302,7 @@ func TestHandleWriteMessageVideo(t *testing.T) {
 	input := modifyTestInputAuthority("NEXT-VIDEO-EDITOR")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTVideos", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -316,7 +317,7 @@ func TestHandleWriteMessageAudio(t *testing.T) {
 	input := modifyTestInputAuthority("NEXT-VIDEO-EDITOR")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTPodcasts", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -329,11 +330,11 @@ func TestHandleWriteMessageAudio(t *testing.T) {
 
 func TestHandleWriteMessageAudioWithoutHeader(t *testing.T) {
 
-	inputJSON := tst.ReadTestResource("exampleAudioModel.json")
+	inputJSON := testdata.ReadTestResource("exampleAudioModel.json")
 	input := strings.Replace(string(inputJSON), "FTCOM-METHODE", "NEXT-VIDEO-EDITOR", 1)
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTPodcasts", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 
 	concordanceAPIMock := new(concordanceAPIMock)
 
@@ -350,7 +351,7 @@ func TestHandleWriteMessageArticleByHeaderType(t *testing.T) {
 	input := modifyTestInputAuthority("invalid")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -362,7 +363,7 @@ func TestHandleWriteMessageArticleByHeaderType(t *testing.T) {
 }
 
 func TestHandleWriteMessageUnknownType(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 
 	input := strings.Replace(string(inputJSON), `"Article"`, `"Content"`, 1)
 
@@ -371,13 +372,13 @@ func TestHandleWriteMessageUnknownType(t *testing.T) {
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Body: input})
 
-	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything)
-	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, "aae9611e-f66c-4fe4-a6c6-2e2bdea69060")
+	serviceMock.AssertNotCalled(t, "WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything)
+	serviceMock.AssertNotCalled(t, "DeleteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060")
 	serviceMock.AssertExpectations(t)
 }
 
 func TestHandleWriteMessageNoUUIDForMetadataPublish(t *testing.T) {
-	inputJSON := tst.ReadTestResource("testEnrichedContentModel3.json")
+	inputJSON := testdata.ReadTestResource("testEnrichedContentModel3.json")
 
 	serviceMock := &esServiceMock{}
 
@@ -390,8 +391,8 @@ func TestHandleWriteMessageNoUUIDForMetadataPublish(t *testing.T) {
 		},
 	})
 
-	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, "b17756fe-0f62-4cf1-9deb-ca7a2ff80172", mock.Anything)
-	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, "b17756fe-0f62-4cf1-9deb-ca7a2ff80172")
+	serviceMock.AssertNotCalled(t, "WriteData", "b17756fe-0f62-4cf1-9deb-ca7a2ff80172", mock.Anything)
+	serviceMock.AssertNotCalled(t, "DeleteData", "b17756fe-0f62-4cf1-9deb-ca7a2ff80172")
 	serviceMock.AssertExpectations(t)
 }
 
@@ -403,15 +404,15 @@ func TestHandleWriteMessageNoType(t *testing.T) {
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Body: input})
 
-	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
-	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything)
 }
 
 func TestHandleWriteMessageError(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, elastic.ErrTimeout)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, elastic.ErrTimeout)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -424,11 +425,11 @@ func TestHandleWriteMessageError(t *testing.T) {
 }
 
 func TestHandleDeleteMessage(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 	input := strings.Replace(string(inputJSON), `"deleted": false`, `"deleted": true`, 1)
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("DeleteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResult{}, nil)
+	serviceMock.On("DeleteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResponse{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Body: input})
@@ -437,12 +438,12 @@ func TestHandleDeleteMessage(t *testing.T) {
 }
 
 func TestHandleDeleteMessageError(t *testing.T) {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 	input := strings.Replace(string(inputJSON), `"deleted": false`, `"deleted": true`, 1)
 
 	serviceMock := &esServiceMock{}
 
-	serviceMock.On("DeleteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResult{}, elastic.ErrTimeout)
+	serviceMock.On("DeleteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060").Return(&elastic.DeleteResponse{}, elastic.ErrTimeout)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Body: input})
@@ -455,8 +456,8 @@ func TestHandleMessageJsonError(t *testing.T) {
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Body: "malformed json"})
 
-	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
-	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything)
 }
 
 func TestHandleSyntheticMessage(t *testing.T) {
@@ -464,8 +465,8 @@ func TestHandleSyntheticMessage(t *testing.T) {
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Headers: map[string]string{"X-Request-Id": "SYNTHETIC-REQ-MON_WuLjbRpCgh"}})
 
-	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
-	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything)
 }
 
 func TestHandlePACMessage(t *testing.T) {
@@ -473,15 +474,15 @@ func TestHandlePACMessage(t *testing.T) {
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
 	handler.handleMessage(kafka.FTMessage{Headers: map[string]string{"Origin-System-Id": config.PACOrigin}, Body: "{}"})
 
-	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything, mock.Anything)
-	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything)
+	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything)
 }
 
 func TestHandlePACMessageWithOldSparkContent(t *testing.T) {
 	input := modifyTestInputAuthority("cct")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -496,7 +497,7 @@ func TestHandlePACMessageWithSparkContent(t *testing.T) {
 	input := modifyTestInputAuthority("spark")
 
 	serviceMock := &esServiceMock{}
-	serviceMock.On("WriteData", "FTCom", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResult{}, nil)
+	serviceMock.On("WriteData", "aae9611e-f66c-4fe4-a6c6-2e2bdea69060", mock.Anything).Return(&elastic.IndexResponse{}, nil)
 	concordanceAPIMock := new(concordanceAPIMock)
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
@@ -508,7 +509,7 @@ func TestHandlePACMessageWithSparkContent(t *testing.T) {
 }
 
 func modifyTestInputAuthority(replacement string) string {
-	inputJSON := tst.ReadTestResource("exampleEnrichedContentModel.json")
+	inputJSON := testdata.ReadTestResource("exampleEnrichedContentModel.json")
 	input := strings.Replace(string(inputJSON), "FTCOM-METHODE", replacement, 1)
 	return input
 }

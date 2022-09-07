@@ -3,13 +3,13 @@ package config
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	"github.com/spf13/viper"
 )
 
@@ -102,5 +102,5 @@ func ReadConfigFile(fileName string) ([]byte, error) {
 	}
 	defer file.Close()
 
-	return ioutil.ReadAll(file)
+	return io.ReadAll(file)
 }

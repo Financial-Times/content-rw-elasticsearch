@@ -1,16 +1,17 @@
 package message
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/es"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/mapper"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/es"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
 	transactionid "github.com/Financial-Times/transactionid-utils-go"
@@ -124,9 +125,8 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 		return
 	}
 
-	conceptType := h.mapper.Config.ESContentTypeMetadataMap.Get(contentType).Collection
 	if combinedPostPublicationEvent.Deleted {
-		_, err = h.esService.DeleteData(conceptType, uuid)
+		_, err = h.esService.DeleteData(context.Background(), uuid)
 		if err != nil {
 			log.WithError(err).Error("Failed to delete indexed content")
 			return
@@ -142,7 +142,7 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 
 	payload := h.mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
 
-	_, err = h.esService.WriteData(conceptType, uuid, payload)
+	_, err = h.esService.WriteData(context.Background(), uuid, payload)
 	if err != nil {
 		log.WithError(err).Error("Failed to index content")
 		return

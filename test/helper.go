@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
 )
 
 func getResourceFilePath(resourceFilePath string) string {

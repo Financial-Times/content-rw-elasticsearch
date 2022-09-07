@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/Financial-Times/go-logger/v2"
+	"github.com/olivere/elastic/v7"
 	awsauth "github.com/smartystreets/go-aws-auth"
-	"gopkg.in/olivere/elastic.v2"
 )
 
 type Client interface {
@@ -13,7 +13,7 @@ type Client interface {
 	Index() *elastic.IndexService
 	Get() *elastic.GetService
 	Delete() *elastic.DeleteService
-	IndexGet() *elastic.IndicesGetService
+	IndexGet(indices ...string) *elastic.IndicesGetService
 }
 
 type AccessConfig struct {

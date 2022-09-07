@@ -5,15 +5,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/concept"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
+	testdata "github.com/Financial-Times/content-rw-elasticsearch/v4/test"
+	"github.com/Financial-Times/go-logger/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/concept"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/config"
-	"github.com/Financial-Times/content-rw-elasticsearch/v2/pkg/schema"
-	tst "github.com/Financial-Times/content-rw-elasticsearch/v2/test"
-	"github.com/Financial-Times/go-logger/v2"
 )
 
 type concordanceAPIMock struct {
@@ -76,7 +75,7 @@ func TestConvertToESContentModel(t *testing.T) {
 
 	for _, test := range tests {
 		if test.inputFileConcordanceModel != "" {
-			inputConcordanceJSON := tst.ReadTestResource(test.inputFileConcordanceModel)
+			inputConcordanceJSON := testdata.ReadTestResource(test.inputFileConcordanceModel)
 
 			var concResp concept.ConcordancesResponse
 			err = json.Unmarshal(inputConcordanceJSON, &concResp)
@@ -85,7 +84,7 @@ func TestConvertToESContentModel(t *testing.T) {
 			concordanceAPIMock.On("GetConcepts", test.tid, mock.AnythingOfType("[]string")).Return(concept.TransformToConceptModel(concResp), nil)
 		}
 		ecModel := schema.EnrichedContent{}
-		inputJSON := tst.ReadTestResource(test.inputFileEnrichedModel)
+		inputJSON := testdata.ReadTestResource(test.inputFileEnrichedModel)
 
 		err = json.Unmarshal(inputJSON, &ecModel)
 		require.NoError(t, err, "Unexpected error")
@@ -104,7 +103,7 @@ func TestConvertToESContentModel(t *testing.T) {
 
 		esModel.IndexDate = nil
 
-		expectedJSON := tst.ReadTestResource(test.outputFile)
+		expectedJSON := testdata.ReadTestResource(test.outputFile)
 		expectedESModel := schema.IndexModel{}
 		err = json.Unmarshal(expectedJSON, &expectedESModel)
 		expect.NoError(err, "Unexpected error")

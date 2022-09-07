@@ -5,5 +5,5 @@ FROM peteclarkft/ersatz:0.0.4
 COPY ./ersatz-fixtures.yml /_ft/ersatz-fixtures.yml
 
 WORKDIR /
-CMD [ "/ersatz" ]
+CMD [ "/ersatz", "--fixtures", "/_ft/ersatz-fixtures.yml", "--port", "9000"  ]
 

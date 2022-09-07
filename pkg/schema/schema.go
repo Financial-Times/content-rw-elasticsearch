@@ -1,6 +1,7 @@
 package schema
 
 type IndexModel struct {
+	Type                       *string  `json:"type"`
 	UID                        *string  `json:"uid"`
 	LastMetadataPublish        *string  `json:"last_metadata_publish"`
 	IndexDate                  *string  `json:"index_date"`

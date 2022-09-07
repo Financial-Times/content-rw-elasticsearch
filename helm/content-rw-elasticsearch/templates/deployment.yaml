@@ -37,7 +37,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               name: global-config
-              key: aws.content.elasticsearch.endpoint
+              key: aws.content.elasticsearch.v2.endpoint
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
         - name: KAFKA_CONSUMER_GROUP
