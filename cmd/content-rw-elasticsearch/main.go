@@ -14,6 +14,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/aws/aws-sdk-go/aws/session"
 	cli "github.com/jawher/mow.cli"
 )
 
@@ -43,16 +44,6 @@ func main() {
 		Value:  config.AppDefaultLogLevel,
 		Desc:   "Logging level (DEBUG, INFO, WARN, ERROR)",
 		EnvVar: "LOG_LEVEL",
-	})
-	accessKey := app.String(cli.StringOpt{
-		Name:   "aws-access-key",
-		Desc:   "AWS ACCESS KEY",
-		EnvVar: "AWS_ACCESS_KEY_ID",
-	})
-	secretKey := app.String(cli.StringOpt{
-		Name:   "aws-secret-access-key",
-		Desc:   "AWS SECRET ACCESS KEY",
-		EnvVar: "AWS_SECRET_ACCESS_KEY",
 	})
 	esEndpoint := app.String(cli.StringOpt{
 		Name:   "elasticsearch-sapi-endpoint",
@@ -109,12 +100,22 @@ func main() {
 
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
+	awsSession, sessionErr := session.NewSession()
+	if sessionErr != nil {
+		log.WithError(sessionErr).Fatal("Failed to initialize AWS session")
+	}
+	credValues, err := awsSession.Config.Credentials.Get()
+	if err != nil {
+		log.WithError(err).Fatal("Failed to obtain AWS credentials values")
+	}
+	log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
 
 	app.Action = func() {
 		accessConfig := es.AccessConfig{
-			AccessKey: *accessKey,
-			SecretKey: *secretKey,
-			Endpoint:  *esEndpoint,
+			AccessKey:    credValues.AccessKeyID,
+			SecretKey:    credValues.SecretAccessKey,
+			SessionToken: credValues.SessionToken,
+			Endpoint:     *esEndpoint,
 		}
 
 		httpClient := pkghttp.NewHTTPClient()
@@ -159,7 +160,7 @@ func main() {
 
 		handler.Stop()
 	}
-	err := app.Run(os.Args)
+	err = app.Run(os.Args)
 	if err != nil {
 		log.WithError(err).WithTime(time.Now()).Fatal("App could not start")
 		return

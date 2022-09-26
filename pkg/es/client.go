@@ -17,9 +17,10 @@ type Client interface {
 }
 
 type AccessConfig struct {
-	AccessKey string
-	SecretKey string
-	Endpoint  string
+	AccessKey    string
+	SecretKey    string
+	SessionToken string
+	Endpoint     string
 }
 
 type AWSSigningTransport struct {
@@ -37,6 +38,7 @@ func NewClient(config AccessConfig, c *http.Client, log *logger.UPPLogger) (Clie
 		Credentials: awsauth.Credentials{
 			AccessKeyID:     config.AccessKey,
 			SecretAccessKey: config.SecretKey,
+			SecurityToken:   config.SessionToken,
 		},
 		HTTPClient: c,
 	}

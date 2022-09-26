@@ -8,6 +8,7 @@ require (
 	github.com/Financial-Times/kafka-client-go/v3 v3.0.5
 	github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d
 	github.com/Financial-Times/transactionid-utils-go v0.2.0
+	github.com/aws/aws-sdk-go v1.44.105
 	github.com/gorilla/mux v1.8.0
 	github.com/jawher/mow.cli v1.0.4
 	github.com/olivere/elastic/v7 v7.0.29
@@ -35,6 +36,7 @@ require (
 	github.com/jcmturner/gofork v1.0.0 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.2 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/klauspost/compress v1.15.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
