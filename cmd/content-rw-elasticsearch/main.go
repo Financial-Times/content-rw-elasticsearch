@@ -18,6 +18,8 @@ import (
 	cli "github.com/jawher/mow.cli"
 )
 
+const defaultESTestingEndpoint = "http://localhost:9000"
+
 func main() {
 	app := cli.App(config.AppName, config.AppDescription)
 
@@ -100,22 +102,30 @@ func main() {
 
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
-	awsSession, sessionErr := session.NewSession()
-	if sessionErr != nil {
-		log.WithError(sessionErr).Fatal("Failed to initialize AWS session")
-	}
-	credValues, err := awsSession.Config.Credentials.Get()
-	if err != nil {
-		log.WithError(err).Fatal("Failed to obtain AWS credentials values")
-	}
-	log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
 
 	app.Action = func() {
 		accessConfig := es.AccessConfig{
-			AccessKey:    credValues.AccessKeyID,
-			SecretKey:    credValues.SecretAccessKey,
-			SessionToken: credValues.SessionToken,
-			Endpoint:     *esEndpoint,
+			Endpoint: *esEndpoint,
+		}
+
+		if *esEndpoint != defaultESTestingEndpoint {
+			log.Info("Trying to get session credentials")
+			awsSession, sessionErr := session.NewSession()
+			if sessionErr != nil {
+				log.WithError(sessionErr).Fatal("Failed to initialize AWS session")
+			}
+			credValues, err := awsSession.Config.Credentials.Get()
+			if err != nil {
+				log.WithError(err).Fatal("Failed to obtain AWS credentials values")
+			}
+			log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
+
+			accessConfig = es.AccessConfig{
+				AccessKey:    credValues.AccessKeyID,
+				SecretKey:    credValues.SecretAccessKey,
+				SessionToken: credValues.SessionToken,
+				Endpoint:     *esEndpoint,
+			}
 		}
 
 		httpClient := pkghttp.NewHTTPClient()
@@ -160,7 +170,7 @@ func main() {
 
 		handler.Stop()
 	}
-	err = app.Run(os.Args)
+	err := app.Run(os.Args)
 	if err != nil {
 		log.WithError(err).WithTime(time.Now()).Fatal("App could not start")
 		return
