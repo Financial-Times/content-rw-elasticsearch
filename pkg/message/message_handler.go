@@ -24,6 +24,8 @@ const (
 	contentTypeHeader        = "Content-Type"
 	audioContentTypeHeader   = "ft-upp-audio"
 	articleContentTypeHeader = "ft-upp-article"
+
+	contextTimeout = 10 * time.Second
 )
 
 type ESClient func(config es.AccessConfig, c *http.Client, log *logger.UPPLogger) (es.Client, error)
@@ -125,8 +127,11 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 		return
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), contextTimeout)
+	defer cancel()
+
 	if combinedPostPublicationEvent.Deleted {
-		_, err = h.esService.DeleteData(context.Background(), uuid)
+		_, err = h.esService.DeleteData(ctx, uuid)
 		if err != nil {
 			log.WithError(err).Error("Failed to delete indexed content")
 			return
@@ -142,7 +147,7 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 
 	payload := h.mapper.ToIndexModel(combinedPostPublicationEvent, contentType, tid)
 
-	_, err = h.esService.WriteData(context.Background(), uuid, payload)
+	_, err = h.esService.WriteData(ctx, uuid, payload)
 	if err != nil {
 		log.WithError(err).Error("Failed to index content")
 		return

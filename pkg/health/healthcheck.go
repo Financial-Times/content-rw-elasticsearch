@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/concept"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/es"
@@ -19,6 +20,8 @@ const (
 	pathHealth        = "/__health"
 	pathHealthDetails = "/__health-details"
 	panicGuide        = "https://runbooks.in.ft.com/content-rw-elasticsearch"
+
+	contextTimeout = 5 * time.Second
 )
 
 type Service struct {
@@ -79,7 +82,9 @@ func (s *Service) clusterIsHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) healthChecker() (string, error) {
-	output, err := s.ESHealthService.GetClusterHealth(context.Background())
+	ctx, ctxClose := context.WithTimeout(context.Background(), contextTimeout)
+	defer ctxClose()
+	output, err := s.ESHealthService.GetClusterHealth(ctx)
 	if err != nil {
 		return "Cluster is not healthy: ", err
 	} else if output.Status != "green" {
@@ -102,7 +107,9 @@ func (s *Service) connectivityHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) connectivityChecker() (string, error) {
-	_, err := s.ESHealthService.GetClusterHealth(context.Background())
+	ctx, ctxClose := context.WithTimeout(context.Background(), contextTimeout)
+	defer ctxClose()
+	_, err := s.ESHealthService.GetClusterHealth(ctx)
 	if err != nil {
 		return "Could not connect to elasticsearch", err
 	}
@@ -123,7 +130,9 @@ func (s *Service) schemaHealthyCheck() fthealth.Check {
 }
 
 func (s *Service) schemaChecker() (string, error) {
-	output, err := s.ESHealthService.GetSchemaHealth(context.Background())
+	ctx, ctxClose := context.WithTimeout(context.Background(), contextTimeout)
+	defer ctxClose()
+	output, err := s.ESHealthService.GetSchemaHealth(ctx)
 	if err != nil {
 		return "Could not get schema: ", err
 	} else if output != "ok" {
@@ -196,7 +205,9 @@ func (s *Service) gtgCheck() gtg.Status {
 // HealthDetails returns the response from elasticsearch service /__health endpoint - describing the cluster health
 func (s *Service) healthDetails(writer http.ResponseWriter, req *http.Request) {
 	writer.Header().Set("Content-Type", "application/json")
-	output, err := s.ESHealthService.GetClusterHealth(context.Background())
+	ctx, ctxClose := context.WithTimeout(context.Background(), contextTimeout)
+	defer ctxClose()
+	output, err := s.ESHealthService.GetClusterHealth(ctx)
 	if err != nil {
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
