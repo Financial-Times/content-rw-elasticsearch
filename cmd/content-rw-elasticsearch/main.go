@@ -112,9 +112,9 @@ func main() {
 
 	app.Action = func() {
 		accessConfig := es.AccessConfig{
-			AwsCreds: credentials.AnonymousCredentials,
+			AwsCreds: credentials.AnonymousCredentials, // placeholder credentials to escape nil pointer error
 			Endpoint: *esEndpoint,
-			Region:   *esRegion,
+			Region:   *esRegion, // for the dredd tests to pass, we use the `local` region to specify that we don't want to sign requests
 		}
 
 		if *esEndpoint != defaultESTestingEndpoint {

@@ -35,6 +35,7 @@ type AWSSigningTransport struct {
 
 // RoundTrip implementation
 func (a AWSSigningTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// If the region is local that means that we probably want to run dredd tests, so our requests won't get signed!
 	if a.Region == "local" {
 		return a.HTTPClient.Do(req)
 	}
