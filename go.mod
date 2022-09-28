@@ -8,12 +8,11 @@ require (
 	github.com/Financial-Times/kafka-client-go/v3 v3.0.5
 	github.com/Financial-Times/service-status-go v0.0.0-20160323111542-3f5199736a3d
 	github.com/Financial-Times/transactionid-utils-go v0.2.0
-	github.com/aws/aws-sdk-go v1.44.105
+	github.com/aws/aws-sdk-go v1.44.83
 	github.com/gorilla/mux v1.8.0
 	github.com/jawher/mow.cli v1.0.4
 	github.com/olivere/elastic/v7 v7.0.29
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
-	github.com/smartystreets/go-aws-auth v0.0.0-20180515143844-0c1422d1fdb9
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
 )

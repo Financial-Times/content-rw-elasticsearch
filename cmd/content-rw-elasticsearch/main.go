@@ -14,6 +14,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cli "github.com/jawher/mow.cli"
 )
@@ -111,7 +112,9 @@ func main() {
 
 	app.Action = func() {
 		accessConfig := es.AccessConfig{
+			AwsCreds: credentials.AnonymousCredentials,
 			Endpoint: *esEndpoint,
+			Region:   *esRegion,
 		}
 
 		if *esEndpoint != defaultESTestingEndpoint {

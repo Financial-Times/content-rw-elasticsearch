@@ -35,6 +35,10 @@ type AWSSigningTransport struct {
 
 // RoundTrip implementation
 func (a AWSSigningTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if a.Region == "local" {
+		return a.HTTPClient.Do(req)
+	}
+
 	signer := awsSigner.NewSigner(a.Credentials)
 	if req.Body != nil {
 		b, err := io.ReadAll(req.Body)
