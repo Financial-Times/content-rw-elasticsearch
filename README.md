@@ -74,20 +74,21 @@ make build-readonly
 ```
 
 ```txt
-Options:
-      --app-system-code                System Code of the application (env $APP_SYSTEM_CODE) (default "content-rw-elasticsearch")
-      --app-name                       Application name (env $APP_NAME) (default "content-rw-elasticsearch")
-      --port                           Port to listen on (env $APP_PORT) (default "8080")
-      --logLevel                       Logging level (DEBUG, INFO, WARN, ERROR) (env $LOG_LEVEL) (default "INFO")
-      --aws-access-key                 AWS ACCES KEY (env $AWS_ACCESS_KEY_ID)
-      --aws-secret-access-key          AWS SECRET ACCES KEY (env $AWS_SECRET_ACCESS_KEY)
-      --elasticsearch-sapi-endpoint    AES endpoint (env $ELASTICSEARCH_SAPI_ENDPOINT) (default "http://localhost:9200")
-      --index-name                     The name of the elaticsearch index (env $ELASTICSEARCH_SAPI_INDEX) (default "ft")
-      --kafka-address                  Addresses used by the consumer to connect to Kafka (env $KAFKA_ADDR) (default "kafka:9092")
-      --kafka-consumer-group           Group used to read the messages from the queue (env $KAFKA_CONSUMER_GROUP) (default "content-rw-elasticsearch")
-      --kafka-topic                    The topic to read the messages from (env $KAFKA_TOPIC) (default "CombinedPostPublicationEvents")
-      --public-concordances-endpoint   Endpoint to concord ids with (env $PUBLIC_CONCORDANCES_ENDPOINT) (default "http://public-concordances-api:8080")
-      --base-api-url                   Base API URL (env $BASE_API_URL) (default "https://api.ft.com/")
+Options:                                    
+      --app-system-code                     System Code of the application (env $APP_SYSTEM_CODE) (default "content-rw-elasticsearch")
+      --app-name                            Application name (env $APP_NAME) (default "content-rw-elasticsearch")
+      --port                                Port to listen on (env $APP_PORT) (default "8080")
+      --logLevel                            Logging level (DEBUG, INFO, WARN, ERROR) (env $LOG_LEVEL) (default "INFO")
+      --elasticsearch-sapi-endpoint         AES endpoint (env $ELASTICSEARCH_SAPI_ENDPOINT) (default "http://localhost:9200")
+      --elasticsearch-region                AES region (env $ELASTICSEARCH_REGION) (default "local")
+      --index-name                          The name of the elasticsearch index (env $ELASTICSEARCH_SAPI_INDEX) (default "ft")
+      --kafka-address                       Addresses used by the queue consumer to connect to Kafka (env $KAFKA_ADDR) (default "kafka:9092")
+      --kafka-consumer-group                Group used to read the messages from the queue (env $KAFKA_CONSUMER_GROUP) (default "content-rw-elasticsearch")
+      --kafka-topic                         The topic to read the messages from (env $KAFKA_TOPIC) (default "CombinedPostPublicationEvents")
+      --kafka-topic-offset-fetch-interval   Interval (in minutes) between each offset fetching request (env $KAFKA_TOPIC_OFFSET_FETCH_INTERVAL) (default 0)
+      --kafka-topic-lag-tolerance           Lag tolerance (in number of messages) used for monitoring the Kafka consumer (env $KAFKA_TOPIC_LAG_TOLERANCE) (default 0)
+      --public-concordances-endpoint        Endpoint to concord ids with (env $PUBLIC_CONCORDANCES_ENDPOINT) (default "http://public-concordances-api:8080")
+      --base-api-url                        Base API URL (env $BASE_API_URL) (default "https://api.ft.com/")
 ```
 
 ## Build and deployment
