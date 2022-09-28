@@ -53,6 +53,12 @@ func main() {
 		Desc:   "AES endpoint",
 		EnvVar: "ELASTICSEARCH_SAPI_ENDPOINT",
 	})
+	esRegion := app.String(cli.StringOpt{
+		Name:   "elasticsearch-region",
+		Value:  "local",
+		Desc:   "AES region",
+		EnvVar: "ELASTICSEARCH_REGION",
+	})
 	indexName := app.String(cli.StringOpt{
 		Name:   "index-name",
 		Value:  "ft",
@@ -118,13 +124,13 @@ func main() {
 			if err != nil {
 				log.WithError(err).Fatal("Failed to obtain AWS credentials values")
 			}
+			awsCreds := awsSession.Config.Credentials
 			log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
 
 			accessConfig = es.AccessConfig{
-				AccessKey:    credValues.AccessKeyID,
-				SecretKey:    credValues.SecretAccessKey,
-				SessionToken: credValues.SessionToken,
-				Endpoint:     *esEndpoint,
+				AwsCreds: awsCreds,
+				Endpoint: *esEndpoint,
+				Region:   *esRegion,
 			}
 		}
 
