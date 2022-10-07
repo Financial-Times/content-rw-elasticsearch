@@ -28,6 +28,7 @@ spec:
                 values:
                 - {{ .Values.service.name }}
             topologyKey: "kubernetes.io/hostname"
+      serviceAccountName: {{ .Values.serviceAccountName }}
       containers:
       - name: {{ .Values.service.name }}
         image: "{{ .Values.image.repository }}:{{ .Chart.Version }}"
@@ -38,6 +39,11 @@ spec:
             configMapKeyRef:
               name: global-config
               key: aws.content.elasticsearch.v2.endpoint
+        - name: ELASTICSEARCH_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: aws.region
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
         - name: KAFKA_CONSUMER_GROUP
@@ -53,16 +59,6 @@ spec:
             configMapKeyRef:
               name: global-config
               key: msk.kafka.broker.url
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: global-secrets
-              key: aws.access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: global-secrets
-              key: aws.secret_access_key
         - name: PUBLIC_CONCORDANCES_ENDPOINT
           value: "{{ .Values.env.PUBLIC_CONCORDANCES_ENDPOINT }}"
         - name: "BASE_API_URL"

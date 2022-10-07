@@ -14,8 +14,12 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
 	cli "github.com/jawher/mow.cli"
 )
+
+const defaultESTestingEndpoint = "http://localhost:9000"
 
 func main() {
 	app := cli.App(config.AppName, config.AppDescription)
@@ -44,21 +48,17 @@ func main() {
 		Desc:   "Logging level (DEBUG, INFO, WARN, ERROR)",
 		EnvVar: "LOG_LEVEL",
 	})
-	accessKey := app.String(cli.StringOpt{
-		Name:   "aws-access-key",
-		Desc:   "AWS ACCESS KEY",
-		EnvVar: "AWS_ACCESS_KEY_ID",
-	})
-	secretKey := app.String(cli.StringOpt{
-		Name:   "aws-secret-access-key",
-		Desc:   "AWS SECRET ACCESS KEY",
-		EnvVar: "AWS_SECRET_ACCESS_KEY",
-	})
 	esEndpoint := app.String(cli.StringOpt{
 		Name:   "elasticsearch-sapi-endpoint",
 		Value:  "http://localhost:9200",
 		Desc:   "AES endpoint",
 		EnvVar: "ELASTICSEARCH_SAPI_ENDPOINT",
+	})
+	esRegion := app.String(cli.StringOpt{
+		Name:   "elasticsearch-region",
+		Value:  "local",
+		Desc:   "AES region",
+		EnvVar: "ELASTICSEARCH_REGION",
 	})
 	indexName := app.String(cli.StringOpt{
 		Name:   "index-name",
@@ -112,9 +112,29 @@ func main() {
 
 	app.Action = func() {
 		accessConfig := es.AccessConfig{
-			AccessKey: *accessKey,
-			SecretKey: *secretKey,
-			Endpoint:  *esEndpoint,
+			AwsCreds: credentials.AnonymousCredentials, // placeholder credentials to escape nil pointer error
+			Endpoint: *esEndpoint,
+			Region:   *esRegion, // for the dredd tests to pass, we use the `local` region to specify that we don't want to sign requests
+		}
+
+		if *esEndpoint != defaultESTestingEndpoint {
+			log.Info("Trying to get session credentials")
+			awsSession, sessionErr := session.NewSession()
+			if sessionErr != nil {
+				log.WithError(sessionErr).Fatal("Failed to initialize AWS session")
+			}
+			credValues, err := awsSession.Config.Credentials.Get()
+			if err != nil {
+				log.WithError(err).Fatal("Failed to obtain AWS credentials values")
+			}
+			awsCreds := awsSession.Config.Credentials
+			log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
+
+			accessConfig = es.AccessConfig{
+				AwsCreds: awsCreds,
+				Endpoint: *esEndpoint,
+				Region:   *esRegion,
+			}
 		}
 
 		httpClient := pkghttp.NewHTTPClient()

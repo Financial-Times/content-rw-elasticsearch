@@ -1,11 +1,16 @@
 package es
 
 import (
+	"fmt"
+	"io"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/Financial-Times/go-logger/v2"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	awsSigner "github.com/aws/aws-sdk-go/aws/signer/v4"
 	"github.com/olivere/elastic/v7"
-	awsauth "github.com/smartystreets/go-aws-auth"
 )
 
 type Client interface {
@@ -17,28 +22,51 @@ type Client interface {
 }
 
 type AccessConfig struct {
-	AccessKey string
-	SecretKey string
-	Endpoint  string
+	AwsCreds *credentials.Credentials
+	Endpoint string
+	Region   string
 }
 
 type AWSSigningTransport struct {
 	HTTPClient  *http.Client
-	Credentials awsauth.Credentials
+	Credentials *credentials.Credentials
+	Region      string
 }
 
 // RoundTrip implementation
 func (a AWSSigningTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	return a.HTTPClient.Do(awsauth.Sign4(req, a.Credentials))
+	// If the region is local that means that we probably want to run dredd tests, so our requests won't get signed!
+	if a.Region == "local" {
+		return a.HTTPClient.Do(req)
+	}
+
+	signer := awsSigner.NewSigner(a.Credentials)
+	if req.Body != nil {
+		b, err := io.ReadAll(req.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read request body with error: %w", err)
+		}
+		body := strings.NewReader(string(b))
+		defer req.Body.Close()
+		_, err = signer.Sign(req, body, "es", a.Region, time.Now())
+		if err != nil {
+			return nil, fmt.Errorf("failed to sign request: %w", err)
+		}
+	} else {
+		_, err := signer.Sign(req, nil, "es", a.Region, time.Now())
+		if err != nil {
+			return nil, fmt.Errorf("failed to sign request: %w", err)
+		}
+	}
+
+	return a.HTTPClient.Do(req)
 }
 
 func NewClient(config AccessConfig, c *http.Client, log *logger.UPPLogger) (Client, error) {
 	signingTransport := AWSSigningTransport{
-		Credentials: awsauth.Credentials{
-			AccessKeyID:     config.AccessKey,
-			SecretAccessKey: config.SecretKey,
-		},
-		HTTPClient: c,
+		Credentials: config.AwsCreds,
+		HTTPClient:  c,
+		Region:      config.Region,
 	}
 	signingClient := &http.Client{Transport: http.RoundTripper(signingTransport)}
 

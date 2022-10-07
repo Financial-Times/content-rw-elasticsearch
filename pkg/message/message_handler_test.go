@@ -18,6 +18,7 @@ import (
 	testdata "github.com/Financial-Times/content-rw-elasticsearch/v4/test"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -128,9 +129,8 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 	uppLogger := logger.NewUPPLogger(config.AppName, config.AppDefaultLogLevel)
 
 	accessConfig := es.AccessConfig{
-		AccessKey: "key",
-		SecretKey: "secret",
-		Endpoint:  "endpoint",
+		AwsCreds: &credentials.Credentials{},
+		Endpoint: "endpoint",
 	}
 
 	var concordanceAPI *concordanceAPIMock
