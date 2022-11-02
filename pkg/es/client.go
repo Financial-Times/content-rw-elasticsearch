@@ -10,7 +10,7 @@ import (
 
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/aws/aws-sdk-go-v2/aws"
-	awsSigner "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
+	signer "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/olivere/elastic/v7"
 )
 
@@ -34,29 +34,38 @@ type AWSSigningTransport struct {
 	Region      string
 }
 
-func (a AWSSigningTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
 	// If the region is local that means that we probably want to run dredd tests, so our requests won't get signed!
 	if a.Region == "local" {
 		return a.HTTPClient.Do(req)
 	}
 
-	hasher := sha256.New()
-	payload := ""
+	defer func() {
+		log := logger.NewUPPLogger("INFO", "roundtripper")
+		if err != nil {
+			log.WithError(err).Error("ERROR")
+		}
+		log.Info("Seems good?")
+	}()
 
-	signer := awsSigner.NewSigner()
+	hasher := sha256.New()
+	payload := []byte("")
+
 	if req.Body != nil {
-		b, err := io.ReadAll(req.Body)
+		payload, err = io.ReadAll(req.Body)
 		if err != nil {
 			return nil, fmt.Errorf("reading request body: %w", err)
 		}
 
-		payload = string(b)
+		defer req.Body.Close()
 	}
 
-	hasher.Write([]byte(payload))
+	hasher.Write(payload)
 	hash := hex.EncodeToString(hasher.Sum(nil))
 
-	err := signer.SignHTTP(req.Context(), a.Credentials, req, hash, "es", a.Region, time.Now())
+	err = signer.
+		NewSigner().
+		SignHTTP(req.Context(), a.Credentials, req, hash, "es", a.Region, time.Now().UTC())
 	if err != nil {
 		return nil, fmt.Errorf("signing request: %w", err)
 	}
