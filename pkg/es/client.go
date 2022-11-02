@@ -41,11 +41,12 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 	}
 
 	defer func() {
-		log := logger.NewUPPLogger("INFO", "roundtripper")
+		log := logger.NewUPPLogger("roundtripper", "INFO")
 		if err != nil {
 			log.WithError(err).Error("ERROR")
+		} else {
+			log.Info("Is it good?")
 		}
-		log.Info("Seems good?")
 	}()
 
 	hasher := sha256.New()
@@ -60,8 +61,7 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 		defer req.Body.Close()
 	}
 
-	hasher.Write(payload)
-	hash := hex.EncodeToString(hasher.Sum(nil))
+	hash := hex.EncodeToString(hasher.Sum(payload))
 
 	err = signer.
 		NewSigner().
