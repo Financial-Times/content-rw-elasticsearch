@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"time"
@@ -14,8 +15,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v3"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
+	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	cli "github.com/jawher/mow.cli"
 )
 
@@ -112,29 +112,23 @@ func main() {
 
 	app.Action = func() {
 		accessConfig := es.AccessConfig{
-			AwsCreds: credentials.AnonymousCredentials, // placeholder credentials to escape nil pointer error
 			Endpoint: *esEndpoint,
 			Region:   *esRegion, // for the dredd tests to pass, we use the `local` region to specify that we don't want to sign requests
 		}
 
 		if *esEndpoint != defaultESTestingEndpoint {
 			log.Info("Trying to get session credentials")
-			awsSession, sessionErr := session.NewSession()
-			if sessionErr != nil {
-				log.WithError(sessionErr).Fatal("Failed to initialize AWS session")
+			cfg, err := awsconfig.LoadDefaultConfig(context.TODO())
+			if err != nil {
+				log.WithError(err).Fatal("Failed to load AWS config")
 			}
-			credValues, err := awsSession.Config.Credentials.Get()
+			credentials, err := cfg.Credentials.Retrieve(context.TODO())
 			if err != nil {
 				log.WithError(err).Fatal("Failed to obtain AWS credentials values")
 			}
-			awsCreds := awsSession.Config.Credentials
-			log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
+			log.Infof("Obtaining AWS credentials by using [%s] as provider", credentials.Source)
 
-			accessConfig = es.AccessConfig{
-				AwsCreds: awsCreds,
-				Endpoint: *esEndpoint,
-				Region:   *esRegion,
-			}
+			accessConfig.Credentials = credentials
 		}
 
 		httpClient := pkghttp.NewHTTPClient()

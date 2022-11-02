@@ -1,15 +1,16 @@
 package es
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	awsSigner "github.com/aws/aws-sdk-go/aws/signer/v4"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	awsSigner "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/olivere/elastic/v7"
 )
 
@@ -22,50 +23,51 @@ type Client interface {
 }
 
 type AccessConfig struct {
-	AwsCreds *credentials.Credentials
-	Endpoint string
-	Region   string
+	Credentials aws.Credentials
+	Endpoint    string
+	Region      string
 }
 
 type AWSSigningTransport struct {
 	HTTPClient  *http.Client
-	Credentials *credentials.Credentials
+	Credentials aws.Credentials
 	Region      string
 }
 
-// RoundTrip implementation
 func (a AWSSigningTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// If the region is local that means that we probably want to run dredd tests, so our requests won't get signed!
 	if a.Region == "local" {
 		return a.HTTPClient.Do(req)
 	}
 
-	signer := awsSigner.NewSigner(a.Credentials)
+	hasher := sha256.New()
+	payload := ""
+
+	signer := awsSigner.NewSigner()
 	if req.Body != nil {
 		b, err := io.ReadAll(req.Body)
 		if err != nil {
-			return nil, fmt.Errorf("failed to read request body with error: %w", err)
+			return nil, fmt.Errorf("reading request body: %w", err)
 		}
-		body := strings.NewReader(string(b))
-		defer req.Body.Close()
-		_, err = signer.Sign(req, body, "es", a.Region, time.Now())
-		if err != nil {
-			return nil, fmt.Errorf("failed to sign request: %w", err)
-		}
-	} else {
-		_, err := signer.Sign(req, nil, "es", a.Region, time.Now())
-		if err != nil {
-			return nil, fmt.Errorf("failed to sign request: %w", err)
-		}
+
+		payload = string(b)
+	}
+
+	hasher.Write([]byte(payload))
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
+	err := signer.SignHTTP(req.Context(), a.Credentials, req, hash, "es", a.Region, time.Now())
+	if err != nil {
+		return nil, fmt.Errorf("signing request: %w", err)
 	}
 
 	return a.HTTPClient.Do(req)
 }
 
-func NewClient(config AccessConfig, c *http.Client, log *logger.UPPLogger) (Client, error) {
+func NewClient(config AccessConfig, client *http.Client, log *logger.UPPLogger) (Client, error) {
 	signingTransport := AWSSigningTransport{
-		Credentials: config.AwsCreds,
-		HTTPClient:  c,
+		Credentials: config.Credentials,
+		HTTPClient:  client,
 		Region:      config.Region,
 	}
 	signingClient := &http.Client{Transport: http.RoundTripper(signingTransport)}
