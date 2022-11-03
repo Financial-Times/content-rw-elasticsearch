@@ -3,6 +3,7 @@ replicaCount: 2
 service:
   name: content-rw-elasticsearch
 env:
+  KAFKA_CLUSTER_ARN: arn:aws:kafka:eu-west-1:070529446553:cluster/upp-dev-msk-eu/fb827cd5-351e-4c16-9d4c-eb1face39ac1-2
   KAFKA_TOPIC: CombinedPostPublicationEvents
   KAFKA_TOPIC_OFFSET_FETCH_INTERVAL: 3
   KAFKA_TOPIC_LAG_TOLERANCE: 250

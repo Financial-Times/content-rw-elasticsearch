@@ -13,7 +13,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/Financial-Times/kafka-client-go/v4"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cli "github.com/jawher/mow.cli"
@@ -65,6 +65,11 @@ func main() {
 		Value:  "ft",
 		Desc:   "The name of the elasticsearch index",
 		EnvVar: "ELASTICSEARCH_SAPI_INDEX",
+	})
+	kafkaClusterArn := app.String(cli.StringOpt{
+		Name:   "kafka-cluster-arn",
+		Desc:   "Addresses used by the queue consumer to connect to Kafka",
+		EnvVar: "KAFKA_CLUSTER_ARN",
 	})
 	kafkaAddress := app.String(cli.StringOpt{
 		Name:   "kafka-address",
@@ -119,22 +124,17 @@ func main() {
 
 		if *esEndpoint != defaultESTestingEndpoint {
 			log.Info("Trying to get session credentials")
-			awsSession, sessionErr := session.NewSession()
-			if sessionErr != nil {
-				log.WithError(sessionErr).Fatal("Failed to initialize AWS session")
+			awsSession, err := session.NewSession()
+			if err != nil {
+				log.WithError(err).Fatal("Failed to initialize AWS session")
 			}
 			credValues, err := awsSession.Config.Credentials.Get()
 			if err != nil {
 				log.WithError(err).Fatal("Failed to obtain AWS credentials values")
 			}
-			awsCreds := awsSession.Config.Credentials
 			log.Infof("Obtaining AWS credentials by using [%s] as provider", credValues.ProviderName)
 
-			accessConfig = es.AccessConfig{
-				AwsCreds: awsCreds,
-				Endpoint: *esEndpoint,
-				Region:   *esRegion,
-			}
+			accessConfig.AwsCreds = awsSession.Config.Credentials
 		}
 
 		httpClient := pkghttp.NewHTTPClient()
@@ -149,16 +149,19 @@ func main() {
 		mapperHandler := mapper.NewMapperHandler(concordanceAPIService, *baseAPIUrl, appConfig, log)
 
 		consumerConfig := kafka.ConsumerConfig{
+			ClusterArn:              kafkaClusterArn,
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
-			ConnectionRetryInterval: time.Minute,
 			OffsetFetchInterval:     time.Duration(*kafkaTopicOffsetFetchInterval) * time.Minute,
 			Options:                 kafka.DefaultConsumerOptions(),
 		}
 		topics := []*kafka.Topic{
 			kafka.NewTopic(*kafkaTopic, kafka.WithLagTolerance(int64(*kafkaLagTolerance))),
 		}
-		messageConsumer := kafka.NewConsumer(consumerConfig, topics, log)
+		messageConsumer, err := kafka.NewConsumer(consumerConfig, topics, log)
+		if err != nil {
+			log.WithError(err).Fatal("Failed to initialize Kafka consumer")
+		}
 
 		handler := message.NewMessageHandler(
 			esService,
