@@ -18,10 +18,11 @@ const (
 	AppDescription     = "Content Read Writer for Elasticsearch"
 	AppDefaultLogLevel = "INFO"
 
-	ArticleType = "article"
-	VideoType   = "video"
-	BlogType    = "blog"
-	AudioType   = "audio"
+	ArticleType   = "article"
+	VideoType     = "video"
+	BlogType      = "blog"
+	AudioType     = "audio"
+	LiveEventType = "live-event"
 
 	PACOrigin = "http://cmdb.ft.com/systems/pac"
 

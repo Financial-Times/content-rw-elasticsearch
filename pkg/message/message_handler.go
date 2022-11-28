@@ -18,12 +18,13 @@ import (
 )
 
 const (
-	syntheticRequestPrefix   = "SYNTHETIC-REQ-MON"
-	transactionIDHeader      = "X-Request-Id"
-	originHeader             = "Origin-System-Id"
-	contentTypeHeader        = "Content-Type"
-	audioContentTypeHeader   = "ft-upp-audio"
-	articleContentTypeHeader = "ft-upp-article"
+	syntheticRequestPrefix     = "SYNTHETIC-REQ-MON"
+	transactionIDHeader        = "X-Request-Id"
+	originHeader               = "Origin-System-Id"
+	contentTypeHeader          = "Content-Type"
+	audioContentTypeHeader     = "ft-upp-audio"
+	articleContentTypeHeader   = "ft-upp-article"
+	liveEventContentTypeHeader = "ft-upp-live-event"
 
 	contextTimeout = 10 * time.Second
 )
@@ -163,6 +164,10 @@ func (h *Handler) readContentType(msg kafka.FTMessage, event schema.EnrichedCont
 	if strings.Contains(typeHeader, articleContentTypeHeader) {
 		return config.ArticleType
 	}
+	if strings.Contains(typeHeader, liveEventContentTypeHeader) {
+		return config.LiveEventType
+	}
+
 	contentMetadata := h.mapper.Config.ContentMetadataMap
 	for _, identifier := range event.Content.Identifiers {
 		for _, t := range contentMetadata {
