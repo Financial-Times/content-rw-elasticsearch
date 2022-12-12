@@ -55,26 +55,20 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 		return nil, err
 	}
 
-	internalReq := req.Clone(req.Context())
-
-	bodyReader, err := req.GetBody()
-	if err != nil {
-		return nil, fmt.Errorf("reading request body: %w", err)
-	}
-
-	hash := sha256.New()
-
-	if _, err := io.Copy(hash, bodyReader); err != nil {
+	hasher := sha256.New()
+	if _, err := io.Copy(hasher, req.Body); err != nil {
 		return nil, fmt.Errorf("copying request body: %w", err)
 	}
 
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
 	if err := signer.
 		NewSigner().
-		SignHTTP(context.Background(), credentials, internalReq, hex.EncodeToString(hash.Sum(nil)), "es", a.Region, time.Now()); err != nil {
+		SignHTTP(context.Background(), credentials, req, hash, "es", a.Region, time.Now()); err != nil {
 		return nil, fmt.Errorf("signing request: %w", err)
 	}
 
-	return a.HTTPClient.Do(internalReq)
+	return a.HTTPClient.Do(req)
 }
 
 func NewClient(config AccessConfig, client *http.Client, log *logger.UPPLogger) (Client, error) {
