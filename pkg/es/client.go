@@ -1,6 +1,7 @@
 package es
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -23,15 +24,15 @@ type Client interface {
 }
 
 type AccessConfig struct {
-	Credentials aws.Credentials
-	Endpoint    string
-	Region      string
+	AWSConfig aws.Config
+	Endpoint  string
+	Region    string
 }
 
 type AWSSigningTransport struct {
-	HTTPClient  *http.Client
-	Credentials aws.Credentials
-	Region      string
+	HTTPClient *http.Client
+	AWSConfig  aws.Config
+	Region     string
 }
 
 func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, err error) {
@@ -49,35 +50,38 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 		}
 	}()
 
-	hasher := sha256.New()
-	payload := []byte("")
-
-	if req.Body != nil {
-		payload, err = io.ReadAll(req.Body)
-		if err != nil {
-			return nil, fmt.Errorf("reading request body: %w", err)
-		}
-
-		defer req.Body.Close()
+	credentials, err := a.AWSConfig.Credentials.Retrieve(req.Context())
+	if err != nil {
+		return nil, err
 	}
 
-	hash := hex.EncodeToString(hasher.Sum(payload))
+	internalReq := req.Clone(req.Context())
 
-	err = signer.
-		NewSigner().
-		SignHTTP(req.Context(), a.Credentials, req, hash, "es", a.Region, time.Now().UTC())
+	bodyReader, err := req.GetBody()
 	if err != nil {
+		return nil, fmt.Errorf("reading request body: %w", err)
+	}
+
+	hash := sha256.New()
+
+	if _, err := io.Copy(hash, bodyReader); err != nil {
+		return nil, fmt.Errorf("copying request body: %w", err)
+	}
+
+	if err := signer.
+		NewSigner().
+		SignHTTP(context.Background(), credentials, internalReq, hex.EncodeToString(hash.Sum(nil)), "es", a.Region, time.Now()); err != nil {
 		return nil, fmt.Errorf("signing request: %w", err)
 	}
 
-	return a.HTTPClient.Do(req)
+	return a.HTTPClient.Do(internalReq)
 }
 
 func NewClient(config AccessConfig, client *http.Client, log *logger.UPPLogger) (Client, error) {
 	signingTransport := AWSSigningTransport{
-		Credentials: config.Credentials,
-		HTTPClient:  client,
-		Region:      config.Region,
+		AWSConfig:  config.AWSConfig,
+		HTTPClient: client,
+		Region:     config.Region,
 	}
 	signingClient := &http.Client{Transport: http.RoundTripper(signingTransport)}
 

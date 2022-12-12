@@ -127,13 +127,8 @@ func main() {
 			if err != nil {
 				log.WithError(err).Fatal("Failed to load AWS config")
 			}
-			credentials, err := cfg.Credentials.Retrieve(context.TODO())
-			if err != nil {
-				log.WithError(err).Fatal("Failed to obtain AWS credentials values")
-			}
-			log.Infof("Obtaining AWS credentials by using [%s] as provider", credentials.Source)
 
-			accessConfig.Credentials = credentials
+			accessConfig.AWSConfig = cfg
 		}
 
 		httpClient := pkghttp.NewHTTPClient()
