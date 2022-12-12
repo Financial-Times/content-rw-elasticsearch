@@ -17,7 +17,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	testdata "github.com/Financial-Times/content-rw-elasticsearch/v4/test"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/Financial-Times/kafka-client-go/v4"
 	"github.com/olivere/elastic/v7"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -13,7 +13,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/Financial-Times/kafka-client-go/v4"
 	transactionid "github.com/Financial-Times/transactionid-utils-go"
 )
 
@@ -71,7 +71,6 @@ func (h *Handler) Start(baseAPIURL string, accessConfig es.AccessConfig) {
 			}
 			h.esService.SetClient(ec)
 			h.log.Info("Connected to Elasticsearch")
-			// this is a blocking method
 			h.consumer.Start(h.handleMessage)
 			return
 		}

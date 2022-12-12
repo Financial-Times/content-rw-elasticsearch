@@ -46,6 +46,8 @@ spec:
               key: aws.region
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
+        - name: KAFKA_CLUSTER_ARN
+          value: {{ .Values.env.KAFKA_CLUSTER_ARN }}
         - name: KAFKA_CONSUMER_GROUP
           value: {{ .Values.service.name }}
         - name: KAFKA_TOPIC
