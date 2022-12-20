@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -58,14 +57,14 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 	hasher := sha256.New()
 	payload := []byte("")
 
-	if req.Body != nil {
-		payload, err = io.ReadAll(req.Body)
-		if err != nil {
-			return nil, fmt.Errorf("reading request body: %w", err)
-		}
-
-		defer req.Body.Close()
-	}
+	//if req.Body != nil {
+	//	payload, err = io.ReadAll(req.Body)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("reading request body: %w", err)
+	//	}
+	//
+	//	defer req.Body.Close()
+	//}
 
 	hash := hex.EncodeToString(hasher.Sum(payload))
 
