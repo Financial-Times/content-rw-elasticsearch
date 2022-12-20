@@ -56,11 +56,18 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 	}
 
 	hasher := sha256.New()
-	if _, err := io.Copy(hasher, req.Body); err != nil {
-		return nil, fmt.Errorf("copying request body: %w", err)
+	payload := []byte("")
+
+	if req.Body != nil {
+		payload, err = io.ReadAll(req.Body)
+		if err != nil {
+			return nil, fmt.Errorf("reading request body: %w", err)
+		}
+
+		defer req.Body.Close()
 	}
 
-	hash := hex.EncodeToString(hasher.Sum(nil))
+	hash := hex.EncodeToString(hasher.Sum(payload))
 
 	if err := signer.
 		NewSigner().
