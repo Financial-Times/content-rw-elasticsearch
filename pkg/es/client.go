@@ -41,13 +41,6 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 		return a.HTTPClient.Do(req)
 	}
 
-	defer func() {
-		log := logger.NewUPPLogger("roundtripper", "INFO")
-		if err != nil {
-			log.WithError(err).Error("ERROR")
-		}
-	}()
-
 	credentials, err := a.AWSConfig.Credentials.Retrieve(req.Context())
 	if err != nil {
 		return nil, err
@@ -74,8 +67,7 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 		return nil, fmt.Errorf("signing request: %w", err)
 	}
 
-	resp, err = a.HTTPClient.Do(req)
-	return resp, err
+	return a.HTTPClient.Do(req)
 }
 
 func NewClient(config AccessConfig, client *http.Client, log *logger.UPPLogger) (Client, error) {
