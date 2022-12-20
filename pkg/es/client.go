@@ -1,10 +1,11 @@
 package es
 
 import (
-	"context"
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -44,8 +45,6 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 		log := logger.NewUPPLogger("roundtripper", "INFO")
 		if err != nil {
 			log.WithError(err).Error("ERROR")
-		} else {
-			log.Info("Is it good?")
 		}
 	}()
 
@@ -57,24 +56,26 @@ func (a AWSSigningTransport) RoundTrip(req *http.Request) (resp *http.Response, 
 	hasher := sha256.New()
 	payload := []byte("")
 
-	//if req.Body != nil {
-	//	payload, err = io.ReadAll(req.Body)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("reading request body: %w", err)
-	//	}
-	//
-	//	defer req.Body.Close()
-	//}
+	if req.Body != nil {
+		payload, err = io.ReadAll(req.Body)
+		if err != nil {
+			return nil, fmt.Errorf("reading request body: %w", err)
+		}
+
+		_ = req.Body.Close()
+		req.Body = io.NopCloser(bytes.NewReader(payload))
+	}
 
 	hash := hex.EncodeToString(hasher.Sum(payload))
 
-	if err := signer.
+	if err = signer.
 		NewSigner().
-		SignHTTP(context.Background(), credentials, req, hash, "es", a.Region, time.Now()); err != nil {
+		SignHTTP(req.Context(), credentials, req, hash, "es", a.Region, time.Now()); err != nil {
 		return nil, fmt.Errorf("signing request: %w", err)
 	}
 
-	return a.HTTPClient.Do(req)
+	resp, err = a.HTTPClient.Do(req)
+	return resp, err
 }
 
 func NewClient(config AccessConfig, client *http.Client, log *logger.UPPLogger) (Client, error) {
