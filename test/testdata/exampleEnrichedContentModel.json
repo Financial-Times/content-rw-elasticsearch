@@ -98,19 +98,6 @@
     },
     {
       "thing": {
-        "id": "http://api.ft.com/things/aeada5a9-39cb-4bb6-b795-5baba8acf3fb",
-        "prefLabel": "Investor activism",
-        "types": [
-          "http://www.ft.com/ontology/core/Thing",
-          "http://www.ft.com/ontology/concept/Concept",
-          "http://www.ft.com/ontology/Topic"
-        ],
-        "predicate": "http://www.ft.com/ontology/annotation/about",
-        "apiUrl": "http://api.ft.com/things/aeada5a9-39cb-4bb6-b795-5baba8acf3fb"
-      }
-    },
-    {
-      "thing": {
         "id": "http://api.ft.com/things/f021ef0a-e3a5-3530-9394-21a1eaf9f3f6",
         "prefLabel": "Markets Insight",
         "types": [

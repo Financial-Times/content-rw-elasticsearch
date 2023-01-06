@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -68,6 +69,7 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 		return model
 	}
 
+	var annotationsIds = map[string][]string{}
 	for _, annotation := range annotations {
 		canonicalID := strings.TrimPrefix(annotation.ID, concept.ThingURIPrefix)
 		concepts, found := concepts[annotation.ID]
@@ -81,16 +83,64 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 		} else {
 			log.Warnf("TME id missing for concept with id %s, using only canonical id", canonicalID)
 		}
+		annotationsIds[annotation.ID] = annIDs
 
 		h.populateAnnotationRelatedFields(annotation, &model, annIDs, canonicalID)
 	}
+
+	h.populatePrimaryTheme(&model, annotations, annotationsIds, "about")
+
 	return model
+}
+
+func (h *Handler) populatePrimaryTheme(model *schema.IndexModel, annotations []schema.Thing, ids map[string][]string, predicateKey string) {
+	predicate := h.Config.Predicates.Get(predicateKey)
+	sorted := filterSortAnnotations(annotations, ids, predicate)
+	if len(sorted) == 0 {
+		return
+	}
+	annotation := sorted[0]
+	annIDs := ids[annotation.ID]
+	conceptTypes := h.Config.ConceptTypes
+
+	for _, taxonomy := range annotation.Types {
+		if annotation.Predicate == predicate {
+			tme := ""
+			switch taxonomy {
+			case conceptTypes.Get("organisation"):
+				tme = tmeOrganisations
+			case conceptTypes.Get("person"):
+				tme = tmePeople
+			case conceptTypes.Get("topic"):
+				tme = tmeTopics
+			case conceptTypes.Get("location"):
+				tme = tmeRegions
+			}
+			if tme != "" {
+				setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tme, annIDs))
+				break
+			}
+		}
+	}
+}
+
+func filterSortAnnotations(annotations []schema.Thing, ids map[string][]string, predicate string) []schema.Thing {
+	var matchedAnnotations []schema.Thing
+
+	for _, annotation := range annotations {
+		if annotation.Predicate == predicate && ids[annotation.ID] != nil {
+			matchedAnnotations = append(matchedAnnotations, annotation)
+		}
+	}
+	sort.Slice(matchedAnnotations, func(i, j int) bool {
+		return matchedAnnotations[i].PrefLabel < matchedAnnotations[j].PrefLabel
+	})
+	return matchedAnnotations
 }
 
 func (h *Handler) populateAnnotationRelatedFields(annotation schema.Thing, model *schema.IndexModel, annIDs []string, canonicalID string) {
 	h.handleSectionMapping(annotation, model, annIDs)
 
-	about := h.Config.Predicates.Get("about")
 	hasAuthor := h.Config.Predicates.Get("hasAuthor")
 	hasContributor := h.Config.Predicates.Get("hasContributor")
 	for _, taxonomy := range annotation.Types {
@@ -99,9 +149,6 @@ func (h *Handler) populateAnnotationRelatedFields(annotation schema.Thing, model
 		case conceptTypes.Get("organisation"):
 			model.CmrOrgnames = appendIfNotExists(model.CmrOrgnames, annotation.PrefLabel)
 			model.CmrOrgnamesIds = prepareElasticField(model.CmrOrgnamesIds, annIDs)
-			if annotation.Predicate == about {
-				setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tmeOrganisations, annIDs))
-			}
 		case conceptTypes.Get("person"):
 			_, personFound := getCmrID(tmePeople, annIDs)
 			authorCmrID, authorFound := getCmrID(tmeAuthors, annIDs)
@@ -117,9 +164,6 @@ func (h *Handler) populateAnnotationRelatedFields(annotation schema.Thing, model
 					model.CmrAuthorsIds = appendIfNotExists(model.CmrAuthorsIds, canonicalID)
 				}
 			}
-			if annotation.Predicate == about {
-				setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tmePeople, annIDs))
-			}
 		case conceptTypes.Get("company"):
 			model.CmrCompanynames = appendIfNotExists(model.CmrCompanynames, annotation.PrefLabel)
 			model.CmrCompanynamesIds = prepareElasticField(model.CmrCompanynamesIds, annIDs)
@@ -129,15 +173,9 @@ func (h *Handler) populateAnnotationRelatedFields(annotation schema.Thing, model
 		case conceptTypes.Get("topic"):
 			model.CmrTopics = appendIfNotExists(model.CmrTopics, annotation.PrefLabel)
 			model.CmrTopicsIds = prepareElasticField(model.CmrTopicsIds, annIDs)
-			if annotation.Predicate == about {
-				setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tmeTopics, annIDs))
-			}
 		case conceptTypes.Get("location"):
 			model.CmrRegions = appendIfNotExists(model.CmrRegions, annotation.PrefLabel)
 			model.CmrRegionsIds = prepareElasticField(model.CmrRegionsIds, annIDs)
-			if annotation.Predicate == about {
-				setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tmeRegions, annIDs))
-			}
 		case conceptTypes.Get("genre"):
 			model.CmrGenres = appendIfNotExists(model.CmrGenres, annotation.PrefLabel)
 			model.CmrGenreIds = prepareElasticField(model.CmrGenreIds, annIDs)

@@ -30,11 +30,11 @@
   "model_excerpt": null,
   "model_resource_uri": null,
   "cmr_primarysection": "Equities",
-  "cmr_primarytheme": "Investor activism",
+  "cmr_primarytheme": null,
   "cmr_mediatype": null,
   "cmr_metadataupdatetime": null,
   "cmr_primarysection_id": "OTg=-U2VjdGlvbnM=",
-  "cmr_primarytheme_id": "OWIwMDQ1MTEtOWIxYi00MmEzLWFjOGQtY2VhMDM0MjJlZjI3-VG9waWNz",
+  "cmr_primarytheme_id": null,
   "cmr_mediatype_id": null,
   "cmr_brands": [
     "Markets Insight",
@@ -49,7 +49,6 @@
   "cmr_specialreports_ids": null,
   "cmr_sections": [
     "Equities",
-    "Investor activism",
     "Markets Insight",
     "Opinion",
     "Markets",
@@ -60,8 +59,6 @@
   "cmr_sections_ids": [
     "b7ea3c33-ea8c-432e-bb7e-e3bbc8fdc2bb",
     "OTg=-U2VjdGlvbnM=",
-    "aeada5a9-39cb-4bb6-b795-5baba8acf3fb",
-    "OWIwMDQ1MTEtOWIxYi00MmEzLWFjOGQtY2VhMDM0MjJlZjI3-VG9waWNz",
     "f021ef0a-e3a5-3530-9394-21a1eaf9f3f6",
     "QnJhbmRzXzExNg==-QnJhbmRz",
     "6da31a37-691f-4908-896f-2829ebe2309e",
@@ -79,15 +76,12 @@
   "cmr_subjects_ids": null,
   "cmr_topics": [
     "Equities",
-    "Investor activism",
     "Markets",
     "Companies"
   ],
   "cmr_topics_ids": [
     "b7ea3c33-ea8c-432e-bb7e-e3bbc8fdc2bb",
     "OTg=-U2VjdGlvbnM=",
-    "aeada5a9-39cb-4bb6-b795-5baba8acf3fb",
-    "OWIwMDQ1MTEtOWIxYi00MmEzLWFjOGQtY2VhMDM0MjJlZjI3-VG9waWNz",
     "c91b1fad-1097-468b-be82-9a8ff717d54c",
     "NzE=-U2VjdGlvbnM=",
     "c47f4dfc-6879-4e95-accf-ca8cbe6a1f69",
