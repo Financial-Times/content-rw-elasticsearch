@@ -95,36 +95,39 @@ func (h *Handler) ToIndexModel(enrichedContent schema.EnrichedContent, contentTy
 
 func (h *Handler) populatePrimaryTheme(model *schema.IndexModel, annotations []schema.Thing, ids map[string][]string, predicateKey string) {
 	predicate := h.Config.Predicates.Get(predicateKey)
-	sorted := filterSortAnnotations(annotations, ids, predicate)
-	if len(sorted) == 0 {
+	annotations = filterAnnotations(annotations, ids, predicate)
+	if len(annotations) == 0 {
 		return
 	}
-	annotation := sorted[0]
+
+	sort.Slice(annotations, func(i, j int) bool {
+		return annotations[i].PrefLabel < annotations[j].PrefLabel
+	})
+
+	annotation := annotations[0]
 	annIDs := ids[annotation.ID]
 	conceptTypes := h.Config.ConceptTypes
 
 	for _, taxonomy := range annotation.Types {
-		if annotation.Predicate == predicate {
-			tme := ""
-			switch taxonomy {
-			case conceptTypes.Get("organisation"):
-				tme = tmeOrganisations
-			case conceptTypes.Get("person"):
-				tme = tmePeople
-			case conceptTypes.Get("topic"):
-				tme = tmeTopics
-			case conceptTypes.Get("location"):
-				tme = tmeRegions
-			}
-			if tme != "" {
-				setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tme, annIDs))
-				break
-			}
+		tme := ""
+		switch taxonomy {
+		case conceptTypes.Get("organisation"):
+			tme = tmeOrganisations
+		case conceptTypes.Get("person"):
+			tme = tmePeople
+		case conceptTypes.Get("topic"):
+			tme = tmeTopics
+		case conceptTypes.Get("location"):
+			tme = tmeRegions
+		}
+		if tme != "" {
+			setPrimaryTheme(model, annotation.PrefLabel, getCmrIDWithFallback(tme, annIDs))
+			break
 		}
 	}
 }
 
-func filterSortAnnotations(annotations []schema.Thing, ids map[string][]string, predicate string) []schema.Thing {
+func filterAnnotations(annotations []schema.Thing, ids map[string][]string, predicate string) []schema.Thing {
 	var matchedAnnotations []schema.Thing
 
 	for _, annotation := range annotations {
@@ -132,9 +135,6 @@ func filterSortAnnotations(annotations []schema.Thing, ids map[string][]string, 
 			matchedAnnotations = append(matchedAnnotations, annotation)
 		}
 	}
-	sort.Slice(matchedAnnotations, func(i, j int) bool {
-		return matchedAnnotations[i].PrefLabel < matchedAnnotations[j].PrefLabel
-	})
 	return matchedAnnotations
 }
 
