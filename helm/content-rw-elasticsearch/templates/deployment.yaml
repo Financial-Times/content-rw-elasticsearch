@@ -48,6 +48,8 @@ spec:
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
         - name: KAFKA_CONSUMER_GROUP
           value: {{ .Values.service.name }}
+        - name: KAFKA_CLUSTER_ARN
+          value: {{ .Values.env.KAFKA_CLUSTER_ARN }}
         - name: KAFKA_TOPIC
           value: {{ .Values.env.KAFKA_TOPIC }}
         - name: KAFKA_TOPIC_OFFSET_FETCH_INTERVAL

@@ -68,7 +68,6 @@ func main() {
 	})
 	kafkaClusterArn := app.String(cli.StringOpt{
 		Name:   "kafka-cluster-arn",
-		Desc:   "Addresses used by the queue consumer to connect to Kafka",
 		EnvVar: "KAFKA_CLUSTER_ARN",
 	})
 	kafkaAddress := app.String(cli.StringOpt{
