@@ -16,12 +16,28 @@ jobs:
           ELASTICSEARCH_SAPI_ENDPOINT: http://localhost:9000
           GITHUB_USERNAME: ${GITHUB_USERNAME}
           GITHUB_TOKEN: ${GITHUB_TOKEN}
+          KAFKA_PROXY_ADDR: "http://localhost:9000"
+          KAFKA_ADDR: "localhost:29092"
+      - image: confluentinc/cp-zookeeper:6.0.0
+        environment:
+          ZOOKEEPER_CLIENT_PORT: 2181
+          ZOOKEEPER_TICK_TIME: 2000
+          ZOOKEEPER_ADMIN_ENABLE_SERVER: "false"
+      - image: confluentinc/cp-kafka:6.0.0
+        environment:
+          KAFKA_BROKER_ID: 1
+          KAFKA_ZOOKEEPER_CONNECT: localhost:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:29092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       - image: peteclarkft/ersatz:stable
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_ACCESS_TOKEN
     steps:
       - checkout
+      - run:
+          name: Wait for Kafka to start
+          command: sleep 5;
       - run:
           name: Download dredd
           command: |

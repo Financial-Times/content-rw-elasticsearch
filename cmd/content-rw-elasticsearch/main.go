@@ -108,6 +108,7 @@ func main() {
 	})
 	clusterArn := app.String(cli.StringOpt{
 		Name:   "kafka-cluster-arn",
+		Value:  "",
 		Desc:   "Amazon Resource Name for the kafka cluster",
 		EnvVar: "KAFKA_CLUSTER_ARN",
 	})
@@ -154,18 +155,22 @@ func main() {
 		mapperHandler := mapper.NewMapperHandler(concordanceAPIService, *baseAPIUrl, appConfig, log)
 
 		consumerConfig := kafka.ConsumerConfig{
-			ClusterArn:              clusterArn,
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
 			OffsetFetchInterval:     time.Duration(*kafkaTopicOffsetFetchInterval) * time.Minute,
 			Options:                 kafka.DefaultConsumerOptions(),
 		}
+
+		if *clusterArn != "" {
+			consumerConfig.ClusterArn = clusterArn
+		}
+
 		topics := []*kafka.Topic{
 			kafka.NewTopic(*kafkaTopic, kafka.WithLagTolerance(int64(*kafkaLagTolerance))),
 		}
 		messageConsumer, err := kafka.NewConsumer(consumerConfig, topics, log)
 		if err != nil {
-			log.WithError(err).Fatal("Failed to create Kafka producer")
+			log.WithError(err).Fatal("Failed to create Kafka consumer")
 		}
 
 		handler := message.NewMessageHandler(
