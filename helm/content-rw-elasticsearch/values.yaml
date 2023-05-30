@@ -4,6 +4,7 @@
 service:
   name: "" # The name of the service, should be defined in the specific app-configs folder.
   hasHealthcheck: "true"
+  serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount
 replicaCount: 2
 image:
   repository: coco/content-rw-elasticsearch
@@ -18,4 +19,3 @@ env:
   KAFKA_TOPIC: ""
   PUBLIC_CONCORDANCES_ENDPOINT: ""
   ELASTICSEARCH_SAPI_INDEX: "ft-v1"
-serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount

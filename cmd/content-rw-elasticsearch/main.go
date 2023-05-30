@@ -13,7 +13,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
 	"github.com/Financial-Times/go-logger/v2"
-	"github.com/Financial-Times/kafka-client-go/v3"
+	"github.com/Financial-Times/kafka-client-go/v4"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cli "github.com/jawher/mow.cli"
@@ -106,6 +106,11 @@ func main() {
 		Desc:   "Base API URL",
 		EnvVar: "BASE_API_URL",
 	})
+	clusterArn := app.String(cli.StringOpt{
+		Name:   "kafka-cluster-arn",
+		Desc:   "Amazon Resource Name for the kafka cluster",
+		EnvVar: "KAFKA_CLUSTER_ARN",
+	})
 
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
@@ -149,16 +154,19 @@ func main() {
 		mapperHandler := mapper.NewMapperHandler(concordanceAPIService, *baseAPIUrl, appConfig, log)
 
 		consumerConfig := kafka.ConsumerConfig{
+			ClusterArn:              clusterArn,
 			BrokersConnectionString: *kafkaAddress,
 			ConsumerGroup:           *kafkaConsumerGroup,
-			ConnectionRetryInterval: time.Minute,
 			OffsetFetchInterval:     time.Duration(*kafkaTopicOffsetFetchInterval) * time.Minute,
 			Options:                 kafka.DefaultConsumerOptions(),
 		}
 		topics := []*kafka.Topic{
 			kafka.NewTopic(*kafkaTopic, kafka.WithLagTolerance(int64(*kafkaLagTolerance))),
 		}
-		messageConsumer := kafka.NewConsumer(consumerConfig, topics, log)
+		messageConsumer, err := kafka.NewConsumer(consumerConfig, topics, log)
+		if err != nil {
+			log.WithError(err).Fatal("Failed to create Kafka producer")
+		}
 
 		handler := message.NewMessageHandler(
 			esService,
