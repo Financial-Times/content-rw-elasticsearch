@@ -66,6 +66,11 @@ spec:
             configMapKeyRef:
               name: global-config
               key: api.host.with.protocol
+        - name: KAFKA_CLUSTER_ARN
+          valueFrom:
+            configMapKeyRef:
+              name: global-config
+              key: msk.kafka.cluster.arn
         ports:
         - containerPort: 8080
         livenessProbe:
