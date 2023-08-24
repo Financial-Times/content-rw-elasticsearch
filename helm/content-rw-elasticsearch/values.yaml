@@ -4,7 +4,7 @@
 service:
   name: "" # The name of the service, should be defined in the specific app-configs folder.
   hasHealthcheck: "true"
-  serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount
+serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount
 replicaCount: 2
 image:
   repository: coco/content-rw-elasticsearch
