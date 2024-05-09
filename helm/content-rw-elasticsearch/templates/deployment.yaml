@@ -44,6 +44,10 @@ spec:
             configMapKeyRef:
               name: global-config
               key: aws.region
+        - name: OPA_URL
+          value: "{{ .Values.env.opaURL }}"
+        - name: FILTER_SV_POLICY_PATH
+          value: "{{ .Values.env.filterSVPolicyPath }}"
         - name: ELASTICSEARCH_SAPI_INDEX
           value: "{{ .Values.env.ELASTICSEARCH_SAPI_INDEX }}"
         - name: KAFKA_CONSUMER_GROUP
@@ -85,3 +89,43 @@ spec:
           periodSeconds: 30
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+      {{- if .Values.openPolicyAgentSidecar }}
+      - name: "{{ .Values.openPolicyAgentSidecar.name }}"
+        image: "{{ .Values.openPolicyAgentSidecar.repository }}:{{ .Values.openPolicyAgentSidecar.tag }}"
+        imagePullPolicy: {{ .Values.openPolicyAgentSidecar.pullPolicy }}
+        env:
+          - name: POLICY_BUCKET
+            valueFrom:
+              configMapKeyRef:
+                name: global-config
+                key: opa.policy2.bucket
+        ports:
+          - name: http
+            containerPort: 8181
+        livenessProbe:
+          httpGet:
+            path: /health
+            scheme: HTTP
+            port: 8181
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health?bundle=true
+            scheme: HTTP
+            port: 8181
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        args:
+          - "run"
+          - "--ignore=.*"
+          - "--server"
+          - "--log-level=error"
+          - "--log-format=json"
+          - "--set=services.bundlesS3Bucket.url=$(POLICY_BUCKET)"
+          - "--set=services.bundlesS3Bucket.credentials.s3_signing.web_identity_credentials.aws_region=$(AWS_REGION)"
+          - "--set=bundles.enrichedContentRWPostgres.service=bundlesS3Bucket"
+          - "--set=bundles.enrichedContentRWPostgres.resource=content-rw-elasticsearch.bundle.tar.gz"
+          - "--set=bundles.enrichedContentRWPostgres.polling.min_delay_seconds=120"
+          - "--set=bundles.enrichedContentRWPostgres.polling.max_delay_seconds=300"
+      {{- end}}

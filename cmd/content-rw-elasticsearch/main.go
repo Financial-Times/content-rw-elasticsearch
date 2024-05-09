@@ -12,8 +12,10 @@ import (
 	pkghttp "github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/http"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/message"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/policy"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v4"
+	"github.com/Financial-Times/opa-client-go"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	cli "github.com/jawher/mow.cli"
@@ -112,6 +114,18 @@ func main() {
 		Desc:   "Amazon Resource Name for the kafka cluster",
 		EnvVar: "KAFKA_CLUSTER_ARN",
 	})
+	opaURL := app.String(cli.StringOpt{
+		Name:   "opaURL",
+		Desc:   "Open Policy Agent sidecar address",
+		Value:  "http://localhost:8181",
+		EnvVar: "OPA_URL",
+	})
+	filterSVPolicyPath := app.String(cli.StringOpt{
+		Name:   "filterSVPolicyPath",
+		Desc:   "The path to the OPA module in OPA module",
+		Value:  "content_rw_elasticsearch/content_msg_evaluator",
+		EnvVar: "FILTER_SV_POLICY_PATH",
+	})
 
 	log := logger.NewUPPLogger(*appSystemCode, *logLevel)
 	log.Info("[Startup] Application is starting")
@@ -173,6 +187,13 @@ func main() {
 			log.WithError(err).Fatal("Failed to create Kafka consumer")
 		}
 
+		paths := map[string]string{
+			policy.FilterSVContent: *filterSVPolicyPath,
+		}
+
+		opaClient := opa.NewOpenPolicyAgentClient(*opaURL, paths, opa.WithLogger(log))
+		opaAgent := policy.NewOpenPolicyAgent(opaClient, log)
+
 		handler := message.NewMessageHandler(
 			esService,
 			mapperHandler,
@@ -180,6 +201,7 @@ func main() {
 			messageConsumer,
 			es.NewClient,
 			log,
+			opaAgent,
 		)
 
 		handler.Start(*baseAPIUrl, accessConfig)

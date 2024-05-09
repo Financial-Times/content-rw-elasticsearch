@@ -4,6 +4,11 @@
 service:
   name: "" # The name of the service, should be defined in the specific app-configs folder.
   hasHealthcheck: "true"
+openPolicyAgentSidecar:
+  name: open-policy-agent
+  repository: openpolicyagent/opa
+  tag: 0.62.1
+  pullPolicy: IfNotPresent
 serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount
 replicaCount: 2
 image:
@@ -16,6 +21,8 @@ resources:
   limits:
     memory: 512Mi
 env:
+  opaURL: "http://localhost:8181"
+  filterSVPolicyPath: "content_rw_elasticsearch/content_msg_evaluator"
   KAFKA_TOPIC: ""
   PUBLIC_CONCORDANCES_ENDPOINT: ""
   ELASTICSEARCH_SAPI_INDEX: "ft-v1"
