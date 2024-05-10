@@ -39,24 +39,15 @@ jobs:
           name: Wait for Kafka to start
           command: sleep 5;
       - run:
-          name: Download dredd
-          command: |
-            GOPRIVATE="github.com/Financial-Times"
-            git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
-            curl -sL https://deb.nodesource.com/setup_14.x | bash -
-            DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=14.\*
-            npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@11.2.19
-            rm -rf /var/lib/apt/lists/*
-            go get -u github.com/myitcv/gobin
-      - run:
           name: Load ersatz-fixtures.yml to ersatz image
           command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
       - run:
-          name: Go Build
+          name: Download Dredd
           command: |
-            GOPRIVATE="github.com/Financial-Times"
-            git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
-            go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+            curl -sL https://deb.nodesource.com/setup_12.x | bash -
+            DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=12.\*
+            npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@8.0.0
+            rm -rf /var/lib/apt/lists/*
       - run:
           name: Dredd API Testing
           command: dredd
