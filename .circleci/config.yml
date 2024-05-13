@@ -29,6 +29,8 @@ jobs:
           KAFKA_ZOOKEEPER_CONNECT: localhost:2181
           KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:29092
           KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - image: openpolicyagent/opa:0.62.1
+        command: [ "run", "--server", "--addr=0.0.0.0:8181", "--log-level=error", "--log-format=json"]
       - image: peteclarkft/ersatz:stable
         auth:
           username: $DOCKERHUB_USERNAME
@@ -48,6 +50,12 @@ jobs:
             DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=12.\*
             npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@8.0.0
             rm -rf /var/lib/apt/lists/*
+      - run:
+          name: Add a dummy OPA policy.
+          command: |
+            curl --location --request PUT 'localhost:8181/v1/policies/c1d20fbc-e9bc-44fb-8b88-0e01d6b13225' \
+            --header 'Content-Type: text/plain' \
+            --data 'package content_rw_elasticsearch/content_msg_evaluator" default skip := false'
       - run:
           name: Dredd API Testing
           command: dredd
