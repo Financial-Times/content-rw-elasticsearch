@@ -27,6 +27,10 @@ jobs:
           KAFKA_ZOOKEEPER_CONNECT: localhost:2181
           KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_HOST://localhost:29092
           KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - image: peteclarkft/ersatz:stable
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_ACCESS_TOKEN
       - image: openpolicyagent/opa:latest
         command: [ "run", "--server", "--addr=0.0.0.0:8181", "--log-level=error", "--log-format=json"]
     steps:
@@ -46,6 +50,9 @@ jobs:
             GOPRIVATE="github.com/Financial-Times"
             git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
             go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+      - run:
+          name: Load ersatz-fixtures.yml to ersatz image
+          command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
       - run:
           name: Download Dredd
           command: |
