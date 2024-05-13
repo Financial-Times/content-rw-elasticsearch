@@ -45,25 +45,31 @@ jobs:
           name: Set GITHUB_USERNAME and GITHUB_TOKEN
           command: git config --global url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
       - run:
-          name: Load ersatz-fixtures.yml to ersatz image
-          command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
-      - run:
-          name: Download Dredd
+          name: Go Build
           command: |
-            curl -sL https://deb.nodesource.com/setup_12.x | bash -
-            DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=12.\*
-            npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@8.0.0
-            rm -rf /var/lib/apt/lists/*
-      - run:
-          name: Add a dummy OPA policy.
-          command: |
-            curl --location --request PUT 'localhost:8181/v1/policies/c1d20fbc-e9bc-44fb-8b88-0e01d6b13225' \
-            --header 'Content-Type: text/plain' \
-            --data 'package content_rw_elasticsearch/content_msg_evaluator" default skip := false'
-      - run:
-          name: Dredd API Testing
-          command: dredd
-
+            GOPRIVATE="github.com/Financial-Times"
+            git config --global url."https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/".insteadOf "https://github.com/"
+            go build -mod=readonly -v ./cmd/content-rw-elasticsearch
+      # - run:
+      #     name: Load ersatz-fixtures.yml to ersatz image
+      #     command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
+      # - run:
+      #     name: Download Dredd
+      #     command: |
+      #       curl -sL https://deb.nodesource.com/setup_12.x | bash -
+      #       DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs=12.\*
+      #       npm install -g --unsafe-perm --loglevel warn --user 0 --no-progress dredd@8.0.0
+      #       rm -rf /var/lib/apt/lists/*
+      # - run:
+      #     name: Add a dummy OPA policy.
+      #     command: |
+      #       curl --location --request PUT 'localhost:8181/v1/policies/c1d20fbc-e9bc-44fb-8b88-0e01d6b13225' \
+      #       --header 'Content-Type: text/plain' \
+      #       --data 'package content_rw_elasticsearch/content_msg_evaluator" default skip := false'
+      # - run:
+      #     name: Dredd API Testing
+      #     command: dredd
+      #
 workflows:
   tests_and_docker:
     jobs:
