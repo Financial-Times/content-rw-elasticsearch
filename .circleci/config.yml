@@ -5,6 +5,7 @@ orbs:
 
 jobs:
   dredd:
+    working_directory: /go/src/github.com/Financial-Times/content-rw-elasticsearch
     docker:
       - image: golang:1
         environment:
@@ -43,9 +44,6 @@ jobs:
       - run:
           name: Set GITHUB_USERNAME and GITHUB_TOKEN
           command: git config --global url."https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
-      - run:
-          name: Go Build
-          command: go build -mod=readonly -v
       - run:
           name: Load ersatz-fixtures.yml to ersatz image
           command: "curl -X POST --data-binary @_ft/ersatz-fixtures.yml -H \"Content-type: text/x-yaml\" http://localhost:9000/__configure"
