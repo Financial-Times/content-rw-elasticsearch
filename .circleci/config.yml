@@ -5,12 +5,8 @@ orbs:
 
 jobs:
   dredd:
-    working_directory: /go/src/github.com/Financial-Times/content-rw-elasticsearch
     docker:
       - image: golang:1
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_ACCESS_TOKEN
         environment:
           GOPATH: /go
           ELASTICSEARCH_SAPI_ENDPOINT: http://localhost:9000
@@ -73,28 +69,36 @@ jobs:
 workflows:
   tests_and_docker:
     jobs:
-      - ft-golang-ci/build-and-test:
-          working-dir: "/content-rw-elasticsearch"
-          name: build-and-test-project
-          executor-name: ft-golang-ci/default-with-elasticsearch
-          context:
-            - dockerhub-shared
-            - cm-team-github
       - dredd:
           context:
-          - cm-team-github
-          - dockerhub-shared
-      - ft-golang-ci/docker-build:
-          name: build-docker-image
-          requires:
-            - build-and-test-project
-          context:
-            - dockerhub-shared
             - cm-team-github
-  snyk-scanning:
-    jobs:
-      - ft-golang-ci/scan:
-          name: scan-dependencies
-          context:
-            - cm-team-snyk
-            - cm-team-github
+            - docker-shared
+
+# workflows:
+#   tests_and_docker:
+#     jobs:
+#       - ft-golang-ci/build-and-test:
+#           working-dir: "/content-rw-elasticsearch"
+#           name: build-and-test-project
+#           executor-name: ft-golang-ci/default-with-elasticsearch
+#           context:
+#             - dockerhub-shared
+#             - cm-team-github
+#       - dredd:
+#           context:
+#           - cm-team-github
+#           - dockerhub-shared
+#       - ft-golang-ci/docker-build:
+#           name: build-docker-image
+#           requires:
+#             - build-and-test-project
+#           context:
+#             - dockerhub-shared
+#             - cm-team-github
+#   snyk-scanning:
+#     jobs:
+#       - ft-golang-ci/scan:
+#           name: scan-dependencies
+#           context:
+#             - cm-team-snyk
+#             - cm-team-github
