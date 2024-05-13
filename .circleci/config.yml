@@ -81,7 +81,9 @@ workflows:
             - dockerhub-shared
             - cm-team-github
       - dredd:
-          context: dockerhub-shared
+          context:
+          - cm-team-github
+          - dockerhub-shared
       - ft-golang-ci/docker-build:
           name: build-docker-image
           requires:
