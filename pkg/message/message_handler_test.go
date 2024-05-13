@@ -14,6 +14,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/policy"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	testdata "github.com/Financial-Times/content-rw-elasticsearch/v4/test"
 	"github.com/Financial-Times/go-logger/v2"
@@ -23,6 +24,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
+
+type mockOpaAgent struct {
+	returnResult *policy.ContentPolicyResult
+	returnError  error
+}
+
+func (m mockOpaAgent) EvaluateContentPolicy(_ map[string]interface{}) (*policy.ContentPolicyResult, error) {
+	return m.returnResult, m.returnError
+}
 
 type esServiceMock struct {
 	mock.Mock
@@ -152,10 +162,14 @@ func mockMessageHandler(esClient ESClient, mocks ...interface{}) (es.AccessConfi
 
 	var handler *Handler
 
+	opaAgent := mockOpaAgent{
+		returnResult: &policy.ContentPolicyResult{},
+	}
+
 	if esService == nil {
-		handler = NewMessageHandler(es.NewService("index"), mapperHandler, http.DefaultClient, consumer, esClient, uppLogger)
+		handler = NewMessageHandler(es.NewService("index"), mapperHandler, http.DefaultClient, consumer, esClient, uppLogger, opaAgent)
 	} else {
-		handler = NewMessageHandler(esService, mapperHandler, http.DefaultClient, consumer, esClient, uppLogger)
+		handler = NewMessageHandler(esService, mapperHandler, http.DefaultClient, consumer, esClient, uppLogger, opaAgent)
 	}
 
 	return accessConfig, handler

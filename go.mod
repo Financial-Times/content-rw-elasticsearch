@@ -9,7 +9,7 @@ require (
 	github.com/Financial-Times/service-status-go v0.3.0
 	github.com/Financial-Times/transactionid-utils-go v1.0.0
 	github.com/aws/aws-sdk-go v1.52.3
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/jawher/mow.cli v1.2.0
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
@@ -18,6 +18,7 @@ require (
 )
 
 require (
+	github.com/Financial-Times/opa-client-go v1.1.2 // indirect
 	github.com/IBM/sarama v1.43.2 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.26.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.27.11 // indirect

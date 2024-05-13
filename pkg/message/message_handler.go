@@ -11,6 +11,7 @@ import (
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/config"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/es"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/mapper"
+	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/policy"
 	"github.com/Financial-Times/content-rw-elasticsearch/v4/pkg/schema"
 	"github.com/Financial-Times/go-logger/v2"
 	"github.com/Financial-Times/kafka-client-go/v4"
@@ -38,16 +39,28 @@ type Consumer interface {
 	MonitorCheck() error
 }
 
-type Handler struct {
-	esService  es.Service
-	consumer   Consumer
-	mapper     *mapper.Handler
-	httpClient *http.Client
-	esClient   ESClient
-	log        *logger.UPPLogger
+type evaluator interface {
+	EvaluateContentPolicy(q map[string]interface{}) (*policy.ContentPolicyResult, error)
 }
 
-func NewMessageHandler(service es.Service, mapper *mapper.Handler, httpClient *http.Client, consumer Consumer, esClient ESClient, logger *logger.UPPLogger) *Handler {
+type Handler struct {
+	esService       es.Service
+	consumer        Consumer
+	mapper          *mapper.Handler
+	httpClient      *http.Client
+	esClient        ESClient
+	log             *logger.UPPLogger
+	policyEvaluator evaluator
+}
+
+func NewMessageHandler(
+	service es.Service,
+	mapper *mapper.Handler,
+	httpClient *http.Client,
+	consumer Consumer,
+	esClient ESClient,
+	logger *logger.UPPLogger,
+	evaluator evaluator) *Handler {
 	indexer := &Handler{
 		esService:  service,
 		consumer:   consumer,
@@ -111,6 +124,23 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 	if combinedPostPublicationEvent.Content.BodyXML != "" && combinedPostPublicationEvent.Content.Body == "" {
 		combinedPostPublicationEvent.Content.Body = combinedPostPublicationEvent.Content.BodyXML
 		combinedPostPublicationEvent.Content.BodyXML = ""
+	}
+
+	input := map[string]interface{}{
+		"payload": map[string]interface{}{
+			"publication": combinedPostPublicationEvent.Publication,
+		},
+	}
+
+	res, err := h.policyEvaluator.EvaluateContentPolicy(input)
+	if err != nil {
+		log.WithError(err).Error("Error with policy evaluation")
+		return
+	}
+
+	if res.Skip {
+		log.WithField("reasons", res.Reasons).Info("Skipping SV content")
+		return
 	}
 
 	if !isAllowedType(combinedPostPublicationEvent.Content.Type) {
