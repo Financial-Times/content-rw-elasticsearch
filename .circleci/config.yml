@@ -67,6 +67,7 @@ workflows:
     jobs:      
       - ft-golang-ci/build-and-test:
           name: build-and-test-project
+          working-dir: "/content-rw-elasticsearch"
           executor-name: ft-golang-ci/default-with-elasticsearch
           context:
             - dockerhub-shared
