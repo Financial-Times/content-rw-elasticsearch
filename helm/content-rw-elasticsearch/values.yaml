@@ -10,12 +10,19 @@ image:
   repository: coco/content-rw-elasticsearch
   version: "" # should be set explicitly at installation
   pullPolicy: IfNotPresent
+openPolicyAgentSidecar:
+  name: open-policy-agent
+  repository: openpolicyagent/opa
+  tag: 0.62.1
+  pullPolicy: IfNotPresent
 resources:
   requests:
     memory: 64Mi
   limits:
     memory: 512Mi
 env:
+  opaURL: "http://localhost:8181"
+  filterSVPolicyPath: "content_rw_elasticsearch/content_msg_evaluator"
   KAFKA_TOPIC: ""
   PUBLIC_CONCORDANCES_ENDPOINT: ""
   ELASTICSEARCH_SAPI_INDEX: "ft-v1"

@@ -6,10 +6,11 @@ require (
 	github.com/Financial-Times/go-fthealth v0.6.2
 	github.com/Financial-Times/go-logger/v2 v2.0.1
 	github.com/Financial-Times/kafka-client-go/v4 v4.2.2
+	github.com/Financial-Times/opa-client-go v1.1.2
 	github.com/Financial-Times/service-status-go v0.3.0
 	github.com/Financial-Times/transactionid-utils-go v1.0.0
 	github.com/aws/aws-sdk-go v1.52.3
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/jawher/mow.cli v1.2.0
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/pborman/uuid v0.0.0-20170612153648-e790cca94e6c
