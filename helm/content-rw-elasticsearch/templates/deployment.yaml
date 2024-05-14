@@ -124,8 +124,8 @@ spec:
           - "--log-format=json"
           - "--set=services.bundlesS3Bucket.url=$(POLICY_BUCKET)"
           - "--set=services.bundlesS3Bucket.credentials.s3_signing.web_identity_credentials.aws_region=$(AWS_REGION)"
-          - "--set=bundles.enrichedContentRWPostgres.service=bundlesS3Bucket"
-          - "--set=bundles.enrichedContentRWPostgres.resource=content-rw-elasticsearch.bundle.tar.gz"
-          - "--set=bundles.enrichedContentRWPostgres.polling.min_delay_seconds=120"
-          - "--set=bundles.enrichedContentRWPostgres.polling.max_delay_seconds=300"
+          - "--set=bundles.contentRWElasticsearch.service=bundlesS3Bucket"
+          - "--set=bundles.contentRWElasticsearch.resource=content-rw-elasticsearch.bundle.tar.gz"
+          - "--set=bundles.contentRWElasticsearch.polling.min_delay_seconds=120"
+          - "--set=bundles.contentRWElasticsearch.polling.max_delay_seconds=300"
       {{- end}}
