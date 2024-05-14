@@ -124,3 +124,4 @@ Shows ES cluster health details
 An example of event structure is here [testdata/exampleEnrichedContentModel.json](test/testdata/exampleEnrichedContentModel.json)
 
 The reference mappings for Elasticsearch are found here [configs/referenceSchema.json](configs/referenceSchema.json)
+
