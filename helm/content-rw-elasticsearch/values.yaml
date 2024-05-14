@@ -4,16 +4,16 @@
 service:
   name: "" # The name of the service, should be defined in the specific app-configs folder.
   hasHealthcheck: "true"
-openPolicyAgentSidecar:
-  name: open-policy-agent
-  repository: openpolicyagent/opa
-  tag: 0.62.1
-  pullPolicy: IfNotPresent
 serviceAccountName: eksctl-content-rw-elasticsearch-serviceaccount
 replicaCount: 2
 image:
   repository: coco/content-rw-elasticsearch
   version: "" # should be set explicitly at installation
+  pullPolicy: IfNotPresent
+openPolicyAgentSidecar:
+  name: open-policy-agent
+  repository: openpolicyagent/opa
+  tag: 0.62.1
   pullPolicy: IfNotPresent
 resources:
   requests:
