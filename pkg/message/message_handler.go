@@ -122,7 +122,7 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 
 	input := map[string]interface{}{
 		"payload": map[string]interface{}{
-			"publication": combinedPostPublicationEvent.Publication,
+			"publication": combinedPostPublicationEvent.Content.Publication,
 		},
 	}
 
