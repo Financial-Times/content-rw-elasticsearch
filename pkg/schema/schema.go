@@ -96,7 +96,6 @@ type EnrichedContent struct {
 	ContentURI      string          `json:"contentUri"`
 	LastModified    string          `json:"lastModified"`
 	Deleted         bool            `json:"deleted"`
-	Publication     []string        `json:"publication,omitempty"`
 }
 
 type Content struct {
@@ -119,6 +118,7 @@ type Content struct {
 	Scoop              bool         `json:"scoop"`
 	CanBeSyndicated    *string      `json:"canBeSyndicated"`
 	CanBeDistributed   *string      `json:"canBeDistributed"`
+	Publication        []string     `json:"publication"`
 }
 
 type dataSource struct {
