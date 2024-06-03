@@ -147,7 +147,7 @@ func (h *Handler) handleMessage(msg kafka.FTMessage) {
 	log.Info(fmt.Sprintf("Processing combined post publication event with type %s", combinedPostPublicationEvent.Content.Type))
 
 	contentType := h.readContentType(msg, combinedPostPublicationEvent)
-	if contentType == "" && msg.Headers[originHeader] != config.PACOrigin {
+	if contentType == "" && msg.Headers[originHeader] != config.FTPinkAnnotationsOrigin {
 		log.Error("Failed to index content. Could not infer type of content")
 		return
 	}

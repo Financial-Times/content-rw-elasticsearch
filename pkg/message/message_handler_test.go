@@ -483,16 +483,16 @@ func TestHandleSyntheticMessage(t *testing.T) {
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything)
 }
 
-func TestHandlePACMessage(t *testing.T) {
+func TestHandleFTPinkAnnotationsMessage(t *testing.T) {
 	serviceMock := &esServiceMock{}
 	_, handler := mockMessageHandler(defaultESClient, serviceMock)
-	handler.handleMessage(kafka.FTMessage{Headers: map[string]string{"Origin-System-Id": config.PACOrigin}, Body: "{}"})
+	handler.handleMessage(kafka.FTMessage{Headers: map[string]string{"Origin-System-Id": config.FTPinkAnnotationsOrigin}, Body: "{}"})
 
 	serviceMock.AssertNotCalled(t, "WriteData", mock.Anything, mock.Anything)
 	serviceMock.AssertNotCalled(t, "DeleteData", mock.Anything)
 }
 
-func TestHandlePACMessageWithOldSparkContent(t *testing.T) {
+func TestHandleFTPinkAnnotationsMessageWithOldSparkContent(t *testing.T) {
 	input := modifyTestInputAuthority("cct")
 
 	serviceMock := &esServiceMock{}
@@ -501,13 +501,13 @@ func TestHandlePACMessageWithOldSparkContent(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{originHeader: config.FTPinkAnnotationsOrigin}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
 }
 
-func TestHandlePACMessageWithSparkContent(t *testing.T) {
+func TestHandleFTPinkAnnotationsMessageWithSparkContent(t *testing.T) {
 	input := modifyTestInputAuthority("spark")
 
 	serviceMock := &esServiceMock{}
@@ -516,7 +516,7 @@ func TestHandlePACMessageWithSparkContent(t *testing.T) {
 	concordanceAPIMock.On("GetConcepts", mock.AnythingOfType("string"), mock.AnythingOfType("[]string")).Return(map[string]concept.Model{}, nil)
 
 	_, handler := mockMessageHandler(defaultESClient, serviceMock, concordanceAPIMock)
-	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{originHeader: config.PACOrigin}})
+	handler.handleMessage(kafka.FTMessage{Body: input, Headers: map[string]string{originHeader: config.FTPinkAnnotationsOrigin}})
 
 	serviceMock.AssertExpectations(t)
 	concordanceAPIMock.AssertExpectations(t)
