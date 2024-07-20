@@ -24,7 +24,7 @@ const (
 	AudioType     = "audio"
 	LiveEventType = "live-event"
 
-	PACOrigin = "http://cmdb.ft.com/systems/pac"
+	FTPinkAnnotationsOrigin = "http://cmdb.ft.com/systems/ft-pink-annotations"
 
 	ContentTypeAudio = "Audio"
 )
